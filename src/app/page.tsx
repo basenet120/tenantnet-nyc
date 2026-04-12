@@ -12,11 +12,25 @@ export default async function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="text-center max-w-sm">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">TENANTNET.NYC</h1>
-        <p className="text-gray-600 mb-6">449 West 125th Street</p>
-        <p className="text-sm text-gray-500">
+    <div className="min-h-dvh flex items-center justify-center px-4">
+      <div className="border-2 border-[var(--color-border-light)] p-8 sm:p-12 max-w-lg w-full text-center">
+        <h1 className="font-display text-5xl sm:text-7xl uppercase leading-[0.9] tracking-tight text-offwhite mb-6">
+          TENANT
+          <br />
+          NET
+          <span className="text-terracotta">.NYC</span>
+        </h1>
+
+        <div className="border-t-2 border-b-2 border-[var(--color-border)] py-3 mb-6">
+          <p className="font-display text-lg sm:text-xl uppercase tracking-widest text-offwhite">
+            449 West 125th Street
+          </p>
+          <p className="font-display text-sm uppercase tracking-[0.2em] text-[var(--color-text-secondary)] mt-1">
+            Harlem, New York
+          </p>
+        </div>
+
+        <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
           Scan the QR code on your apartment door to access the building forum.
         </p>
       </div>

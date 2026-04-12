@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PostCard } from "@/components/post-card";
@@ -49,20 +50,33 @@ export default async function DashboardPage() {
   ]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-4 py-4">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <h1 className="text-lg font-bold tracking-tight">TENANTNET.NYC</h1>
-          <span className="text-sm text-gray-500">Unit {session.unitLabel}</span>
+    <div className="min-h-dvh">
+      {/* Header */}
+      <header className="border-b-2 border-[var(--color-border)] px-4 py-5">
+        <div className="container-narrow flex items-center justify-between">
+          <div>
+            <h1 className="font-display text-xl uppercase tracking-tight text-offwhite">
+              449 W 125th St
+            </h1>
+            <p className="text-xs uppercase tracking-[0.15em] text-[var(--color-text-secondary)] mt-0.5">
+              Tenantnet.nyc
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="badge badge-terracotta">Unit {session.unitLabel}</span>
+            <Link href="/new-post" className="btn btn-primary btn-sm no-underline">
+              + New Post
+            </Link>
+          </div>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-6 space-y-8">
+      <main className="container-narrow py-8 space-y-10">
         {/* Pinned Bulletins */}
         {pinnedBulletins.length > 0 && (
           <section>
-            <h2 className="text-sm font-semibold text-gray-900 mb-3">Pinned Bulletins</h2>
-            <div className="space-y-2">
+            <h2 className="section-label">Pinned Bulletins</h2>
+            <div className="space-y-3">
               {pinnedBulletins.map((post: PostWithRelations) => (
                 <PostCard
                   key={post.id}
@@ -85,8 +99,8 @@ export default async function DashboardPage() {
         {/* Your Open Issues */}
         {myIssues.length > 0 && (
           <section>
-            <h2 className="text-sm font-semibold text-gray-900 mb-3">Your Open Issues</h2>
-            <div className="space-y-2">
+            <h2 className="section-label">Your Open Issues</h2>
+            <div className="space-y-3">
               {myIssues.map((post: PostWithRelations) => (
                 <PostCard
                   key={post.id}
@@ -108,14 +122,14 @@ export default async function DashboardPage() {
 
         {/* Sections */}
         <section>
-          <h2 className="text-sm font-semibold text-gray-900 mb-3">Sections</h2>
+          <h2 className="section-label">Sections</h2>
           <SectionNav sections={sections} />
         </section>
 
         {/* Recent Posts */}
         <section>
-          <h2 className="text-sm font-semibold text-gray-900 mb-3">Recent Posts</h2>
-          <div className="space-y-2">
+          <h2 className="section-label">Recent Posts</h2>
+          <div className="space-y-3">
             {recentPosts.map((post: PostWithRelations) => (
               <PostCard
                 key={post.id}
@@ -132,7 +146,9 @@ export default async function DashboardPage() {
               />
             ))}
             {recentPosts.length === 0 && (
-              <p className="text-sm text-gray-500 text-center py-8">No posts yet. Be the first to post!</p>
+              <p className="text-sm text-[var(--color-text-secondary)] text-center py-12">
+                No posts yet. Be the first to post!
+              </p>
             )}
           </div>
         </section>

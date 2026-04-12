@@ -50,13 +50,13 @@ export default async function SectionFeedPage({
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-dvh">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-4">
-        <div className="max-w-2xl mx-auto flex items-center gap-3">
+      <header className="border-b-2 border-[var(--color-border)] px-4 py-5">
+        <div className="container-narrow flex items-center gap-4">
           <Link
             href="/dashboard"
-            className="text-gray-600 hover:text-gray-900"
+            className="text-[var(--color-text-secondary)] hover:text-offwhite transition-colors"
             aria-label="Back to dashboard"
           >
             <svg
@@ -73,18 +73,20 @@ export default async function SectionFeedPage({
             </svg>
           </Link>
           <div className="flex-1">
-            <h1 className="text-lg font-semibold text-gray-900">
+            <h1 className="font-display text-2xl uppercase tracking-tight text-offwhite">
               {section.name}
             </h1>
-            <p className="text-sm text-gray-500">{session.unitLabel}</p>
+            <p className="text-xs uppercase tracking-[0.15em] text-[var(--color-text-secondary)] mt-0.5">
+              Unit {session.unitLabel}
+            </p>
           </div>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-6">
-        {/* Status filter pills (only for issue-tracking sections) */}
+      <main className="container-narrow py-8">
+        {/* Status filter pills */}
         {section.hasIssueTracking && (
-          <div className="flex gap-2 overflow-x-auto pb-4">
+          <div className="flex gap-2 overflow-x-auto pb-6">
             {STATUS_OPTIONS.map((option) => {
               const isActive =
                 option === "all"
@@ -98,10 +100,10 @@ export default async function SectionFeedPage({
                       ? `/section/${slug}`
                       : `/section/${slug}?status=${option}`
                   }
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium capitalize whitespace-nowrap ${
+                  className={`px-4 py-2 text-xs font-display uppercase tracking-[0.08em] border-2 whitespace-nowrap no-underline transition-colors ${
                     isActive
-                      ? "bg-gray-900 text-white"
-                      : "bg-white border border-gray-200 text-gray-600"
+                      ? "bg-terracotta border-terracotta text-offwhite"
+                      : "bg-transparent border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-light)]"
                   }`}
                 >
                   {option}
@@ -114,28 +116,18 @@ export default async function SectionFeedPage({
         {/* New Post button */}
         <Link
           href={`/new-post?section=${slug}`}
-          className="mb-6 flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 transition-colors"
+          className="btn btn-primary w-full mb-8 no-underline"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-              clipRule="evenodd"
-            />
-          </svg>
-          New Post
+          + New Post
         </Link>
 
         {/* Post list */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {posts.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <p className="text-sm">No posts yet. Be the first to post!</p>
+            <div className="text-center py-16">
+              <p className="text-[var(--color-text-secondary)] text-sm">
+                No posts yet. Be the first to post!
+              </p>
             </div>
           ) : (
             posts.map((post) => (

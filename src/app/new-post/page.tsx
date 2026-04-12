@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { ImageUpload } from "@/components/image-upload";
 import { IMAGE_LIMITS } from "@/lib/constants";
 
@@ -69,89 +70,121 @@ function NewPostForm() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold text-zinc-100">New Post</h1>
-
-      {error && (
-        <div className="mb-4 rounded-lg bg-red-900/50 px-4 py-3 text-sm text-red-300">
-          {error}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <label htmlFor="section" className="mb-1 block text-sm font-medium text-zinc-300">
-            Section
-          </label>
-          <select
-            id="section"
-            value={sectionId}
-            onChange={(e) => setSectionId(e.target.value)}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-zinc-100 focus:border-blue-500 focus:outline-none"
-            required
+    <div className="min-h-dvh">
+      {/* Header */}
+      <header className="border-b-2 border-[var(--color-border)] px-4 py-5">
+        <div className="container-narrow flex items-center gap-4">
+          <Link
+            href="/dashboard"
+            className="text-[var(--color-text-secondary)] hover:text-offwhite transition-colors"
+            aria-label="Back to dashboard"
           >
-            <option value="">Select a section...</option>
-            {sections.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </Link>
+          <h1 className="font-display text-xl uppercase tracking-tight text-offwhite">
+            New Post
+          </h1>
         </div>
+      </header>
 
-        <div>
-          <label htmlFor="title" className="mb-1 block text-sm font-medium text-zinc-300">
-            Title
-          </label>
-          <input
-            id="title"
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="What's this about?"
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
-            required
-          />
-        </div>
+      <main className="container-narrow py-8">
+        {error && (
+          <div className="mb-6 border-2 border-[var(--color-danger)] bg-[var(--color-danger)]/10 px-4 py-3 text-sm text-[var(--color-danger)]">
+            {error}
+          </div>
+        )}
 
-        <div>
-          <label htmlFor="body" className="mb-1 block text-sm font-medium text-zinc-300">
-            Details
-          </label>
-          <textarea
-            id="body"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Describe the issue or topic..."
-            rows={6}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
-            required
-          />
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="section" className="section-label block">
+              Section
+            </label>
+            <select
+              id="section"
+              value={sectionId}
+              onChange={(e) => setSectionId(e.target.value)}
+              required
+            >
+              <option value="">Select a section...</option>
+              {sections.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <div>
-          <label className="mb-1 block text-sm font-medium text-zinc-300">Photos</label>
-          <ImageUpload
-            maxImages={IMAGE_LIMITS.maxPerPost}
-            onImagesChange={setImageUrls}
-          />
-        </div>
+          <div>
+            <label htmlFor="title" className="section-label block">
+              Title
+            </label>
+            <input
+              id="title"
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="What's this about?"
+              required
+            />
+          </div>
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full rounded-lg bg-blue-600 px-4 py-2.5 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {submitting ? "Posting..." : "Create Post"}
-        </button>
-      </form>
+          <div>
+            <label htmlFor="body" className="section-label block">
+              Details
+            </label>
+            <textarea
+              id="body"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Describe the issue or topic..."
+              rows={6}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="section-label block">Photos</label>
+            <ImageUpload
+              maxImages={IMAGE_LIMITS.maxPerPost}
+              onImagesChange={setImageUrls}
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="btn btn-primary w-full disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {submitting ? "Posting..." : "Create Post"}
+          </button>
+        </form>
+      </main>
     </div>
   );
 }
 
 export default function NewPostPage() {
   return (
-    <Suspense fallback={<div className="px-4 py-8 text-center text-zinc-400">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-dvh flex items-center justify-center">
+          <p className="text-[var(--color-text-secondary)] text-sm uppercase tracking-wide">
+            Loading...
+          </p>
+        </div>
+      }
+    >
       <NewPostForm />
     </Suspense>
   );

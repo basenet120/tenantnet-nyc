@@ -45,13 +45,13 @@ export default async function PostPage({
       : "Unknown";
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-dvh">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-4">
-        <div className="max-w-2xl mx-auto flex items-center gap-3">
+      <header className="border-b-2 border-[var(--color-border)] px-4 py-5">
+        <div className="container-narrow flex items-center gap-4">
           <Link
             href={`/section/${post.section.slug}`}
-            className="text-gray-600 hover:text-gray-900"
+            className="text-[var(--color-text-secondary)] hover:text-offwhite transition-colors"
             aria-label="Back to section"
           >
             <svg
@@ -67,22 +67,22 @@ export default async function PostPage({
               />
             </svg>
           </Link>
-          <h1 className="text-lg font-semibold text-gray-900">
+          <h1 className="font-display text-lg uppercase tracking-tight text-offwhite">
             {post.section.name}
           </h1>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-6">
+      <main className="container-narrow py-8">
         {/* Post */}
-        <article className="bg-white border border-gray-200 rounded-lg p-5">
-          <div className="mb-3">
-            <h2 className="text-xl font-semibold text-gray-900">
+        <article className="card">
+          <div className="mb-4">
+            <h2 className="font-display text-xl sm:text-2xl uppercase leading-tight text-[var(--color-text-on-surface)]">
               {post.title}
             </h2>
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-gray-500">
-              <span>{authorLabel}</span>
-              <span>&middot;</span>
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-[var(--color-charcoal-lighter)]">
+              <span className="font-semibold">{authorLabel}</span>
+              <span aria-hidden="true">|</span>
               <time dateTime={post.createdAt.toISOString()}>
                 {post.createdAt.toLocaleDateString("en-US", {
                   month: "short",
@@ -91,21 +91,19 @@ export default async function PostPage({
                 })}
               </time>
               {post.isPinned && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                  Pinned
-                </span>
+                <span className="badge badge-amber">Pinned</span>
               )}
               {post.status && <StatusBadge status={post.status} />}
             </div>
           </div>
 
-          <div className="text-gray-800 text-sm whitespace-pre-wrap">
+          <div className="text-sm text-[var(--color-text-on-surface)] whitespace-pre-wrap leading-relaxed">
             {post.body}
           </div>
 
           {/* Post images */}
           {post.images.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-wrap gap-3">
               {post.images.map((image) => (
                 <a
                   key={image.id}
@@ -116,7 +114,7 @@ export default async function PostPage({
                   <img
                     src={image.url}
                     alt=""
-                    className="h-24 w-24 rounded-lg border border-gray-200 object-cover hover:opacity-80 transition-opacity"
+                    className="h-24 w-24 border-2 border-[var(--color-border)] object-cover hover:opacity-80 transition-opacity"
                   />
                 </a>
               ))}
@@ -125,24 +123,24 @@ export default async function PostPage({
         </article>
 
         {/* Comments */}
-        <section className="mt-6">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">
+        <section className="mt-8">
+          <h3 className="section-label">
             {post.comments.length}{" "}
             {post.comments.length === 1 ? "Comment" : "Comments"}
           </h3>
 
           {post.comments.length > 0 && (
-            <div className="space-y-4 mb-6">
+            <div className="space-y-3 mb-8">
               {post.comments.map((comment) => (
                 <div
                   key={comment.id}
-                  className="bg-white border border-gray-200 rounded-lg p-4"
+                  className="card-dark"
                 >
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                    <span className="font-medium text-gray-700">
+                  <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] mb-2">
+                    <span className="font-display uppercase tracking-wide text-offwhite">
                       Unit {comment.unit.label}
                     </span>
-                    <span>&middot;</span>
+                    <span aria-hidden="true">|</span>
                     <time dateTime={comment.createdAt.toISOString()}>
                       {comment.createdAt.toLocaleDateString("en-US", {
                         month: "short",
@@ -151,7 +149,7 @@ export default async function PostPage({
                       })}
                     </time>
                   </div>
-                  <p className="text-sm text-gray-800 whitespace-pre-wrap">
+                  <p className="text-sm text-offwhite whitespace-pre-wrap leading-relaxed">
                     {comment.body}
                   </p>
                   {comment.images.length > 0 && (
@@ -166,7 +164,7 @@ export default async function PostPage({
                           <img
                             src={image.url}
                             alt=""
-                            className="h-20 w-20 rounded-lg border border-gray-200 object-cover hover:opacity-80 transition-opacity"
+                            className="h-20 w-20 border-2 border-[var(--color-border)] object-cover hover:opacity-80 transition-opacity"
                           />
                         </a>
                       ))}
