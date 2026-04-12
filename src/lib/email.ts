@@ -33,6 +33,71 @@ function wrapHtml(content: string): string {
 </html>`.trim();
 }
 
+export async function sendWelcomeEmail(
+  to: string,
+  firstName: string,
+  unitLabel: string,
+) {
+  if (!resend) {
+    console.warn("[email] RESEND_API_KEY not set — skipping welcome email");
+    return;
+  }
+
+  try {
+    await resend.emails.send({
+      from: FROM_ADDRESS,
+      to,
+      subject: `Welcome to TENANTNET.NYC, ${firstName}!`,
+      html: wrapHtml(`
+        <h2 style="margin:0 0 8px;font-size:24px;font-weight:900;text-transform:uppercase;color:#c45d3e;font-family:'Archivo Black',Impact,sans-serif;">
+          Welcome Home
+        </h2>
+        <p style="margin:0 0 20px;font-size:15px;color:#f5f0eb;">
+          Hey ${firstName} — we're excited to have you join our building's community.
+        </p>
+        <div style="background:#2a2a2a;border:2px solid #3a3a3a;padding:20px;margin-bottom:24px;">
+          <p style="margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:0.15em;color:#a8a29e;">Your Unit</p>
+          <p style="margin:0;font-size:22px;font-weight:900;color:#f5f0eb;font-family:'Archivo Black',Impact,sans-serif;">${unitLabel}</p>
+          <p style="margin:8px 0 0;font-size:12px;text-transform:uppercase;letter-spacing:0.15em;color:#a8a29e;">449 West 125th Street, Harlem</p>
+        </div>
+        <p style="margin:0 0 16px;font-size:14px;color:#a8a29e;line-height:1.6;">
+          TENANTNET.NYC is your building's private forum. Here's what you can do:
+        </p>
+        <table style="margin:0 0 24px;width:100%;" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding:8px 0;font-size:13px;color:#f5f0eb;border-bottom:1px solid #3a3a3a;">
+              <span style="color:#c45d3e;font-weight:bold;margin-right:8px;">01</span> Report maintenance issues with photos as evidence
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;font-size:13px;color:#f5f0eb;border-bottom:1px solid #3a3a3a;">
+              <span style="color:#c45d3e;font-weight:bold;margin-right:8px;">02</span> Document landlord disputes — everything is timestamped
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;font-size:13px;color:#f5f0eb;border-bottom:1px solid #3a3a3a;">
+              <span style="color:#c45d3e;font-weight:bold;margin-right:8px;">03</span> Stay informed with building bulletins and announcements
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;font-size:13px;color:#f5f0eb;">
+              <span style="color:#c45d3e;font-weight:bold;margin-right:8px;">04</span> Connect with your neighbors and build community
+            </td>
+          </tr>
+        </table>
+        <a href="https://tenantnet.nyc/dashboard" style="display:inline-block;background:#c45d3e;color:#f5f0eb;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:12px 24px;text-decoration:none;">
+          Go to Your Dashboard
+        </a>
+        <p style="margin:24px 0 0;font-size:13px;color:#a8a29e;">
+          You can also log in anytime at <a href="https://tenantnet.nyc/login" style="color:#d4795f;">tenantnet.nyc/login</a> with your username and password.
+        </p>
+      `),
+    });
+  } catch (err) {
+    console.error("[email] Failed to send welcome email:", err);
+  }
+}
+
 export async function sendNewPostNotification(
   to: string[],
   unitLabel: string,

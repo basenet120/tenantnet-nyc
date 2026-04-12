@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   const session = await getSession();
@@ -70,6 +71,9 @@ export async function POST(request: NextRequest) {
       isRegistered: true,
     },
   });
+
+  // Send welcome email (non-blocking)
+  sendWelcomeEmail(email.trim(), firstName.trim(), unit.label);
 
   return NextResponse.json({ success: true, unitLabel: unit.label });
 }
