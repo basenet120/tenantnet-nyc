@@ -25,6 +25,12 @@ model Unit {
   passwordHash String?  @map("password_hash")
   phone        String?
 
+  // Notification preferences
+  notifyNewPosts     Boolean @default(true)  @map("notify_new_posts")
+  notifyComments     Boolean @default(true)  @map("notify_comments")
+  notifyStatusChange Boolean @default(true)  @map("notify_status_change")
+  notifyBulletins    Boolean @default(true)  @map("notify_bulletins")
+
   sessions Session[]
   posts    Post[]
   comments Comment[]
