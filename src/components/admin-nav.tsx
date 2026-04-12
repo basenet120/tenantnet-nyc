@@ -9,15 +9,15 @@ const navItems = [
 
 export default function AdminNav({ current }: { current: string }) {
   return (
-    <nav className="flex gap-1">
+    <nav className="flex gap-0 border-b-2 border-border">
       {navItems.map((item) => (
         <Link
           key={item.href}
           href={item.href}
-          className={`rounded-lg px-3 py-2 text-sm font-medium ${
+          className={`px-5 py-3 font-display text-[0.8125rem] tracking-[0.08em] uppercase no-underline transition-colors duration-150 ${
             current === item.href
-              ? "bg-gray-900 text-white"
-              : "text-gray-600 hover:bg-gray-100"
+              ? "text-terracotta border-b-[3px] border-b-terracotta -mb-[2px]"
+              : "text-offwhite-dim hover:text-offwhite -mb-[2px] border-b-[3px] border-b-transparent"
           }`}
         >
           {item.label}

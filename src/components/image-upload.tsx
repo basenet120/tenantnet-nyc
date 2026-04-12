@@ -78,12 +78,12 @@ export function ImageUpload({ maxImages, onImagesChange }: ImageUploadProps) {
               <img
                 src={url}
                 alt={`Upload ${i + 1}`}
-                className="h-24 w-24 rounded-lg border border-zinc-700 object-cover"
+                className="h-24 w-24 rounded-none border-2 border-border object-cover"
               />
               <button
                 type="button"
                 onClick={() => removeImage(i)}
-                className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-xs text-white hover:bg-red-700"
+                className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-none bg-danger text-[0.625rem] font-bold text-offwhite hover:bg-[#a33535] transition-colors"
               >
                 x
               </button>
@@ -93,7 +93,7 @@ export function ImageUpload({ maxImages, onImagesChange }: ImageUploadProps) {
       )}
 
       {urls.length < maxImages && (
-        <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-700">
+        <label className="btn btn-outline rounded-none cursor-pointer text-[0.75rem]">
           {uploading ? "Uploading..." : "Add Photos"}
           <input
             ref={fileInputRef}

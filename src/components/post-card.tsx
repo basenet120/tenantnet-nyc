@@ -14,26 +14,66 @@ type PostCardProps = {
   imageCount: number;
 };
 
-export function PostCard({ id, title, body, authorLabel, sectionName, status, isPinned, createdAt, commentCount, imageCount }: PostCardProps) {
+export function PostCard({
+  id,
+  title,
+  body,
+  authorLabel,
+  sectionName,
+  status,
+  isPinned,
+  createdAt,
+  commentCount,
+  imageCount,
+}: PostCardProps) {
   return (
-    <Link href={`/post/${id}`} className="block">
-      <div className="bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              {isPinned && <span className="text-xs text-amber-600 font-medium">PINNED</span>}
-              <span className="text-xs text-gray-500">{sectionName}</span>
-            </div>
-            <h3 className="font-semibold text-gray-900 truncate">{title}</h3>
-            <p className="text-sm text-gray-600 mt-1 line-clamp-2">{body}</p>
-            <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
-              <span>{authorLabel}</span>
-              <span>{createdAt.toLocaleDateString()}</span>
-              {commentCount > 0 && <span>{commentCount} comments</span>}
-              {imageCount > 0 && <span>{imageCount} photos</span>}
-            </div>
-          </div>
+    <Link href={`/post/${id}`} className="block group no-underline">
+      <div
+        className={`relative bg-surface text-charcoal border-2 border-border rounded-none p-5 transition-all duration-150 hover:border-l-terracotta hover:border-l-4 ${
+          isPinned ? "border-l-4 border-l-amber" : ""
+        }`}
+      >
+        {/* Top row: section label + status badge */}
+        <div className="flex items-start justify-between gap-3 mb-2">
+          <span className="font-display text-[0.6875rem] tracking-[0.12em] uppercase text-charcoal-lighter">
+            {sectionName}
+          </span>
           {status && <StatusBadge status={status} />}
+        </div>
+
+        {/* Title */}
+        <h3 className="font-display text-lg uppercase leading-tight text-charcoal mb-1 truncate group-hover:text-terracotta transition-colors">
+          {title}
+        </h3>
+
+        {/* Body excerpt */}
+        <p className="text-sm text-charcoal-lighter leading-relaxed line-clamp-2 mb-3">
+          {body}
+        </p>
+
+        {/* Meta row */}
+        <div className="flex items-center gap-3 text-[0.6875rem] tracking-wide text-charcoal-lighter font-mono">
+          <span>{authorLabel}</span>
+          <span aria-hidden="true" className="text-border-light">|</span>
+          <span>{createdAt.toLocaleDateString()}</span>
+          {commentCount > 0 && (
+            <>
+              <span aria-hidden="true" className="text-border-light">|</span>
+              <span>{commentCount} comments</span>
+            </>
+          )}
+          {imageCount > 0 && (
+            <>
+              <span aria-hidden="true" className="text-border-light">|</span>
+              <span>{imageCount} photos</span>
+            </>
+          )}
+          {isPinned && (
+            <>
+              <span aria-hidden="true" className="text-border-light">|</span>
+              <span className="text-amber-dark font-bold uppercase">Pinned</span>
+            </>
+          )}
         </div>
       </div>
     </Link>
