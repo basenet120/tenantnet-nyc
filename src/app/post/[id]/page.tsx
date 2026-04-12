@@ -151,7 +151,7 @@ export default async function PostPage({
                 >
                   <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] mb-2">
                     <span className="font-display uppercase tracking-wide text-offwhite">
-                      Unit {comment.unit.label}
+                      {comment.admin ? "Tenant Manager" : comment.unit ? `Unit ${comment.unit.label}` : "Unknown"}
                     </span>
                     <span aria-hidden="true">|</span>
                     <time dateTime={comment.createdAt.toISOString()}>

@@ -6,7 +6,7 @@ import { PostStatus } from "@/generated/prisma/client";
 
 export async function POST(request: Request) {
   const session = await getSession();
-  if (!session || session.type !== "unit") {
+  if (!session || (session.type !== "unit" && session.type !== "admin")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -40,13 +40,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Section not found" }, { status: 404 });
   }
 
+  const isAdmin = session.type === "admin";
+
   const post = await prisma.post.create({
     data: {
       title,
       body: content,
       sectionId,
-      unitId: session.unitId,
-      status: section.hasIssueTracking ? PostStatus.reported : null,
+      ...(isAdmin
+        ? { adminId: session.adminId }
+        : { unitId: session.unitId }),
+      // Admin posts are informational — no auto-reported status
+      status: !isAdmin && section.hasIssueTracking ? PostStatus.reported : null,
       images:
         imageUrls && imageUrls.length > 0
           ? { create: imageUrls.map((url) => ({ url })) }

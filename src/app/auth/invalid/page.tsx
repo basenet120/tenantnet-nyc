@@ -10,7 +10,7 @@ export default function InvalidAuthPage() {
 
         <p className="text-[var(--color-text-secondary)] leading-relaxed mb-6">
           This QR code is no longer valid. It may have been rotated by your
-          building admin.
+          tenant manager.
         </p>
 
         <p className="text-sm text-offwhite font-medium uppercase tracking-wide">

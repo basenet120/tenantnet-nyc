@@ -5,7 +5,7 @@ import { IMAGE_LIMITS } from "@/lib/constants";
 
 export async function POST(request: Request) {
   const session = await getSession();
-  if (!session || session.type !== "unit") {
+  if (!session || (session.type !== "unit" && session.type !== "admin")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -30,10 +30,14 @@ export async function POST(request: Request) {
     );
   }
 
+  const isAdmin = session.type === "admin";
+
   const comment = await prisma.comment.create({
     data: {
       postId,
-      unitId: session.unitId,
+      ...(isAdmin
+        ? { adminId: session.adminId }
+        : { unitId: session.unitId }),
       body: content,
       images:
         imageUrls && imageUrls.length > 0
