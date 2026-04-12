@@ -19,7 +19,10 @@ export async function GET(
 
   const sessionToken = await createUnitSession(unit.id);
   const cookie = setSessionCookie(sessionToken);
-  const response = NextResponse.redirect(new URL("/dashboard", request.url));
+
+  // If not registered yet, redirect to registration
+  const destination = unit.isRegistered ? "/dashboard" : "/register";
+  const response = NextResponse.redirect(new URL(destination, request.url));
   response.cookies.set(cookie);
   return response;
 }

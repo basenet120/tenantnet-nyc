@@ -27,6 +27,7 @@ function authorLabel(post: { admin: { email: string } | null; unit: { label: str
 export default async function DashboardPage() {
   const session = await getSession();
   if (!session || session.type !== "unit") redirect("/");
+  if (!session.isRegistered) redirect("/register");
 
   const [myIssues, recentPosts, pinnedBulletins, sections] = await Promise.all([
     prisma.post.findMany({

@@ -16,6 +16,14 @@ model Unit {
   qrTokenCreatedAt DateTime @default(now()) @map("qr_token_created_at")
   createdAt        DateTime @default(now()) @map("created_at")
 
+  // Tenant profile (filled on first QR scan)
+  isRegistered Boolean  @default(false) @map("is_registered")
+  firstName    String?  @map("first_name")
+  lastName     String?  @map("last_name")
+  email        String?
+  username     String?  @unique
+  phone        String?
+
   sessions Session[]
   posts    Post[]
   comments Comment[]

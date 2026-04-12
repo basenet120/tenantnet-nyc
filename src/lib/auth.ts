@@ -4,7 +4,7 @@ import { COOKIE_NAME, SESSION_DURATION_DAYS } from "./constants";
 import { randomBytes } from "crypto";
 
 export type SessionData =
-  | { type: "unit"; unitId: string; unitLabel: string }
+  | { type: "unit"; unitId: string; unitLabel: string; isRegistered: boolean }
   | { type: "admin"; adminId: string; email: string }
   | null;
 
@@ -21,7 +21,7 @@ export async function getSession(): Promise<SessionData> {
   if (!session || session.expiresAt < new Date()) return null;
 
   if (session.unit) {
-    return { type: "unit", unitId: session.unit.id, unitLabel: session.unit.label };
+    return { type: "unit", unitId: session.unit.id, unitLabel: session.unit.label, isRegistered: session.unit.isRegistered };
   }
   if (session.admin) {
     return { type: "admin", adminId: session.admin.id, email: session.admin.email };
