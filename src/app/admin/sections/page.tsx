@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import AdminNav from "@/components/admin-nav";
 
 type Section = {
@@ -51,6 +52,11 @@ export default function AdminSectionsPage() {
             : s,
         ),
       );
+      toast.success(
+        `Issue tracking ${section.hasIssueTracking ? "disabled" : "enabled"} for ${section.name}`,
+      );
+    } else {
+      toast.error("Failed to toggle issue tracking");
     }
   }
 
@@ -76,6 +82,9 @@ export default function AdminSectionsPage() {
       setSections((prev) => [...prev, section]);
       setNewName("");
       setNewIssueTracking(false);
+      toast.success(`Section "${section.name}" added`);
+    } else {
+      toast.error("Failed to add section");
     }
     setAdding(false);
   }

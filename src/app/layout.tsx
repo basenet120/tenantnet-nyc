@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Archivo_Black } from "next/font/google";
+import { ToasterProvider } from "@/components/toaster-provider";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -31,7 +32,10 @@ export default function RootLayout({
       lang="en"
       className={`${dmSans.variable} ${archivoBlack.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <ToasterProvider />
+      </body>
     </html>
   );
 }

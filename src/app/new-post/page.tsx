@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 import Link from "next/link";
 import { ImageUpload } from "@/components/image-upload";
 import { IMAGE_LIMITS } from "@/lib/constants";
@@ -64,7 +65,9 @@ function NewPostForm() {
       const data = await res.json();
       router.push(`/post/${data.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      setError(message);
+      toast.error(message);
       setSubmitting(false);
     }
   }

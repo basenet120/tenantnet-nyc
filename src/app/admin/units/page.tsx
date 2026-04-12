@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import QRCode from "qrcode";
 import AdminNav from "@/components/admin-nav";
 
@@ -89,12 +90,16 @@ export default function AdminUnitsPage() {
     const res = await fetch(`/api/admin/units/${unit.id}/rotate`, {
       method: "POST",
     });
-    if (!res.ok) return;
+    if (!res.ok) {
+      toast.error("Failed to rotate QR code");
+      return;
+    }
     const { qrToken } = await res.json();
     setUnits((prev) =>
       prev.map((u) => (u.id === unit.id ? { ...u, qrToken } : u)),
     );
     setConfirmUnit(null);
+    toast.success(`QR code rotated for ${unit.label}`);
     // Regenerate QR image if it was showing
     if (qrImages[unit.id]) {
       const url = `${window.location.origin}/auth/${qrToken}`;

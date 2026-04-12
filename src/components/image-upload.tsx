@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { toast } from "sonner";
 import { IMAGE_LIMITS } from "@/lib/constants";
 
 interface ImageUploadProps {
@@ -54,7 +55,7 @@ export function ImageUpload({ maxImages, onImagesChange }: ImageUploadProps) {
       setUrls(updated);
       onImagesChange(updated);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Upload failed");
+      toast.error(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploading(false);
       if (fileInputRef.current) {

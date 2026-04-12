@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { ImageUpload } from "@/components/image-upload";
 
 export function CommentForm({ postId }: { postId: string }) {
@@ -31,8 +32,9 @@ export function CommentForm({ postId }: { postId: string }) {
       setContent("");
       setImageUrls([]);
       router.refresh();
+      toast.success("Comment posted");
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to post comment");
+      toast.error(err instanceof Error ? err.message : "Failed to post comment");
     } finally {
       setSubmitting(false);
     }

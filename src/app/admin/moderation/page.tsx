@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import AdminNav from "@/components/admin-nav";
 import { POST_STATUS } from "@/lib/constants";
 
@@ -75,39 +76,57 @@ export default function ModerationPage() {
       setBulletinBody("");
       const postsRes = await fetch("/api/admin/posts");
       setPosts(await postsRes.json());
+      toast.success("Bulletin created");
+    } else {
+      toast.error("Failed to create bulletin");
     }
     setSubmitting(false);
   }
 
   async function togglePin(post: Post) {
-    await fetch(`/api/admin/posts/${post.id}`, {
+    const res = await fetch(`/api/admin/posts/${post.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ isPinned: !post.isPinned }),
     });
-    setPosts((prev) =>
-      prev.map((p) =>
-        p.id === post.id ? { ...p, isPinned: !p.isPinned } : p,
-      ),
-    );
+    if (res.ok) {
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === post.id ? { ...p, isPinned: !p.isPinned } : p,
+        ),
+      );
+      toast.success(post.isPinned ? "Post unpinned" : "Post pinned");
+    } else {
+      toast.error("Failed to update pin status");
+    }
   }
 
   async function changeStatus(postId: string, status: string) {
-    await fetch(`/api/admin/posts/${postId}`, {
+    const res = await fetch(`/api/admin/posts/${postId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });
-    setPosts((prev) =>
-      prev.map((p) => (p.id === postId ? { ...p, status } : p)),
-    );
+    if (res.ok) {
+      setPosts((prev) =>
+        prev.map((p) => (p.id === postId ? { ...p, status } : p)),
+      );
+      toast.success(`Status changed to ${status}`);
+    } else {
+      toast.error("Failed to change status");
+    }
   }
 
   async function deletePost(postId: string) {
     if (!confirm("Delete this post? This cannot be undone.")) return;
 
-    await fetch(`/api/admin/posts/${postId}`, { method: "DELETE" });
-    setPosts((prev) => prev.filter((p) => p.id !== postId));
+    const res = await fetch(`/api/admin/posts/${postId}`, { method: "DELETE" });
+    if (res.ok) {
+      setPosts((prev) => prev.filter((p) => p.id !== postId));
+      toast.success("Post deleted");
+    } else {
+      toast.error("Failed to delete post");
+    }
   }
 
   if (loading) {
