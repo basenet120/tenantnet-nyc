@@ -12,6 +12,7 @@ type PostCardProps = {
   createdAt: Date;
   commentCount: number;
   imageCount: number;
+  isAdmin?: boolean;
 };
 
 export function PostCard({
@@ -25,6 +26,7 @@ export function PostCard({
   createdAt,
   commentCount,
   imageCount,
+  isAdmin = false,
 }: PostCardProps) {
   return (
     <Link href={`/post/${id}`} className="block group no-underline">
@@ -53,6 +55,15 @@ export function PostCard({
 
         {/* Meta row */}
         <div className="flex items-center gap-3 text-[0.6875rem] tracking-wide text-charcoal-lighter font-mono">
+          {isAdmin && (
+            <>
+              <span className="inline-flex items-center gap-1 text-terracotta font-bold uppercase">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-terracotta" />
+                MOD
+              </span>
+              <span aria-hidden="true" className="text-border-light">|</span>
+            </>
+          )}
           <span>{authorLabel}</span>
           <span aria-hidden="true" className="text-border-light">|</span>
           <span>{createdAt.toLocaleDateString()}</span>

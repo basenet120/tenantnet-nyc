@@ -15,9 +15,10 @@ export default async function SectionFeedPage({
   searchParams: Promise<{ status?: string }>;
 }) {
   const session = await getSession();
-  if (!session || session.type !== "unit") {
+  if (!session || (session.type !== "unit" && session.type !== "admin")) {
     redirect("/");
   }
+  const isAdmin = session.type === "admin";
 
   const { slug } = await params;
   const { status } = await searchParams;
@@ -77,7 +78,7 @@ export default async function SectionFeedPage({
               {section.name}
             </h1>
             <p className="text-xs uppercase tracking-[0.15em] text-[var(--color-text-secondary)] mt-0.5">
-              Unit {session.unitLabel}
+              {isAdmin ? "Tenant Manager" : `Unit ${session.unitLabel}`}
             </p>
           </div>
         </div>
@@ -145,6 +146,7 @@ export default async function SectionFeedPage({
                 createdAt={post.createdAt}
                 commentCount={post._count.comments}
                 imageCount={post._count.images}
+                isAdmin={isAdmin}
               />
             ))
           )}

@@ -9,7 +9,7 @@ export default async function Home() {
     redirect("/dashboard");
   }
   if (session?.type === "admin") {
-    redirect("/admin");
+    redirect("/dashboard");
   }
 
   return (

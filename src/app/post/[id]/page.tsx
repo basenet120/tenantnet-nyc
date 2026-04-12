@@ -4,6 +4,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { StatusBadge } from "@/components/status-badge";
 import { CommentForm } from "@/components/comment-form";
+import { ModerationToolbar } from "@/components/moderation-toolbar";
 
 export default async function PostPage({
   params,
@@ -11,9 +12,10 @@ export default async function PostPage({
   params: Promise<{ id: string }>;
 }) {
   const session = await getSession();
-  if (!session || session.type !== "unit") {
+  if (!session || (session.type !== "unit" && session.type !== "admin")) {
     redirect("/");
   }
+  const isAdmin = session.type === "admin";
 
   const { id } = await params;
 
@@ -27,6 +29,7 @@ export default async function PostPage({
       comments: {
         include: {
           unit: true,
+          admin: true,
           images: { orderBy: { createdAt: "asc" } },
         },
         orderBy: { createdAt: "asc" },
@@ -39,7 +42,7 @@ export default async function PostPage({
   }
 
   const authorLabel = post.admin
-    ? "Building Admin"
+    ? "Tenant Manager"
     : post.unit
       ? `Unit ${post.unit.label}`
       : "Unknown";
@@ -121,6 +124,16 @@ export default async function PostPage({
             </div>
           )}
         </article>
+
+        {/* Moderation Toolbar (admin only) */}
+        {isAdmin && (
+          <ModerationToolbar
+            postId={post.id}
+            isPinned={post.isPinned}
+            status={post.status}
+            hasIssueTracking={post.section.hasIssueTracking}
+          />
+        )}
 
         {/* Comments */}
         <section className="mt-8">
