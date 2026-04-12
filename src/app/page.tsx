@@ -1,5 +1,6 @@
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export default async function Home() {
   const session = await getSession();
@@ -33,6 +34,12 @@ export default async function Home() {
         <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
           Scan the QR code on your apartment door to access the building forum.
         </p>
+
+        <div className="mt-6 pt-6" style={{ borderTop: "1px solid var(--color-border)" }}>
+          <Link href="/login" className="btn btn-outline w-full">
+            Log In
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -22,6 +22,7 @@ model Unit {
   lastName     String?  @map("last_name")
   email        String?
   username     String?  @unique
+  passwordHash String?  @map("password_hash")
   phone        String?
 
   sessions Session[]
