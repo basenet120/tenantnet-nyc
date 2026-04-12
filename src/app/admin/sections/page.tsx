@@ -81,37 +81,40 @@ export default function AdminSectionsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold tracking-tight">
-        Section Management
-      </h1>
+    <div className="container-wide py-8">
+      {/* Header */}
+      <div className="mb-6">
+        <p className="section-label border-b-0 mb-1">Administration</p>
+        <h1 className="text-3xl tracking-tight">SECTIONS</h1>
+      </div>
 
       <AdminNav current="/admin/sections" />
 
+      {/* Section List */}
       <div className="mt-8">
         {loading ? (
-          <p className="text-sm text-gray-500">Loading sections...</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">Loading sections...</p>
         ) : sections.length === 0 ? (
-          <p className="text-sm text-gray-500">No sections yet.</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">No sections yet.</p>
         ) : (
-          <ul className="divide-y divide-gray-100">
+          <ul className="divide-y divide-[var(--color-border)]">
             {sections.map((section) => (
               <li
                 key={section.id}
-                className="flex items-center justify-between py-3"
+                className="flex items-center justify-between py-4"
               >
                 <div>
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-semibold text-offwhite">
                     {section.name}
                   </p>
-                  <p className="text-xs text-gray-500">{section.slug}</p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">
+                    /{section.slug}
+                  </p>
                 </div>
                 <button
                   onClick={() => toggleIssueTracking(section)}
-                  className={`rounded px-3 py-1 text-xs font-medium ${
-                    section.hasIssueTracking
-                      ? "bg-green-100 text-green-800"
-                      : "bg-gray-100 text-gray-600"
+                  className={`btn btn-sm ${
+                    section.hasIssueTracking ? "btn-primary" : "btn-outline"
                   }`}
                 >
                   Issue Tracking: {section.hasIssueTracking ? "ON" : "OFF"}
@@ -122,42 +125,43 @@ export default function AdminSectionsPage() {
         )}
       </div>
 
+      {/* Add Section */}
       <div className="mt-10">
-        <h2 className="mb-4 text-lg font-semibold">Add Section</h2>
-        <form onSubmit={addSection} className="flex flex-wrap items-end gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Name
+        <h2 className="section-label">Add Section</h2>
+        <form onSubmit={addSection} className="card-dark">
+          <div className="flex flex-wrap items-end gap-4">
+            <div className="flex-1 min-w-[200px]">
+              <label>Name</label>
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="Section name"
+                required
+              />
+              {newName.trim() && (
+                <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
+                  Slug: <span className="text-terracotta-light">{generateSlug(newName)}</span>
+                </p>
+              )}
+            </div>
+            <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] cursor-pointer pb-1">
+              <input
+                type="checkbox"
+                checked={newIssueTracking}
+                onChange={(e) => setNewIssueTracking(e.target.checked)}
+                className="accent-[var(--color-terracotta)]"
+              />
+              Issue Tracking
             </label>
-            <input
-              type="text"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              className="mt-1 rounded border border-gray-300 px-3 py-2 text-sm"
-              placeholder="Section name"
-              required
-            />
-            {newName.trim() && (
-              <p className="mt-1 text-xs text-gray-400">
-                Slug: {generateSlug(newName)}
-              </p>
-            )}
+            <button
+              type="submit"
+              disabled={adding}
+              className="btn btn-primary disabled:opacity-50"
+            >
+              {adding ? "Adding..." : "Add Section"}
+            </button>
           </div>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={newIssueTracking}
-              onChange={(e) => setNewIssueTracking(e.target.checked)}
-            />
-            Issue Tracking
-          </label>
-          <button
-            type="submit"
-            disabled={adding}
-            className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
-          >
-            {adding ? "Adding..." : "Add Section"}
-          </button>
         </form>
       </div>
     </div>

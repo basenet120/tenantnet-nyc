@@ -64,12 +64,17 @@ export default function AdminUnitsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold tracking-tight">Unit Management</h1>
+    <div className="container-wide py-8">
+      {/* Header */}
+      <div className="mb-6">
+        <p className="section-label border-b-0 mb-1">Administration</p>
+        <h1 className="text-3xl tracking-tight">UNIT MANAGEMENT</h1>
+      </div>
+
       <AdminNav current="/admin/units" />
 
       {loading ? (
-        <p className="mt-8 text-sm text-gray-500">Loading units...</p>
+        <p className="mt-8 text-sm text-[var(--color-text-secondary)]">Loading units...</p>
       ) : (
         <div className="mt-8 space-y-10">
           {floors.map((floor) => {
@@ -77,49 +82,63 @@ export default function AdminUnitsPage() {
             if (floorUnits.length === 0) return null;
             return (
               <div key={floor}>
-                <h2 className="mb-4 text-lg font-semibold text-gray-700">
-                  Floor {floor}
-                </h2>
+                {/* Floor Header */}
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="font-display text-lg text-terracotta">
+                    {String(floor).padStart(2, "0")}
+                  </span>
+                  <h2 className="section-label mb-0 border-b-0 flex-1 border-b-2 border-[var(--color-border)] pb-1">
+                    Floor {floor}
+                  </h2>
+                </div>
+
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {floorUnits.map((unit) => (
                     <div
                       key={unit.id}
-                      className="rounded-lg border border-gray-200 bg-white p-4"
+                      className="card-dark"
                     >
-                      <p className="text-sm font-bold text-gray-900">
-                        {unit.label}
-                      </p>
-                      <p className="mt-1 text-xs text-gray-500">
-                        {unit._count.posts} posts &middot;{" "}
-                        {unit._count.comments} comments
-                      </p>
+                      {/* Unit Label */}
+                      <div className="flex items-baseline justify-between">
+                        <p className="font-display text-lg text-offwhite">
+                          {unit.label}
+                        </p>
+                        <span className="badge badge-muted">
+                          {unit._count.posts}P / {unit._count.comments}C
+                        </span>
+                      </div>
+
+                      {/* Actions */}
                       <div className="mt-3 flex gap-2">
                         <button
                           onClick={() => showQr(unit)}
-                          className="rounded bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-700"
+                          className="btn btn-outline btn-sm"
                         >
                           {qrImages[unit.id] ? "Hide QR" : "Show QR"}
                         </button>
                         <button
                           onClick={() => rotateQr(unit)}
-                          className="rounded border border-red-300 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
+                          className="btn btn-danger btn-sm"
                         >
                           Rotate QR
                         </button>
                       </div>
+
+                      {/* QR Code Display */}
                       {qrImages[unit.id] && (
-                        <div className="mt-3">
-                          <img
-                            src={qrImages[unit.id]}
-                            alt={`QR code for ${unit.label}`}
-                            className="mx-auto"
-                            width={256}
-                            height={256}
-                          />
+                        <div className="mt-4 border-t-2 border-[var(--color-border)] pt-4">
+                          <div className="bg-offwhite p-3 inline-block">
+                            <img
+                              src={qrImages[unit.id]}
+                              alt={`QR code for ${unit.label}`}
+                              width={256}
+                              height={256}
+                            />
+                          </div>
                           <a
                             href={qrImages[unit.id]}
                             download={`qr-${unit.label}.png`}
-                            className="mt-2 block text-center text-xs text-blue-600 hover:underline"
+                            className="mt-2 block text-xs text-terracotta-light hover:text-terracotta"
                           >
                             Download QR Code
                           </a>

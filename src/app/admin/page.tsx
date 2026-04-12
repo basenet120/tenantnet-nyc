@@ -37,52 +37,74 @@ export default async function AdminDashboardPage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold tracking-tight">
-        TENANTNET.NYC Admin
-      </h1>
+    <div className="container-wide py-8">
+      {/* Header */}
+      <div className="mb-6">
+        <p className="section-label border-b-0 mb-1">Administration</p>
+        <h1 className="text-3xl tracking-tight">TENANTNET.NYC</h1>
+      </div>
 
       <AdminNav current="/admin" />
 
+      {/* Stat Cards */}
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard label="Open Issues" value={openIssues} />
-        <StatCard label="Posts Today" value={postsToday} />
-        <StatCard label="Total Posts" value={totalPosts} />
+        <StatCard label="Open Issues" value={openIssues} accent="terracotta" />
+        <StatCard label="Posts Today" value={postsToday} accent="amber" />
+        <StatCard label="Total Posts" value={totalPosts} accent="sage" />
       </div>
 
-      <h2 className="mt-10 mb-4 text-lg font-semibold">Recent Activity</h2>
+      {/* Recent Activity */}
+      <div className="mt-10">
+        <h2 className="section-label">Recent Activity</h2>
 
-      {recentPosts.length === 0 ? (
-        <p className="text-sm text-gray-500">No posts yet.</p>
-      ) : (
-        <ul className="divide-y divide-gray-100">
-          {recentPosts.map((post: RecentPost) => (
-            <li key={post.id} className="flex items-baseline justify-between py-3">
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-gray-900">
-                  {post.title}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {post.unit?.label ?? post.admin?.email ?? "Unknown"} in{" "}
-                  {post.section.name}
-                </p>
-              </div>
-              <time className="ml-4 shrink-0 text-xs text-gray-400">
-                {post.createdAt.toLocaleDateString()}
-              </time>
-            </li>
-          ))}
-        </ul>
-      )}
+        {recentPosts.length === 0 ? (
+          <p className="text-sm text-[var(--color-text-secondary)]">No posts yet.</p>
+        ) : (
+          <ul className="divide-y divide-[var(--color-border)]">
+            {recentPosts.map((post: RecentPost) => (
+              <li key={post.id} className="flex items-baseline justify-between py-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-offwhite">
+                    {post.title}
+                  </p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">
+                    {post.unit?.label ?? post.admin?.email ?? "Unknown"} in{" "}
+                    <span className="text-terracotta-light">{post.section.name}</span>
+                  </p>
+                </div>
+                <time className="ml-4 shrink-0 text-xs text-[var(--color-text-secondary)]">
+                  {post.createdAt.toLocaleDateString()}
+                </time>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
 
-function StatCard({ label, value }: { label: string; value: number }) {
+function StatCard({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: number;
+  accent: "terracotta" | "amber" | "sage";
+}) {
+  const borderColors = {
+    terracotta: "border-l-terracotta",
+    amber: "border-l-amber",
+    sage: "border-l-sage",
+  };
+
   return (
-    <div className="rounded-lg border border-gray-200 bg-white px-5 py-4">
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-gray-900">{value}</p>
+    <div
+      className={`card-dark border-l-[3px] ${borderColors[accent]}`}
+    >
+      <p className="uppercase-label text-[var(--color-text-secondary)]">{label}</p>
+      <p className="mt-1 font-display text-3xl text-offwhite">{value}</p>
     </div>
   );
 }

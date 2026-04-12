@@ -112,55 +112,58 @@ export default function ModerationPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-8">
-        <h1 className="mb-6 text-2xl font-bold tracking-tight">Moderation</h1>
+      <div className="container-wide py-8">
+        <div className="mb-6">
+          <p className="section-label border-b-0 mb-1">Administration</p>
+          <h1 className="text-3xl tracking-tight">MODERATION</h1>
+        </div>
         <AdminNav current="/admin/moderation" />
-        <p className="mt-8 text-sm text-gray-500">Loading...</p>
+        <p className="mt-8 text-sm text-[var(--color-text-secondary)]">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold tracking-tight">Moderation</h1>
+    <div className="container-wide py-8">
+      {/* Header */}
+      <div className="mb-6">
+        <p className="section-label border-b-0 mb-1">Administration</p>
+        <h1 className="text-3xl tracking-tight">MODERATION</h1>
+      </div>
+
       <AdminNav current="/admin/moderation" />
 
       {/* Create Bulletin */}
-      <div className="mt-8 rounded-lg border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold">Create Bulletin</h2>
+      <div className="mt-8 card-dark border-l-[3px] border-l-terracotta">
+        <h2 className="font-display text-lg uppercase tracking-wide text-offwhite mb-4">
+          Create Bulletin
+        </h2>
         <form onSubmit={handleCreateBulletin} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Title
-            </label>
+            <label>Title</label>
             <input
               type="text"
               value={bulletinTitle}
               onChange={(e) => setBulletinTitle(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none"
+              placeholder="Bulletin title"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Body
-            </label>
+            <label>Body</label>
             <textarea
               value={bulletinBody}
               onChange={(e) => setBulletinBody(e.target.value)}
               rows={3}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none"
+              placeholder="Write your bulletin..."
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Section
-            </label>
+            <label>Section</label>
             <select
               value={bulletinSectionId}
               onChange={(e) => setBulletinSectionId(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none"
               required
             >
               <option value="">Select section</option>
@@ -174,7 +177,7 @@ export default function ModerationPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+            className="btn btn-primary disabled:opacity-50"
           >
             {submitting ? "Creating..." : "Create Bulletin"}
           </button>
@@ -182,74 +185,78 @@ export default function ModerationPage() {
       </div>
 
       {/* Posts List */}
-      <h2 className="mt-10 mb-4 text-lg font-semibold">All Posts</h2>
-      {posts.length === 0 ? (
-        <p className="text-sm text-gray-500">No posts yet.</p>
-      ) : (
-        <ul className="space-y-4">
-          {posts.map((post) => (
-            <li
-              key={post.id}
-              className="rounded-lg border border-gray-200 bg-white p-4"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-900">
-                    {post.isPinned && (
-                      <span className="mr-1 text-amber-500" title="Pinned">
-                        &#x1f4cc;
-                      </span>
-                    )}
-                    {post.title}
-                  </p>
-                  <p className="mt-1 text-xs text-gray-500">
-                    {post.unit?.label ?? post.admin?.email ?? "Unknown"} in{" "}
-                    {post.section.name} &middot;{" "}
-                    {new Date(post.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="flex shrink-0 gap-2">
-                  <button
-                    onClick={() => togglePin(post)}
-                    className={`rounded px-2 py-1 text-xs font-medium ${
-                      post.isPinned
-                        ? "bg-amber-100 text-amber-800"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    }`}
-                  >
-                    {post.isPinned ? "Unpin" : "Pin"}
-                  </button>
-                  <button
-                    onClick={() => deletePost(post.id)}
-                    className="rounded bg-red-50 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
+      <div className="mt-10">
+        <h2 className="section-label">All Posts</h2>
 
-              {/* Status buttons for issue-tracking sections */}
-              {post.section.hasIssueTracking && (
-                <div className="mt-3 flex gap-2">
-                  {POST_STATUS.map((s) => (
+        {posts.length === 0 ? (
+          <p className="text-sm text-[var(--color-text-secondary)]">No posts yet.</p>
+        ) : (
+          <ul className="space-y-3">
+            {posts.map((post) => (
+              <li
+                key={post.id}
+                className={`card-dark ${post.isPinned ? "pinned-accent" : ""}`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      {post.isPinned && (
+                        <span className="badge badge-amber">Pinned</span>
+                      )}
+                      <p className="text-sm font-semibold text-offwhite truncate">
+                        {post.title}
+                      </p>
+                    </div>
+                    <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
+                      {post.unit?.label ?? post.admin?.email ?? "Unknown"} in{" "}
+                      <span className="text-terracotta-light">{post.section.name}</span>
+                      {" "}&middot;{" "}
+                      {new Date(post.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex shrink-0 gap-2">
                     <button
-                      key={s}
-                      onClick={() => changeStatus(post.id, s)}
-                      className={`rounded px-2 py-1 text-xs font-medium capitalize ${
-                        post.status === s
-                          ? "bg-gray-900 text-white"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      onClick={() => togglePin(post)}
+                      className={`btn btn-sm ${
+                        post.isPinned ? "btn-warning" : "btn-outline"
                       }`}
                     >
-                      {s}
+                      {post.isPinned ? "Unpin" : "Pin"}
                     </button>
-                  ))}
+                    <button
+                      onClick={() => deletePost(post.id)}
+                      className="btn btn-danger btn-sm"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+
+                {/* Status buttons for issue-tracking sections */}
+                {post.section.hasIssueTracking && (
+                  <div className="mt-3 flex gap-0 border-2 border-[var(--color-border)] inline-flex">
+                    {POST_STATUS.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => changeStatus(post.id, s)}
+                        className={`px-3 py-1.5 text-xs font-display uppercase tracking-wider transition-colors ${
+                          post.status === s
+                            ? "bg-terracotta text-offwhite"
+                            : "text-[var(--color-text-secondary)] hover:text-offwhite hover:bg-charcoal-lighter"
+                        } ${s !== POST_STATUS[0] ? "border-l-2 border-[var(--color-border)]" : ""}`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
