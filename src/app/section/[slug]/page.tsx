@@ -1,11 +1,32 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { getSession } from "@/lib/auth";
+import { getSession, sessionBuildingId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PostCard } from "@/components/post-card";
 import { PostStatus } from "@/generated/prisma/client";
+import { postVisibilityWhere } from "@/lib/post-filters";
 
 const STATUS_OPTIONS = ["all", "reported", "acknowledged", "fixed", "unresolved"] as const;
+
+function authorLabel(post: { admin: { email: string; role: string; name: string | null } | null; unit: { label: string } | null }) {
+  if (post.admin) {
+    const roleLabel = post.admin.role === "system_admin" ? "System Admin"
+      : post.admin.role === "tenant_rep" ? "Tenant Rep"
+      : post.admin.role === "mgmt_rep" ? "Mgmt Rep"
+      : "Admin";
+    return post.admin.name ? `${post.admin.name} (${roleLabel})` : roleLabel;
+  }
+  if (post.unit) return `Unit ${post.unit.label}`;
+  return "Unknown";
+}
+
+function roleBadgeLabel(session: NonNullable<Awaited<ReturnType<typeof getSession>>>) {
+  if (session.type === "unit") return `Unit ${session.unitLabel}`;
+  if (session.role === "system_admin") return "System Admin";
+  if (session.role === "tenant_rep") return "Tenant Rep";
+  if (session.role === "mgmt_rep") return "Mgmt Rep";
+  return "Admin";
+}
 
 export default async function SectionFeedPage({
   params,
@@ -20,11 +41,14 @@ export default async function SectionFeedPage({
   }
   const isAdmin = session.type === "admin";
 
+  const buildingId = sessionBuildingId(session);
+  if (!buildingId) redirect("/admin/system");
+
   const { slug } = await params;
   const { status } = await searchParams;
 
   const section = await prisma.section.findUnique({
-    where: { slug },
+    where: { buildingId_slug: { buildingId, slug } },
   });
 
   if (!section) {
@@ -36,15 +60,19 @@ export default async function SectionFeedPage({
       ? (status as PostStatus)
       : undefined;
 
+  const visibilityFilter = postVisibilityWhere(session);
+
   const posts = await prisma.post.findMany({
     where: {
       sectionId: section.id,
+      buildingId,
       ...(statusFilter ? { status: statusFilter } : {}),
+      ...visibilityFilter,
     },
     include: {
       section: true,
       unit: true,
-      admin: true,
+      admin: { select: { email: true, role: true, name: true } },
       _count: { select: { comments: true, images: true } },
     },
     orderBy: [{ isPinned: "desc" }, { createdAt: "desc" }],
@@ -78,7 +106,7 @@ export default async function SectionFeedPage({
               {section.name}
             </h1>
             <p className="text-xs uppercase tracking-[0.15em] text-[var(--color-text-secondary)] mt-0.5">
-              {isAdmin ? "Tenant Manager" : `Unit ${session.unitLabel}`}
+              {roleBadgeLabel(session)}
             </p>
           </div>
         </div>
@@ -137,12 +165,11 @@ export default async function SectionFeedPage({
                 id={post.id}
                 title={post.title}
                 body={post.body}
-                authorLabel={
-                  post.admin ? "Tenant Manager" : post.unit ? `Unit ${post.unit.label}` : "Unknown"
-                }
+                authorLabel={authorLabel(post)}
                 sectionName={post.section.name}
                 status={post.status ?? null}
                 isPinned={post.isPinned}
+                visibility={post.visibility}
                 createdAt={post.createdAt}
                 commentCount={post._count.comments}
                 imageCount={post._count.images}

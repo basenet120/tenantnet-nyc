@@ -31,7 +31,13 @@ export default function AdminLoginPage() {
         return;
       }
 
-      router.push("/admin");
+      const data = await res.json();
+      // Redirect based on role
+      if (data.role === "system_admin") {
+        router.push("/admin/system");
+      } else {
+        router.push("/admin");
+      }
     } catch {
       setError("Something went wrong. Please try again.");
       toast.error("Something went wrong. Please try again.");

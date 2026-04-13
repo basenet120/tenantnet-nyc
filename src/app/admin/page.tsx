@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/auth";
+import { getSession, sessionBuildingId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import AdminNav from "@/components/admin-nav";
@@ -9,7 +9,7 @@ type RecentPost = {
   createdAt: Date;
   section: { name: string };
   unit: { label: string } | null;
-  admin: { email: string } | null;
+  admin: { email: string; name: string | null; role: string } | null;
 };
 
 export default async function AdminDashboardPage() {
@@ -18,21 +18,33 @@ export default async function AdminDashboardPage() {
     redirect("/admin/login");
   }
 
+  // System admin with no building context goes to system dashboard
+  const buildingId = sessionBuildingId(session);
+  if (!buildingId) redirect("/admin/system");
+
+  const building = await prisma.building.findUnique({
+    where: { id: buildingId },
+    select: { name: true },
+  });
+
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
 
+  const bFilter = { buildingId };
+
   const [openIssues, postsToday, totalPosts, recentPosts] = await Promise.all([
     prisma.post.count({
-      where: { status: { in: ["reported", "acknowledged"] } },
+      where: { ...bFilter, status: { in: ["reported", "acknowledged"] } },
     }),
     prisma.post.count({
-      where: { createdAt: { gte: todayStart } },
+      where: { ...bFilter, createdAt: { gte: todayStart } },
     }),
-    prisma.post.count(),
+    prisma.post.count({ where: bFilter }),
     prisma.post.findMany({
+      where: bFilter,
       take: 10,
       orderBy: { createdAt: "desc" },
-      include: { section: true, unit: true, admin: true },
+      include: { section: true, unit: true, admin: { select: { email: true, name: true, role: true } } },
     }) as Promise<RecentPost[]>,
   ]);
 
@@ -41,10 +53,10 @@ export default async function AdminDashboardPage() {
       {/* Header */}
       <div className="mb-6">
         <p className="section-label border-b-0 mb-1">Administration</p>
-        <h1 className="text-3xl tracking-tight">TENANTNET.NYC</h1>
+        <h1 className="text-3xl tracking-tight">{building?.name ?? "TENANTNET.NYC"}</h1>
       </div>
 
-      <AdminNav current="/admin" />
+      <AdminNav current="/admin" role={session.role} />
 
       {/* Stat Cards */}
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -68,7 +80,7 @@ export default async function AdminDashboardPage() {
                     {post.title}
                   </p>
                   <p className="text-xs text-[var(--color-text-secondary)]">
-                    {post.unit?.label ?? post.admin?.email ?? "Unknown"} in{" "}
+                    {post.unit?.label ?? post.admin?.name ?? post.admin?.email ?? "Unknown"} in{" "}
                     <span className="text-terracotta-light">{post.section.name}</span>
                   </p>
                 </div>

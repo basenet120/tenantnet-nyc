@@ -3,12 +3,81 @@ import { PrismaClient } from "../src/generated/prisma/client.js";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { randomBytes } from "crypto";
 import bcrypt from "bcryptjs";
+import { generateBuildingRecordUrls } from "../src/lib/nyc-records.js";
+import { generateBuildingEmail } from "../src/lib/building-email.js";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  // Seed 17 units: 1A on floor 1, then 2A-2D through 5A-5D
+  // 1. Create or find building for 449 West 125th Street
+  const buildingData = {
+    name: "449 West 125th Street",
+    address: "449 West 125th Street",
+    borough: "manhattan" as const,
+    zip: "10027",
+    block: "1964",
+    lot: "55",
+    bin: "1056573",
+    floors: 5,
+    totalUnits: 17,
+    buildingType: "rent_stabilized" as const,
+    amenities: [],
+  };
+
+  let building = await prisma.building.findFirst({
+    where: { address: buildingData.address },
+  });
+
+  if (!building) {
+    building = await prisma.building.create({
+      data: {
+        ...buildingData,
+        replyEmail: generateBuildingEmail(buildingData.address, buildingData.zip),
+      },
+    });
+  } else if (!building.replyEmail) {
+    building = await prisma.building.update({
+      where: { id: building.id },
+      data: { replyEmail: generateBuildingEmail(building.address, building.zip) },
+    });
+  }
+
+  // 2. Create system admin
+  const adminEmail = process.env.ADMIN_EMAIL || "admin@tenantnet.nyc";
+  const adminPassword = process.env.ADMIN_PASSWORD || "changeme";
+  const adminHash = await bcrypt.hash(adminPassword, 10);
+
+  await prisma.admin.upsert({
+    where: { email: adminEmail },
+    update: { role: "system_admin", buildingId: null },
+    create: {
+      email: adminEmail,
+      passwordHash: adminHash,
+      role: "system_admin",
+      buildingId: null,
+      name: "System Admin",
+    },
+  });
+
+  // 3. Create tenant rep for the building
+  const repEmail = "rep@tenantnet.nyc";
+  const repPassword = process.env.ADMIN_PASSWORD || "changeme";
+  const repHash = await bcrypt.hash(repPassword, 10);
+
+  await prisma.admin.upsert({
+    where: { email: repEmail },
+    update: { role: "tenant_rep", buildingId: building.id },
+    create: {
+      email: repEmail,
+      passwordHash: repHash,
+      role: "tenant_rep",
+      buildingId: building.id,
+      name: "Tenant Rep",
+    },
+  });
+
+  // 4. Seed 17 units: 1A on floor 1, then 2A-2D through 5A-5D
   const units: { floor: number; letter: string }[] = [{ floor: 1, letter: "A" }];
   for (let floor = 2; floor <= 5; floor++) {
     for (const letter of ["A", "B", "C", "D"]) {
@@ -18,19 +87,23 @@ async function main() {
 
   for (const unit of units) {
     const label = `${unit.floor}${unit.letter}`;
-    await prisma.unit.upsert({
-      where: { label },
-      update: {},
-      create: {
-        floor: unit.floor,
-        letter: unit.letter,
-        label,
-        qrToken: randomBytes(16).toString("hex"),
-      },
+    const existing = await prisma.unit.findFirst({
+      where: { buildingId: building.id, label },
     });
+    if (!existing) {
+      await prisma.unit.create({
+        data: {
+          buildingId: building.id,
+          floor: unit.floor,
+          letter: unit.letter,
+          label,
+          qrToken: randomBytes(16).toString("hex"),
+        },
+      });
+    }
   }
 
-  // Seed 5 default sections
+  // 5. Seed 5 default sections
   const sections = [
     { name: "Maintenance", slug: "maintenance", description: "Report and track maintenance issues", hasIssueTracking: true, sortOrder: 1 },
     { name: "Landlord Issues", slug: "landlord-issues", description: "Document landlord disputes and complaints", hasIssueTracking: true, sortOrder: 2 },
@@ -40,28 +113,47 @@ async function main() {
   ];
 
   for (const section of sections) {
-    await prisma.section.upsert({
-      where: { slug: section.slug },
-      update: {},
-      create: section,
+    const existing = await prisma.section.findFirst({
+      where: { buildingId: building.id, slug: section.slug },
     });
+    if (!existing) {
+      await prisma.section.create({
+        data: { ...section, buildingId: building.id },
+      });
+    }
   }
 
-  // Seed admin account
-  const adminEmail = process.env.ADMIN_EMAIL || "admin@tenantnet.nyc";
-  const adminPassword = process.env.ADMIN_PASSWORD || "changeme";
-  const hash = await bcrypt.hash(adminPassword, 10);
-
-  await prisma.admin.upsert({
-    where: { email: adminEmail },
-    update: {},
-    create: {
-      email: adminEmail,
-      passwordHash: hash,
-    },
+  // 6. Generate NYC building records
+  const existingRecords = await prisma.buildingRecord.count({
+    where: { buildingId: building.id },
   });
 
-  console.log("Seeded 17 units, 5 sections, 1 admin");
+  if (existingRecords === 0) {
+    const recordUrls = generateBuildingRecordUrls({
+      borough: building.borough,
+      block: building.block,
+      lot: building.lot,
+      bin: building.bin,
+      address: building.address,
+    });
+
+    for (const record of recordUrls) {
+      await prisma.buildingRecord.create({
+        data: {
+          buildingId: building.id,
+          recordType: record.recordType as never,
+          url: record.url,
+          label: record.label,
+          description: record.description,
+          autoGenerated: true,
+        },
+      });
+    }
+
+    console.log(`Generated ${recordUrls.length} NYC record links`);
+  }
+
+  console.log("Seeded: 1 building, 2 admins (system + tenant rep), 17 units, 5 sections");
 }
 
 main()

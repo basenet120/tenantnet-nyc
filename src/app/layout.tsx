@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     default: "TENANTNET.NYC",
     template: "%s | TENANTNET.NYC",
   },
-  description: "Tenant forum and issue tracker for 449 West 125th Street, Harlem NYC",
+  description: "Private tenant forums for NYC rent-stabilized buildings — report issues, document disputes, connect with neighbors.",
   openGraph: {
     title: "TENANTNET.NYC",
     description: "Your building's private forum — report issues, document disputes, connect with neighbors.",

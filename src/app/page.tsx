@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { BuildingSignupForm } from "@/components/building-signup-form";
 
 export default async function Home() {
   const session = await getSession();
@@ -9,11 +10,14 @@ export default async function Home() {
     redirect("/dashboard");
   }
   if (session?.type === "admin") {
+    if (session.role === "system_admin") {
+      redirect("/admin/system");
+    }
     redirect("/dashboard");
   }
 
   return (
-    <div className="min-h-dvh flex items-center justify-center px-4">
+    <div className="min-h-dvh flex flex-col items-center justify-center px-4 py-16">
       <div className="border-2 border-[var(--color-border-light)] p-8 sm:p-12 max-w-lg w-full text-center">
         <h1 className="font-display text-5xl sm:text-7xl uppercase leading-[0.9] tracking-tight text-offwhite mb-6">
           TENANT
@@ -24,10 +28,10 @@ export default async function Home() {
 
         <div className="border-t-2 border-b-2 border-[var(--color-border)] py-3 mb-6">
           <p className="font-display text-lg sm:text-xl uppercase tracking-widest text-offwhite">
-            449 West 125th Street
+            Your Building&apos;s Forum
           </p>
           <p className="font-display text-sm uppercase tracking-[0.2em] text-[var(--color-text-secondary)] mt-1">
-            Harlem, New York
+            NYC Rent-Stabilized Tenants
           </p>
         </div>
 
@@ -39,6 +43,19 @@ export default async function Home() {
           <Link href="/login" className="btn btn-outline w-full">
             Log In
           </Link>
+        </div>
+      </div>
+
+      {/* Building Signup */}
+      <div className="mt-16 max-w-lg w-full">
+        <div className="border-t-2 border-[var(--color-border)] pt-10">
+          <h2 className="font-display text-2xl uppercase tracking-tight text-offwhite text-center mb-2">
+            Want TENANTNET for your building?
+          </h2>
+          <p className="text-sm text-[var(--color-text-secondary)] text-center mb-8">
+            Submit your building info and we&apos;ll get you set up.
+          </p>
+          <BuildingSignupForm />
         </div>
       </div>
     </div>

@@ -17,7 +17,7 @@ export async function GET(
     return NextResponse.redirect(url);
   }
 
-  const sessionToken = await createUnitSession(unit.id);
+  const sessionToken = await createUnitSession(unit.id, unit.buildingId);
   const cookie = setSessionCookie(sessionToken);
 
   // If not registered yet, redirect to registration

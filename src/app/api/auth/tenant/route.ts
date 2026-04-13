@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   if (unit?.isRegistered && unit.passwordHash) {
     const valid = await bcrypt.compare(password, unit.passwordHash);
     if (valid) {
-      const token = await createUnitSession(unit.id);
+      const token = await createUnitSession(unit.id, unit.buildingId);
       const cookieStore = await cookies();
       cookieStore.set(setSessionCookie(token));
       return NextResponse.json({ success: true });
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     if (admin) {
       const valid = await bcrypt.compare(password, admin.passwordHash);
       if (valid) {
-        const token = await createAdminSession(admin.id);
+        const token = await createAdminSession(admin.id, admin.buildingId);
         const cookieStore = await cookies();
         cookieStore.set(setSessionCookie(token));
         return NextResponse.json({ success: true });

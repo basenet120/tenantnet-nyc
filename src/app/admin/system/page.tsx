@@ -1,0 +1,79 @@
+import { redirect } from "next/navigation";
+import { getSession } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import SystemAdminNav from "@/components/system-admin-nav";
+import Link from "next/link";
+
+export default async function SystemDashboardPage() {
+  const session = await getSession();
+  if (!session || session.type !== "admin" || session.role !== "system_admin") {
+    redirect("/admin/login");
+  }
+
+  const [buildingCount, totalPosts, pendingSignups, recentBuildings] = await Promise.all([
+    prisma.building.count(),
+    prisma.post.count(),
+    prisma.buildingSignup.count({ where: { status: "pending" } }),
+    prisma.building.findMany({
+      take: 5,
+      orderBy: { createdAt: "desc" },
+      include: { _count: { select: { units: true, posts: true, admins: true } } },
+    }),
+  ]);
+
+  return (
+    <div className="container-wide py-8">
+      <div className="mb-6">
+        <p className="section-label border-b-0 mb-1">System Administration</p>
+        <h1 className="text-3xl tracking-tight">TENANTNET.NYC</h1>
+      </div>
+
+      <SystemAdminNav current="/admin/system" />
+
+      {/* Stats */}
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="card-dark border-l-[3px] border-l-terracotta">
+          <p className="uppercase-label text-[var(--color-text-secondary)]">Buildings</p>
+          <p className="mt-1 font-display text-3xl text-offwhite">{buildingCount}</p>
+        </div>
+        <div className="card-dark border-l-[3px] border-l-amber">
+          <p className="uppercase-label text-[var(--color-text-secondary)]">Total Posts</p>
+          <p className="mt-1 font-display text-3xl text-offwhite">{totalPosts}</p>
+        </div>
+        <div className="card-dark border-l-[3px] border-l-sage">
+          <p className="uppercase-label text-[var(--color-text-secondary)]">Pending Signups</p>
+          <p className="mt-1 font-display text-3xl text-offwhite">{pendingSignups}</p>
+          {pendingSignups > 0 && (
+            <Link href="/admin/system/signups" className="text-xs text-terracotta-light mt-1 block">
+              Review signups
+            </Link>
+          )}
+        </div>
+      </div>
+
+      {/* Recent Buildings */}
+      <div className="mt-10">
+        <h2 className="section-label">Recent Buildings</h2>
+        {recentBuildings.length === 0 ? (
+          <p className="text-sm text-[var(--color-text-secondary)]">No buildings yet.</p>
+        ) : (
+          <ul className="divide-y divide-[var(--color-border)]">
+            {recentBuildings.map((b) => (
+              <li key={b.id} className="flex items-baseline justify-between py-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-offwhite truncate">{b.name}</p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">
+                    {b._count.units} units &middot; {b._count.posts} posts &middot; {b._count.admins} admins
+                  </p>
+                </div>
+                <time className="ml-4 shrink-0 text-xs text-[var(--color-text-secondary)]">
+                  {b.createdAt.toLocaleDateString()}
+                </time>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}

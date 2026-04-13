@@ -4,8 +4,9 @@ import { COOKIE_NAME, SESSION_DURATION_DAYS } from "./constants";
 import { randomBytes } from "crypto";
 
 export type SessionData =
-  | { type: "unit"; unitId: string; unitLabel: string; isRegistered: boolean }
-  | { type: "admin"; adminId: string; email: string }
+  | { type: "unit"; unitId: string; unitLabel: string; buildingId: string; isRegistered: boolean }
+  | { type: "admin"; adminId: string; email: string; role: "system_admin"; buildingId: null; name: string | null }
+  | { type: "admin"; adminId: string; email: string; role: "tenant_rep" | "mgmt_rep"; buildingId: string; name: string | null }
   | null;
 
 export async function getSession(): Promise<SessionData> {
@@ -15,16 +16,42 @@ export async function getSession(): Promise<SessionData> {
 
   const session = await prisma.session.findUnique({
     where: { token: sessionToken },
-    include: { unit: true, admin: true },
+    include: {
+      unit: { select: { id: true, label: true, buildingId: true, isRegistered: true } },
+      admin: { select: { id: true, email: true, role: true, buildingId: true, name: true } },
+    },
   });
 
   if (!session || session.expiresAt < new Date()) return null;
 
   if (session.unit) {
-    return { type: "unit", unitId: session.unit.id, unitLabel: session.unit.label, isRegistered: session.unit.isRegistered };
+    return {
+      type: "unit",
+      unitId: session.unit.id,
+      unitLabel: session.unit.label,
+      buildingId: session.unit.buildingId,
+      isRegistered: session.unit.isRegistered,
+    };
   }
   if (session.admin) {
-    return { type: "admin", adminId: session.admin.id, email: session.admin.email };
+    if (session.admin.role === "system_admin") {
+      return {
+        type: "admin",
+        adminId: session.admin.id,
+        email: session.admin.email,
+        role: "system_admin",
+        buildingId: null,
+        name: session.admin.name,
+      };
+    }
+    return {
+      type: "admin",
+      adminId: session.admin.id,
+      email: session.admin.email,
+      role: session.admin.role as "tenant_rep" | "mgmt_rep",
+      buildingId: session.admin.buildingId!,
+      name: session.admin.name,
+    };
   }
   return null;
 }
@@ -45,25 +72,65 @@ export async function requireAdmin() {
   return session;
 }
 
-export async function createUnitSession(unitId: string): Promise<string> {
+export async function requireSystemAdmin() {
+  const session = await getSession();
+  if (!session || session.type !== "admin" || session.role !== "system_admin") {
+    throw new Error("Unauthorized");
+  }
+  return session;
+}
+
+export async function requireTenantRep() {
+  const session = await getSession();
+  if (!session || session.type !== "admin" || (session.role !== "tenant_rep" && session.role !== "system_admin")) {
+    throw new Error("Unauthorized");
+  }
+  return session;
+}
+
+export async function requireBuildingAdmin(buildingId: string) {
+  const session = await getSession();
+  if (!session || session.type !== "admin") {
+    throw new Error("Unauthorized");
+  }
+  if (session.role === "system_admin") return session;
+  if (session.role === "tenant_rep" && session.buildingId === buildingId) return session;
+  throw new Error("Unauthorized");
+}
+
+export async function requireAnyAdmin() {
+  const session = await getSession();
+  if (!session || session.type !== "admin") {
+    throw new Error("Unauthorized");
+  }
+  return session;
+}
+
+/** Get the buildingId from any session type. Returns null for system_admin with no building context. */
+export function sessionBuildingId(session: NonNullable<SessionData>): string | null {
+  if (session.type === "unit") return session.buildingId;
+  return session.buildingId;
+}
+
+export async function createUnitSession(unitId: string, buildingId: string): Promise<string> {
   const token = randomBytes(32).toString("hex");
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + SESSION_DURATION_DAYS);
 
   await prisma.session.create({
-    data: { unitId, token, expiresAt },
+    data: { unitId, buildingId, token, expiresAt },
   });
 
   return token;
 }
 
-export async function createAdminSession(adminId: string): Promise<string> {
+export async function createAdminSession(adminId: string, buildingId: string | null): Promise<string> {
   const token = randomBytes(32).toString("hex");
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + SESSION_DURATION_DAYS);
 
   await prisma.session.create({
-    data: { adminId, token, expiresAt },
+    data: { adminId, buildingId, token, expiresAt },
   });
 
   return token;

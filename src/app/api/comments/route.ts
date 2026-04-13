@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { getSession, sessionBuildingId } from "@/lib/auth";
 import { IMAGE_LIMITS } from "@/lib/constants";
 
 export async function POST(request: Request) {
@@ -8,6 +8,8 @@ export async function POST(request: Request) {
   if (!session || (session.type !== "unit" && session.type !== "admin")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const buildingId = sessionBuildingId(session);
 
   const body = await request.json();
   const { postId, content, imageUrls } = body as {
@@ -30,9 +32,9 @@ export async function POST(request: Request) {
     );
   }
 
-  // Verify post exists
+  // Verify post exists and belongs to session's building
   const post = await prisma.post.findUnique({ where: { id: postId } });
-  if (!post) {
+  if (!post || (buildingId && post.buildingId !== buildingId)) {
     return NextResponse.json({ error: "Post not found" }, { status: 404 });
   }
 

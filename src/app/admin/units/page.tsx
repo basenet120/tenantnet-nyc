@@ -36,10 +36,10 @@ function ConfirmModal({
         <div className="mt-4 border-2 border-[var(--color-border)] bg-[var(--color-charcoal-light)] p-3">
           <p className="text-xs uppercase tracking-wider text-[var(--color-amber)] font-bold mb-2">This will:</p>
           <ul className="space-y-1 text-sm text-[var(--color-muted)]">
-            <li>• Invalidate the current QR code sticker</li>
-            <li>• Log out the tenant immediately</li>
-            <li>• Require printing a new QR code</li>
-            <li>• Reset their registration</li>
+            <li>Invalidate the current QR code sticker</li>
+            <li>Log out the tenant immediately</li>
+            <li>Require printing a new QR code</li>
+            <li>Reset their registration</li>
           </ul>
         </div>
         <div className="mt-6 flex gap-3">
@@ -70,7 +70,8 @@ export default function AdminUnitsPage() {
       });
   }, []);
 
-  const floors = [1, 2, 3, 4, 5];
+  // Get unique floors from the data instead of hardcoding
+  const floors = [...new Set(units.map((u) => u.floor))].sort((a, b) => a - b);
 
   async function showQr(unit: UnitData) {
     if (qrImages[unit.id]) {
@@ -100,7 +101,6 @@ export default function AdminUnitsPage() {
     );
     setConfirmUnit(null);
     toast.success(`QR code rotated for ${unit.label}`);
-    // Regenerate QR image if it was showing
     if (qrImages[unit.id]) {
       const url = `${window.location.origin}/auth/${qrToken}`;
       const dataUrl = await QRCode.toDataURL(url, { width: 256, margin: 2 });
@@ -116,7 +116,7 @@ export default function AdminUnitsPage() {
         <h1 className="text-3xl tracking-tight">UNIT MANAGEMENT</h1>
       </div>
 
-      <AdminNav current="/admin/units" />
+      <AdminNav current="/admin/units" role="tenant_rep" />
 
       {loading ? (
         <p className="mt-8 text-sm text-[var(--color-text-secondary)]">Loading units...</p>
@@ -127,7 +127,6 @@ export default function AdminUnitsPage() {
             if (floorUnits.length === 0) return null;
             return (
               <div key={floor}>
-                {/* Floor Header */}
                 <div className="flex items-center gap-3 mb-4">
                   <span className="font-display text-lg text-terracotta">
                     {String(floor).padStart(2, "0")}
@@ -139,11 +138,7 @@ export default function AdminUnitsPage() {
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {floorUnits.map((unit) => (
-                    <div
-                      key={unit.id}
-                      className="card-dark"
-                    >
-                      {/* Unit Label */}
+                    <div key={unit.id} className="card-dark">
                       <div className="flex items-baseline justify-between">
                         <p className="font-display text-lg text-offwhite">
                           {unit.label}
@@ -153,7 +148,6 @@ export default function AdminUnitsPage() {
                         </span>
                       </div>
 
-                      {/* Actions */}
                       <div className="mt-3 flex gap-2">
                         <button
                           onClick={() => showQr(unit)}
@@ -169,7 +163,6 @@ export default function AdminUnitsPage() {
                         </button>
                       </div>
 
-                      {/* QR Code Display */}
                       {qrImages[unit.id] && (
                         <div className="mt-4 border-t-2 border-[var(--color-border)] pt-4">
                           <div className="bg-offwhite p-3 inline-block">
@@ -198,7 +191,6 @@ export default function AdminUnitsPage() {
         </div>
       )}
 
-      {/* Confirmation Modal */}
       {confirmUnit && (
         <ConfirmModal
           unit={confirmUnit}

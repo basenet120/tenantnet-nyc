@@ -1,0 +1,153 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { getSession } from "@/lib/auth";
+import { randomBytes } from "crypto";
+import bcrypt from "bcryptjs";
+import { generateBuildingRecordUrls } from "@/lib/nyc-records";
+import { generateBuildingEmail } from "@/lib/building-email";
+import { sendTenantRepInvite } from "@/lib/email";
+
+export async function POST(request: Request) {
+  const session = await getSession();
+  if (!session || session.type !== "admin" || session.role !== "system_admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const {
+    name, address, borough, zip, block, lot, bin,
+    floors, totalUnits, yearBuilt, buildingType, amenities,
+    managementCompany, managementPhone, managementEmail,
+    tenantRepName, tenantRepEmail, tenantRepPassword,
+    unitPattern,
+  } = body;
+
+  if (!address || !borough || !zip || !floors || !totalUnits) {
+    return NextResponse.json({ error: "Missing required building fields" }, { status: 400 });
+  }
+  if (!tenantRepEmail || !tenantRepPassword) {
+    return NextResponse.json({ error: "Tenant rep email and password are required" }, { status: 400 });
+  }
+
+  const passwordHash = await bcrypt.hash(tenantRepPassword, 12);
+
+  // Single transaction
+  const result = await prisma.$transaction(async (tx) => {
+    // 1. Create building
+    const building = await tx.building.create({
+      data: {
+        name: name || address,
+        address,
+        borough,
+        zip,
+        block: block || null,
+        lot: lot || null,
+        bin: bin || null,
+        floors,
+        totalUnits,
+        yearBuilt: yearBuilt || null,
+        buildingType: buildingType || "rent_stabilized",
+        amenities: amenities || [],
+        managementCompany: managementCompany || null,
+        managementPhone: managementPhone || null,
+        managementEmail: managementEmail || null,
+        replyEmail: generateBuildingEmail(address, zip),
+      },
+    });
+
+    // 2. Generate units
+    const units: { floor: number; letter: string; label: string }[] = [];
+    const pattern = unitPattern || "floor_letter"; // "floor_letter" or "sequential"
+
+    if (pattern === "floor_letter") {
+      const lettersPerFloor = Math.ceil(totalUnits / floors);
+      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".slice(0, lettersPerFloor);
+      let count = 0;
+      for (let floor = 1; floor <= floors && count < totalUnits; floor++) {
+        for (const letter of letters) {
+          if (count >= totalUnits) break;
+          units.push({ floor, letter, label: `${floor}${letter}` });
+          count++;
+        }
+      }
+    } else {
+      for (let i = 1; i <= totalUnits; i++) {
+        const floor = Math.ceil(i / Math.ceil(totalUnits / floors));
+        units.push({ floor, letter: String(i), label: String(i) });
+      }
+    }
+
+    for (const unit of units) {
+      await tx.unit.create({
+        data: {
+          buildingId: building.id,
+          floor: unit.floor,
+          letter: unit.letter,
+          label: unit.label,
+          qrToken: randomBytes(16).toString("hex"),
+        },
+      });
+    }
+
+    // 3. Create default sections
+    const defaultSections = [
+      { name: "Maintenance", slug: "maintenance", description: "Report and track maintenance issues", hasIssueTracking: true, sortOrder: 1 },
+      { name: "Landlord Issues", slug: "landlord-issues", description: "Document landlord disputes and complaints", hasIssueTracking: true, sortOrder: 2 },
+      { name: "Building Bulletins", slug: "bulletins", description: "Announcements, water shutoffs, events", hasIssueTracking: false, sortOrder: 3 },
+      { name: "Community", slug: "community", description: "General discussion, selling, lending, recommendations", hasIssueTracking: false, sortOrder: 4 },
+      { name: "Safety & Security", slug: "safety", description: "Door locks, suspicious activity, fire safety", hasIssueTracking: true, sortOrder: 5 },
+    ];
+
+    for (const section of defaultSections) {
+      await tx.section.create({
+        data: { ...section, buildingId: building.id },
+      });
+    }
+
+    // 4. Create tenant rep admin
+    const admin = await tx.admin.create({
+      data: {
+        email: tenantRepEmail,
+        passwordHash,
+        role: "tenant_rep",
+        buildingId: building.id,
+        name: tenantRepName || null,
+        invitedBy: session.adminId,
+      },
+    });
+
+    // 5. Generate building records from NYC identifiers
+    const recordUrls = generateBuildingRecordUrls({
+      borough,
+      block,
+      lot,
+      bin,
+      address,
+    });
+
+    for (const record of recordUrls) {
+      await tx.buildingRecord.create({
+        data: {
+          buildingId: building.id,
+          recordType: record.recordType as never,
+          url: record.url,
+          label: record.label,
+          description: record.description,
+          autoGenerated: true,
+        },
+      });
+    }
+
+    return { building, admin, unitCount: units.length, recordCount: recordUrls.length };
+  });
+
+  // Send tenant rep invite email (fire-and-forget)
+  sendTenantRepInvite(tenantRepEmail, result.building.name, tenantRepPassword);
+
+  return NextResponse.json({
+    buildingId: result.building.id,
+    buildingName: result.building.name,
+    unitCount: result.unitCount,
+    recordCount: result.recordCount,
+  });
+}

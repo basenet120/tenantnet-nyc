@@ -1,10 +1,18 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { getSession } from "@/lib/auth";
+import { getSession, sessionBuildingId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { StatusBadge } from "@/components/status-badge";
 import { CommentForm } from "@/components/comment-form";
 import { ModerationToolbar } from "@/components/moderation-toolbar";
+
+function roleLabel(admin: { role: string; name: string | null }) {
+  const tag = admin.role === "system_admin" ? "System Admin"
+    : admin.role === "tenant_rep" ? "Tenant Rep"
+    : admin.role === "mgmt_rep" ? "Mgmt Rep"
+    : "Admin";
+  return admin.name ? `${admin.name} (${tag})` : tag;
+}
 
 export default async function PostPage({
   params,
@@ -16,7 +24,9 @@ export default async function PostPage({
     redirect("/");
   }
   const isAdmin = session.type === "admin";
+  const canModerate = isAdmin && session.role !== "mgmt_rep";
 
+  const buildingId = sessionBuildingId(session);
   const { id } = await params;
 
   const post = await prisma.post.findUnique({
@@ -24,12 +34,12 @@ export default async function PostPage({
     include: {
       section: true,
       unit: true,
-      admin: true,
+      admin: { select: { email: true, role: true, name: true } },
       images: { orderBy: { createdAt: "asc" } },
       comments: {
         include: {
           unit: true,
-          admin: true,
+          admin: { select: { email: true, role: true, name: true } },
           images: { orderBy: { createdAt: "asc" } },
         },
         orderBy: { createdAt: "asc" },
@@ -37,12 +47,18 @@ export default async function PostPage({
     },
   });
 
-  if (!post) {
-    notFound();
+  if (!post) notFound();
+
+  // Verify post belongs to session's building
+  if (buildingId && post.buildingId !== buildingId) notFound();
+
+  // Check visibility: private posts only visible to author or admins
+  if (post.visibility === "private" && !isAdmin) {
+    if (session.type === "unit" && post.unitId !== session.unitId) notFound();
   }
 
-  const authorLabel = post.admin
-    ? "Tenant Manager"
+  const authorLabelText = post.admin
+    ? roleLabel(post.admin)
     : post.unit
       ? `Unit ${post.unit.label}`
       : "Unknown";
@@ -84,7 +100,7 @@ export default async function PostPage({
               {post.title}
             </h2>
             <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-[var(--color-charcoal-lighter)]">
-              <span className="font-semibold">{authorLabel}</span>
+              <span className="font-semibold">{authorLabelText}</span>
               <span aria-hidden="true">|</span>
               <time dateTime={post.createdAt.toISOString()}>
                 {post.createdAt.toLocaleDateString("en-US", {
@@ -97,6 +113,14 @@ export default async function PostPage({
                 <span className="badge badge-amber">Pinned</span>
               )}
               {post.status && <StatusBadge status={post.status} />}
+              {post.visibility === "private" && (
+                <span className="badge badge-muted flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                  </svg>
+                  Private
+                </span>
+              )}
             </div>
           </div>
 
@@ -125,8 +149,8 @@ export default async function PostPage({
           )}
         </article>
 
-        {/* Moderation Toolbar (admin only) */}
-        {isAdmin && (
+        {/* Moderation Toolbar (tenant_rep and system_admin only) */}
+        {canModerate && (
           <ModerationToolbar
             postId={post.id}
             isPinned={post.isPinned}
@@ -151,7 +175,7 @@ export default async function PostPage({
                 >
                   <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] mb-2">
                     <span className="font-display uppercase tracking-wide text-offwhite">
-                      {comment.admin ? "Tenant Manager" : comment.unit ? `Unit ${comment.unit.label}` : "Unknown"}
+                      {comment.admin ? roleLabel(comment.admin) : comment.unit ? `Unit ${comment.unit.label}` : "Unknown"}
                     </span>
                     <span aria-hidden="true">|</span>
                     <time dateTime={comment.createdAt.toISOString()}>

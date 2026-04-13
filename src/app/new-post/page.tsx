@@ -23,6 +23,7 @@ function NewPostForm() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [visibility, setVisibility] = useState<"public" | "private">("public");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -60,7 +61,7 @@ function NewPostForm() {
       const res = await fetch("/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title.trim(), sectionId, content: content.trim(), imageUrls }),
+        body: JSON.stringify({ title: title.trim(), sectionId, content: content.trim(), imageUrls, visibility }),
       });
 
       if (!res.ok) {
@@ -160,6 +161,34 @@ function NewPostForm() {
               rows={6}
               required
             />
+          </div>
+
+          <div>
+            <label className="section-label block">Visibility</label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 text-sm text-offwhite cursor-pointer">
+                <input
+                  type="radio"
+                  name="visibility"
+                  value="public"
+                  checked={visibility === "public"}
+                  onChange={() => setVisibility("public")}
+                  className="accent-[var(--color-terracotta)]"
+                />
+                Public — visible to all tenants
+              </label>
+              <label className="flex items-center gap-2 text-sm text-offwhite cursor-pointer">
+                <input
+                  type="radio"
+                  name="visibility"
+                  value="private"
+                  checked={visibility === "private"}
+                  onChange={() => setVisibility("private")}
+                  className="accent-[var(--color-terracotta)]"
+                />
+                Private — only you and admins
+              </label>
+            </div>
           </div>
 
           <div>

@@ -1,9 +1,11 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getSession } from "@/lib/auth";
+import { getSession, sessionBuildingId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PostCard } from "@/components/post-card";
 import { SectionNav } from "@/components/section-nav";
+import { BuildingRecords } from "@/components/building-records";
+import { postVisibilityWhere } from "@/lib/post-filters";
 
 type PostWithRelations = {
   id: string;
@@ -11,17 +13,32 @@ type PostWithRelations = {
   body: string;
   isPinned: boolean;
   status: string | null;
+  visibility: string;
   createdAt: Date;
   section: { name: string };
   unit: { label: string } | null;
-  admin: { email: string } | null;
+  admin: { email: string; role: string; name: string | null } | null;
   _count: { comments: number; images: number };
 };
 
-function authorLabel(post: { admin: { email: string } | null; unit: { label: string } | null }) {
-  if (post.admin) return "Tenant Manager";
+function authorLabel(post: { admin: { email: string; role: string; name: string | null } | null; unit: { label: string } | null }) {
+  if (post.admin) {
+    const roleLabel = post.admin.role === "system_admin" ? "System Admin"
+      : post.admin.role === "tenant_rep" ? "Tenant Rep"
+      : post.admin.role === "mgmt_rep" ? "Mgmt Rep"
+      : "Admin";
+    return post.admin.name ? `${post.admin.name} (${roleLabel})` : roleLabel;
+  }
   if (post.unit) return `Unit ${post.unit.label}`;
   return "Unknown";
+}
+
+function roleBadgeLabel(session: NonNullable<Awaited<ReturnType<typeof getSession>>>) {
+  if (session.type === "unit") return `Unit ${session.unitLabel}`;
+  if (session.role === "system_admin") return "System Admin";
+  if (session.role === "tenant_rep") return "Tenant Rep";
+  if (session.role === "mgmt_rep") return "Mgmt Rep";
+  return "Admin";
 }
 
 export default async function DashboardPage() {
@@ -30,28 +47,42 @@ export default async function DashboardPage() {
   const isAdmin = session.type === "admin";
   if (!isAdmin && !session.isRegistered) redirect("/register");
 
-  const [myIssues, recentPosts, pinnedBulletins, sections] = await Promise.all([
+  const buildingId = sessionBuildingId(session);
+  if (!buildingId) redirect("/admin/system");
+
+  const building = await prisma.building.findUnique({
+    where: { id: buildingId },
+    select: { name: true, address: true },
+  });
+
+  const visibilityFilter = postVisibilityWhere(session);
+  const buildingFilter = { buildingId };
+
+  const [myIssues, recentPosts, pinnedBulletins, sections, records] = await Promise.all([
     isAdmin
       ? (Promise.resolve([]) as Promise<PostWithRelations[]>)
       : (prisma.post.findMany({
-          where: { unitId: session.unitId, status: { not: null } },
-          include: { section: true, unit: true, admin: true, _count: { select: { comments: true, images: true } } },
+          where: { ...buildingFilter, unitId: session.unitId, status: { not: null } },
+          include: { section: true, unit: true, admin: { select: { email: true, role: true, name: true } }, _count: { select: { comments: true, images: true } } },
           orderBy: { createdAt: "desc" },
           take: 5,
         }) as Promise<PostWithRelations[]>),
     prisma.post.findMany({
-      where: {},
-      include: { section: true, unit: true, admin: true, _count: { select: { comments: true, images: true } } },
+      where: { ...buildingFilter, ...visibilityFilter },
+      include: { section: true, unit: true, admin: { select: { email: true, role: true, name: true } }, _count: { select: { comments: true, images: true } } },
       orderBy: { createdAt: "desc" },
       take: 20,
     }) as Promise<PostWithRelations[]>,
     prisma.post.findMany({
-      where: { isPinned: true },
-      include: { section: true, unit: true, admin: true, _count: { select: { comments: true, images: true } } },
+      where: { ...buildingFilter, isPinned: true, ...visibilityFilter },
+      include: { section: true, unit: true, admin: { select: { email: true, role: true, name: true } }, _count: { select: { comments: true, images: true } } },
       orderBy: { createdAt: "desc" },
     }) as Promise<PostWithRelations[]>,
-    prisma.section.findMany({ orderBy: { sortOrder: "asc" } }),
+    prisma.section.findMany({ where: buildingFilter, orderBy: { sortOrder: "asc" } }),
+    prisma.buildingRecord.findMany({ where: { buildingId }, orderBy: { createdAt: "asc" } }),
   ]);
+
+  const isMgmtRep = isAdmin && session.role === "mgmt_rep";
 
   return (
     <div className="min-h-dvh">
@@ -60,7 +91,7 @@ export default async function DashboardPage() {
         <div className="container-narrow flex items-center justify-between">
           <div>
             <h1 className="font-display text-xl uppercase tracking-tight text-offwhite">
-              449 W 125th St
+              {building?.name ?? "Building"}
             </h1>
             <p className="text-xs uppercase tracking-[0.15em] text-[var(--color-text-secondary)] mt-0.5">
               Tenantnet.nyc
@@ -85,14 +116,19 @@ export default async function DashboardPage() {
                 >
                   Admin Panel
                 </Link>
-                <span className="badge badge-terracotta">Tenant Manager</span>
+                <span className="badge badge-terracotta">{roleBadgeLabel(session)}</span>
               </>
             ) : (
               <span className="badge badge-terracotta">Unit {session.unitLabel}</span>
             )}
-            <Link href="/new-post" className="btn btn-primary btn-sm no-underline">
-              + New Post
+            <Link href="/send-report" className="btn btn-outline btn-sm no-underline">
+              Send Report
             </Link>
+            {!isMgmtRep && (
+              <Link href="/new-post" className="btn btn-primary btn-sm no-underline">
+                + New Post
+              </Link>
+            )}
           </div>
         </div>
       </header>
@@ -113,6 +149,7 @@ export default async function DashboardPage() {
                   sectionName={post.section.name}
                   status={post.status}
                   isPinned={post.isPinned}
+                  visibility={post.visibility}
                   createdAt={post.createdAt}
                   commentCount={post._count.comments}
                   imageCount={post._count.images}
@@ -120,6 +157,14 @@ export default async function DashboardPage() {
                 />
               ))}
             </div>
+          </section>
+        )}
+
+        {/* NYC Building Records */}
+        {records.length > 0 && (
+          <section>
+            <h2 className="section-label">NYC Public Records</h2>
+            <BuildingRecords records={records} />
           </section>
         )}
 
@@ -138,6 +183,7 @@ export default async function DashboardPage() {
                   sectionName={post.section.name}
                   status={post.status}
                   isPinned={post.isPinned}
+                  visibility={post.visibility}
                   createdAt={post.createdAt}
                   commentCount={post._count.comments}
                   imageCount={post._count.images}
@@ -168,6 +214,7 @@ export default async function DashboardPage() {
                 sectionName={post.section.name}
                 status={post.status}
                 isPinned={post.isPinned}
+                visibility={post.visibility}
                 createdAt={post.createdAt}
                 commentCount={post._count.comments}
                 imageCount={post._count.images}

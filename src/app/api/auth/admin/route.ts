@@ -24,9 +24,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const token = await createAdminSession(admin.id);
+  const token = await createAdminSession(admin.id, admin.buildingId);
   const cookieStore = await cookies();
   cookieStore.set(setSessionCookie(token));
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, role: admin.role });
 }

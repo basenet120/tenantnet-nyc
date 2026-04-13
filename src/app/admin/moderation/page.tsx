@@ -21,7 +21,7 @@ type Post = {
   createdAt: string;
   section: Section;
   unit: { label: string } | null;
-  admin: { email: string } | null;
+  admin: { email: string; name: string | null; role: string } | null;
 };
 
 export default function ModerationPage() {
@@ -129,6 +129,17 @@ export default function ModerationPage() {
     }
   }
 
+  function postAuthorLabel(post: Post) {
+    if (post.admin) {
+      const tag = post.admin.role === "system_admin" ? "System Admin"
+        : post.admin.role === "tenant_rep" ? "Tenant Rep"
+        : post.admin.role === "mgmt_rep" ? "Mgmt Rep"
+        : "Admin";
+      return post.admin.name ? `${post.admin.name} (${tag})` : post.admin.email;
+    }
+    return post.unit?.label ?? "Unknown";
+  }
+
   if (loading) {
     return (
       <div className="container-wide py-8">
@@ -136,7 +147,7 @@ export default function ModerationPage() {
           <p className="section-label border-b-0 mb-1">Administration</p>
           <h1 className="text-3xl tracking-tight">MODERATION</h1>
         </div>
-        <AdminNav current="/admin/moderation" />
+        <AdminNav current="/admin/moderation" role="tenant_rep" />
         <p className="mt-8 text-sm text-[var(--color-text-secondary)]">Loading...</p>
       </div>
     );
@@ -150,7 +161,7 @@ export default function ModerationPage() {
         <h1 className="text-3xl tracking-tight">MODERATION</h1>
       </div>
 
-      <AdminNav current="/admin/moderation" />
+      <AdminNav current="/admin/moderation" role="tenant_rep" />
 
       {/* Create Bulletin */}
       <div className="mt-8 card-dark border-l-[3px] border-l-terracotta">
@@ -227,7 +238,7 @@ export default function ModerationPage() {
                       </p>
                     </div>
                     <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
-                      {post.unit?.label ?? post.admin?.email ?? "Unknown"} in{" "}
+                      {postAuthorLabel(post)} in{" "}
                       <span className="text-terracotta-light">{post.section.name}</span>
                       {" "}&middot;{" "}
                       {new Date(post.createdAt).toLocaleDateString()}

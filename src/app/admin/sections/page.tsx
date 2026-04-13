@@ -97,7 +97,7 @@ export default function AdminSectionsPage() {
         <h1 className="text-3xl tracking-tight">SECTIONS</h1>
       </div>
 
-      <AdminNav current="/admin/sections" />
+      <AdminNav current="/admin/sections" role="tenant_rep" />
 
       {/* Section List */}
       <div className="mt-8">
