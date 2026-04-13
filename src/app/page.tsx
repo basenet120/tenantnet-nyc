@@ -4,6 +4,8 @@ import Link from "next/link";
 import { BuildingSignupForm } from "@/components/building-signup-form";
 import { LanguagePicker } from "@/components/language-picker";
 import { getLang } from "@/lib/get-lang";
+import { translateUiStrings, RTL_LANGS } from "@/lib/i18n";
+import landingStrings from "@/i18n/landing.en.json";
 
 export default async function Home() {
   const session = await getSession();
@@ -19,9 +21,12 @@ export default async function Home() {
   }
 
   const lang = await getLang();
+  const strings = await translateUiStrings(landingStrings, lang, "landing");
+  const t = (key: keyof typeof landingStrings) => strings[key] ?? landingStrings[key];
+  const dir = RTL_LANGS.includes(lang) ? "rtl" : "ltr";
 
   return (
-    <div className="min-h-dvh">
+    <div className="min-h-dvh" dir={dir}>
       {/* Fixed language picker — top left */}
       <div className="fixed top-4 left-4 z-50">
         <LanguagePicker currentLang={lang} />
@@ -60,16 +65,12 @@ export default async function Home() {
         <div className="container-wide relative">
           <div className="max-w-5xl py-24 sm:py-32">
             {/* Overline */}
-            <p
-              className="font-display text-[0.6875rem] tracking-[0.25em] uppercase text-[var(--color-text-secondary)] mb-6 animate-in"
-            >
-              A platform for NYC tenants
+            <p className="font-display text-[0.6875rem] tracking-[0.25em] uppercase text-[var(--color-text-secondary)] mb-6 animate-in">
+              {t("hero_overline")}
             </p>
 
             {/* Main title */}
-            <h1
-              className="font-display text-[clamp(3.5rem,10vw,9rem)] uppercase leading-[0.85] tracking-tight text-offwhite mb-0 animate-in stagger-1"
-            >
+            <h1 className="font-display text-[clamp(3.5rem,10vw,9rem)] uppercase leading-[0.85] tracking-tight text-offwhite mb-0 animate-in stagger-1">
               TENANT
               <br />
               NET<span className="text-terracotta">.NYC</span>
@@ -78,18 +79,17 @@ export default async function Home() {
             {/* Subtitle bar */}
             <div className="mt-8 border-l-[3px] border-terracotta pl-5 max-w-xl animate-in stagger-2">
               <p className="text-lg sm:text-xl text-offwhite leading-snug font-medium">
-                Your building&apos;s private forum. Report issues. Document disputes.
-                Hold landlords accountable. Build community.
+                {t("hero_subtitle")}
               </p>
             </div>
 
             {/* CTA row */}
             <div className="mt-10 flex flex-wrap gap-4 animate-in stagger-3">
               <Link href="/login" className="btn btn-primary no-underline">
-                Log In
+                {t("hero_btn_login")}
               </Link>
               <a href="#how-it-works" className="btn btn-outline no-underline">
-                Learn More
+                {t("hero_btn_learn")}
               </a>
             </div>
 
@@ -97,15 +97,15 @@ export default async function Home() {
             <div className="mt-16 flex flex-wrap gap-10 animate-in stagger-4">
               <div>
                 <p className="font-display text-3xl sm:text-4xl text-terracotta">100%</p>
-                <p className="text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--color-text-secondary)] mt-1">Free for tenants</p>
+                <p className="text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--color-text-secondary)] mt-1">{t("hero_stat_free")}</p>
               </div>
               <div>
                 <p className="font-display text-3xl sm:text-4xl text-offwhite">QR</p>
-                <p className="text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--color-text-secondary)] mt-1">Scan to join</p>
+                <p className="text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--color-text-secondary)] mt-1">{t("hero_stat_qr")}</p>
               </div>
               <div>
                 <p className="font-display text-3xl sm:text-4xl text-offwhite">NYC</p>
-                <p className="text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--color-text-secondary)] mt-1">Public records built in</p>
+                <p className="text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--color-text-secondary)] mt-1">{t("hero_stat_nyc")}</p>
               </div>
             </div>
           </div>
@@ -114,7 +114,7 @@ export default async function Home() {
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-in stagger-5">
           <div className="flex flex-col items-center gap-2 text-[var(--color-text-secondary)]">
-            <span className="text-[0.5625rem] uppercase tracking-[0.2em]">Scroll</span>
+            <span className="text-[0.5625rem] uppercase tracking-[0.2em]">{t("hero_scroll")}</span>
             <div className="w-[1px] h-8 bg-[var(--color-border-light)] relative overflow-hidden">
               <div
                 className="absolute inset-x-0 h-4 bg-terracotta"
@@ -131,55 +131,27 @@ export default async function Home() {
       <section className="py-20 sm:py-28 border-t-2 border-[var(--color-border)]">
         <div className="container-wide">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-12 lg:gap-20">
-            {/* Left: section label */}
             <div>
               <p className="font-display text-[0.6875rem] tracking-[0.2em] uppercase text-terracotta mb-4">
-                What is this
+                {t("what_overline")}
               </p>
               <h2 className="font-display text-3xl sm:text-4xl uppercase leading-[0.95] text-offwhite">
-                Your building,
+                {t("what_title_1")}
                 <br />
-                <span className="text-terracotta">organized.</span>
+                <span className="text-terracotta">{t("what_title_2")}</span>
               </h2>
               <p className="mt-6 text-[var(--color-text-secondary)] leading-relaxed max-w-sm">
-                TENANTNET.NYC gives every apartment building its own private, timestamped
-                forum — so tenants can document problems, coordinate with neighbors,
-                and create a paper trail that actually matters.
+                {t("what_desc")}
               </p>
             </div>
 
-            {/* Right: feature grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-[2px] bg-[var(--color-border)]">
-              <FeatureCard
-                number="01"
-                title="Report Issues"
-                description="Maintenance problems, safety hazards, lease violations — document everything with photos and timestamps that hold up."
-              />
-              <FeatureCard
-                number="02"
-                title="Track Resolution"
-                description="Every issue gets a status: reported, acknowledged, fixed, or unresolved. Nothing falls through the cracks."
-              />
-              <FeatureCard
-                number="03"
-                title="Build Evidence"
-                description="Every post is timestamped and attributed. If it goes to court, you have a documented record of complaints."
-              />
-              <FeatureCard
-                number="04"
-                title="Know Your Rights"
-                description="Direct links to your building's DOB violations, HPD complaints, ACRIS records, and more — pulled from NYC public databases."
-              />
-              <FeatureCard
-                number="05"
-                title="Email Reports"
-                description="Send documented complaints directly to your landlord, management company, HPD, or 311 — right from the platform."
-              />
-              <FeatureCard
-                number="06"
-                title="Stay Anonymous"
-                description="Posts are attributed to unit numbers, not names. Your identity is protected. Organize without fear of retaliation."
-              />
+              <FeatureCard number="01" title={t("feat_01_title")} description={t("feat_01_desc")} />
+              <FeatureCard number="02" title={t("feat_02_title")} description={t("feat_02_desc")} />
+              <FeatureCard number="03" title={t("feat_03_title")} description={t("feat_03_desc")} />
+              <FeatureCard number="04" title={t("feat_04_title")} description={t("feat_04_desc")} />
+              <FeatureCard number="05" title={t("feat_05_title")} description={t("feat_05_desc")} />
+              <FeatureCard number="06" title={t("feat_06_title")} description={t("feat_06_desc")} />
             </div>
           </div>
         </div>
@@ -191,30 +163,16 @@ export default async function Home() {
       <section id="how-it-works" className="py-20 sm:py-28 border-t-2 border-[var(--color-border)] scroll-mt-8">
         <div className="container-wide">
           <p className="font-display text-[0.6875rem] tracking-[0.2em] uppercase text-terracotta mb-4">
-            How it works
+            {t("how_overline")}
           </p>
           <h2 className="font-display text-3xl sm:text-4xl uppercase leading-[0.95] text-offwhite mb-16">
-            Three steps. <span className="text-terracotta">Zero friction.</span>
+            {t("how_title_1")} <span className="text-terracotta">{t("how_title_2")}</span>
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
-            <StepCard
-              step="01"
-              title="Get your QR code"
-              description="Your building's tenant rep distributes a unique QR code to each unit. Scan it with your phone camera — that's your login. No apps, no downloads, no passwords to remember."
-              isFirst
-            />
-            <StepCard
-              step="02"
-              title="Post & document"
-              description="Report maintenance issues with photos. Flag landlord disputes. Read building bulletins. Comment on your neighbors' posts. Every action is timestamped and preserved."
-            />
-            <StepCard
-              step="03"
-              title="Hold them accountable"
-              description="Send formal complaints to your landlord or city agencies right from the platform. Access your building's HPD violations, DOB complaints, and public records. Build your case."
-              isLast
-            />
+            <StepCard step="01" title={t("how_step1_title")} description={t("how_step1_desc")} isFirst />
+            <StepCard step="02" title={t("how_step2_title")} description={t("how_step2_desc")} />
+            <StepCard step="03" title={t("how_step3_title")} description={t("how_step3_desc")} isLast />
           </div>
         </div>
       </section>
@@ -225,29 +183,17 @@ export default async function Home() {
       <section className="py-20 sm:py-28 border-t-2 border-[var(--color-border)]">
         <div className="container-wide">
           <p className="font-display text-[0.6875rem] tracking-[0.2em] uppercase text-terracotta mb-4">
-            Who it&apos;s for
+            {t("who_overline")}
           </p>
           <h2 className="font-display text-3xl sm:text-4xl uppercase leading-[0.95] text-offwhite mb-12">
-            Every tenant. <span className="text-terracotta">Every building.</span>
+            {t("who_title_1")} <span className="text-terracotta">{t("who_title_2")}</span>
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <AudienceCard
-              label="Rent Stabilized"
-              description="Document violations. Build your case for rent overcharges. Know your succession and renewal rights."
-            />
-            <AudienceCard
-              label="Market Rate"
-              description="Just because your rent isn't regulated doesn't mean your landlord can ignore repairs. Document everything."
-            />
-            <AudienceCard
-              label="NYCHA / Public"
-              description="Track maintenance tickets that NYCHA loses. Coordinate with neighbors on shared building issues."
-            />
-            <AudienceCard
-              label="Co-ops & Condos"
-              description="Board transparency. Maintenance coordination. Building-wide communication without the email chain chaos."
-            />
+            <AudienceCard label={t("who_rent_label")} description={t("who_rent_desc")} />
+            <AudienceCard label={t("who_market_label")} description={t("who_market_desc")} />
+            <AudienceCard label={t("who_nycha_label")} description={t("who_nycha_desc")} />
+            <AudienceCard label={t("who_coop_label")} description={t("who_coop_desc")} />
           </div>
         </div>
       </section>
@@ -256,7 +202,6 @@ export default async function Home() {
           NYC RECORDS CALLOUT
           ═══════════════════════════════════════════ */}
       <section className="py-20 sm:py-28 border-t-2 border-[var(--color-border)] relative overflow-hidden">
-        {/* Background accent */}
         <div
           className="absolute top-0 right-0 w-1/2 h-full opacity-[0.03]"
           style={{
@@ -269,29 +214,28 @@ export default async function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <p className="font-display text-[0.6875rem] tracking-[0.2em] uppercase text-terracotta mb-4">
-                NYC public records
+                {t("records_overline")}
               </p>
               <h2 className="font-display text-3xl sm:text-4xl uppercase leading-[0.95] text-offwhite mb-6">
-                Your building&apos;s history,
+                {t("records_title_1")}
                 <br />
-                <span className="text-terracotta">one click away.</span>
+                <span className="text-terracotta">{t("records_title_2")}</span>
               </h2>
               <p className="text-[var(--color-text-secondary)] leading-relaxed mb-8 max-w-md">
-                Every building on TENANTNET.NYC gets automatic links to NYC government
-                databases. Know what the city knows about your building.
+                {t("records_desc")}
               </p>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-[2px] bg-[var(--color-border)]">
               {[
-                { code: "DOB", label: "Building Profile", sub: "Permits & certificates" },
-                { code: "HPD", label: "Violations", sub: "Housing code violations" },
-                { code: "HPD", label: "Complaints", sub: "Filed complaints" },
-                { code: "311", label: "Service Requests", sub: "Noise, heat, pests" },
-                { code: "ACRIS", label: "Property Docs", sub: "Deeds & mortgages" },
-                { code: "ZoLA", label: "Zoning Info", sub: "Land use & zoning" },
-              ].map((record) => (
-                <div key={record.label} className="bg-[var(--color-charcoal-light)] p-4">
+                { code: "DOB", label: t("records_dob_label"), sub: t("records_dob_sub") },
+                { code: "HPD", label: t("records_hpd_v_label"), sub: t("records_hpd_v_sub") },
+                { code: "HPD", label: t("records_hpd_c_label"), sub: t("records_hpd_c_sub") },
+                { code: "311", label: t("records_311_label"), sub: t("records_311_sub") },
+                { code: "ACRIS", label: t("records_acris_label"), sub: t("records_acris_sub") },
+                { code: "ZoLA", label: t("records_zola_label"), sub: t("records_zola_sub") },
+              ].map((record, i) => (
+                <div key={i} className="bg-[var(--color-charcoal-light)] p-4">
                   <span className="font-display text-sm text-terracotta tracking-wider">{record.code}</span>
                   <p className="text-sm font-semibold text-offwhite mt-1">{record.label}</p>
                   <p className="text-[0.6875rem] text-[var(--color-text-secondary)] mt-0.5">{record.sub}</p>
@@ -308,36 +252,27 @@ export default async function Home() {
       <section className="py-20 sm:py-28 border-t-2 border-[var(--color-border)]">
         <div className="container-wide">
           <p className="font-display text-[0.6875rem] tracking-[0.2em] uppercase text-terracotta mb-4">
-            Built-in structure
+            {t("roles_overline")}
           </p>
           <h2 className="font-display text-3xl sm:text-4xl uppercase leading-[0.95] text-offwhite mb-12">
-            Roles that <span className="text-terracotta">make sense.</span>
+            {t("roles_title_1")} <span className="text-terracotta">{t("roles_title_2")}</span>
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="border-2 border-[var(--color-border)] p-6 relative">
               <div className="absolute top-0 left-0 w-full h-[3px] bg-terracotta" />
-              <p className="font-display text-lg uppercase text-offwhite mt-2">Tenant Rep</p>
-              <p className="text-sm text-[var(--color-text-secondary)] mt-3 leading-relaxed">
-                The building organizer. Manages units, moderates posts, invites management reps, and sends
-                official reports to the landlord and city agencies. Every building gets one.
-              </p>
+              <p className="font-display text-lg uppercase text-offwhite mt-2">{t("roles_rep_title")}</p>
+              <p className="text-sm text-[var(--color-text-secondary)] mt-3 leading-relaxed">{t("roles_rep_desc")}</p>
             </div>
             <div className="border-2 border-[var(--color-border)] p-6 relative">
               <div className="absolute top-0 left-0 w-full h-[3px] bg-amber" />
-              <p className="font-display text-lg uppercase text-offwhite mt-2">Tenants</p>
-              <p className="text-sm text-[var(--color-text-secondary)] mt-3 leading-relaxed">
-                Post issues, upload photo evidence, comment on neighbors&apos; posts, track the status of
-                reported problems. Identified by unit number, never by name.
-              </p>
+              <p className="font-display text-lg uppercase text-offwhite mt-2">{t("roles_tenant_title")}</p>
+              <p className="text-sm text-[var(--color-text-secondary)] mt-3 leading-relaxed">{t("roles_tenant_desc")}</p>
             </div>
             <div className="border-2 border-[var(--color-border)] p-6 relative">
               <div className="absolute top-0 left-0 w-full h-[3px] bg-sage" />
-              <p className="font-display text-lg uppercase text-offwhite mt-2">Management Rep</p>
-              <p className="text-sm text-[var(--color-text-secondary)] mt-3 leading-relaxed">
-                Invited by the tenant rep. Read-only access to all posts, can comment but can&apos;t
-                moderate or delete. Transparency without control.
-              </p>
+              <p className="font-display text-lg uppercase text-offwhite mt-2">{t("roles_mgmt_title")}</p>
+              <p className="text-sm text-[var(--color-text-secondary)] mt-3 leading-relaxed">{t("roles_mgmt_desc")}</p>
             </div>
           </div>
         </div>
@@ -349,17 +284,16 @@ export default async function Home() {
       <section className="py-16 border-t-2 border-[var(--color-border)]">
         <div className="container-narrow text-center">
           <p className="font-display text-[0.6875rem] tracking-[0.2em] uppercase text-[var(--color-text-secondary)] mb-4">
-            Already on TENANTNET.NYC?
+            {t("cta_overline")}
           </p>
           <h2 className="font-display text-2xl sm:text-3xl uppercase leading-[0.95] text-offwhite mb-3">
-            Scan your QR code <span className="text-terracotta">or log in.</span>
+            {t("cta_title_1")} <span className="text-terracotta">{t("cta_title_2")}</span>
           </h2>
           <p className="text-sm text-[var(--color-text-secondary)] mb-8 max-w-md mx-auto">
-            Scan the QR code your tenant rep distributed. Or log in with the
-            username and password you created during registration.
+            {t("cta_desc")}
           </p>
           <Link href="/login" className="btn btn-primary no-underline">
-            Log In
+            {t("hero_btn_login")}
           </Link>
         </div>
       </section>
@@ -368,22 +302,20 @@ export default async function Home() {
           BUILDING SIGNUP
           ═══════════════════════════════════════════ */}
       <section className="py-20 sm:py-28 border-t-2 border-terracotta relative overflow-hidden">
-        {/* Terracotta accent bar top */}
         <div className="absolute top-0 left-0 w-full h-[3px] bg-terracotta" />
 
         <div className="container-narrow">
           <div className="text-center mb-12">
             <p className="font-display text-[0.6875rem] tracking-[0.2em] uppercase text-terracotta mb-4">
-              Get started
+              {t("signup_overline")}
             </p>
             <h2 className="font-display text-3xl sm:text-5xl uppercase leading-[0.9] text-offwhite mb-4">
-              Bring TENANTNET
+              {t("signup_title_1")}
               <br />
-              <span className="text-terracotta">to your building.</span>
+              <span className="text-terracotta">{t("signup_title_2")}</span>
             </h2>
             <p className="text-[var(--color-text-secondary)] leading-relaxed max-w-lg mx-auto">
-              Whether you&apos;re a tenant organizer, a concerned neighbor, or a tenant
-              association — submit your building and we&apos;ll set you up. It&apos;s free.
+              {t("signup_desc")}
             </p>
           </div>
 
@@ -392,7 +324,7 @@ export default async function Home() {
           </div>
 
           <p className="text-center text-sm text-[var(--color-text-secondary)] mt-10">
-            Questions? Press inquiries? Reach us at{" "}
+            {t("signup_contact")}{" "}
             <a href="mailto:hello@tenantnet.nyc" className="text-terracotta-light hover:text-terracotta">
               hello@tenantnet.nyc
             </a>
@@ -411,14 +343,14 @@ export default async function Home() {
                 TENANTNET<span className="text-terracotta">.NYC</span>
               </span>
               <span className="text-[0.625rem] uppercase tracking-[0.15em] text-[var(--color-text-secondary)]">
-                By tenants, for tenants.
+                {t("footer_tagline")}
               </span>
             </div>
             <div className="flex items-center gap-6 text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--color-text-secondary)]">
-              <a href="mailto:hello@tenantnet.nyc" className="hover:text-offwhite transition-colors no-underline">Contact</a>
-              <Link href="/login" className="hover:text-offwhite transition-colors no-underline">Log In</Link>
-              <a href="#how-it-works" className="hover:text-offwhite transition-colors no-underline">How It Works</a>
-              <Link href="/admin/login" className="hover:text-offwhite transition-colors no-underline">Admin</Link>
+              <a href="mailto:hello@tenantnet.nyc" className="hover:text-offwhite transition-colors no-underline">{t("footer_contact")}</a>
+              <Link href="/login" className="hover:text-offwhite transition-colors no-underline">{t("footer_login")}</Link>
+              <a href="#how-it-works" className="hover:text-offwhite transition-colors no-underline">{t("footer_how")}</a>
+              <Link href="/admin/login" className="hover:text-offwhite transition-colors no-underline">{t("footer_admin")}</Link>
             </div>
           </div>
         </div>
@@ -435,7 +367,7 @@ export default async function Home() {
   );
 }
 
-/* ─── Sub-components (server, no separate files needed) ─── */
+/* ─── Sub-components ─── */
 
 function FeatureCard({ number, title, description }: { number: string; title: string; description: string }) {
   return (
@@ -443,12 +375,8 @@ function FeatureCard({ number, title, description }: { number: string; title: st
       <span className="font-display text-2xl text-[var(--color-border-light)] group-hover:text-terracotta transition-colors duration-300">
         {number}
       </span>
-      <h3 className="font-display text-base uppercase tracking-wide text-offwhite mt-2 mb-2">
-        {title}
-      </h3>
-      <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
-        {description}
-      </p>
+      <h3 className="font-display text-base uppercase tracking-wide text-offwhite mt-2 mb-2">{title}</h3>
+      <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">{description}</p>
     </div>
   );
 }
@@ -456,17 +384,12 @@ function FeatureCard({ number, title, description }: { number: string; title: st
 function StepCard({ step, title, description, isFirst, isLast }: { step: string; title: string; description: string; isFirst?: boolean; isLast?: boolean }) {
   return (
     <div className={`relative p-8 border-2 border-[var(--color-border)] ${!isLast ? "md:border-r-0" : ""}`}>
-      {/* Connector line */}
       {!isFirst && (
         <div className="hidden md:block absolute -left-[2px] top-1/2 -translate-y-1/2 w-[2px] h-8 bg-terracotta" />
       )}
       <span className="font-display text-5xl text-[var(--color-charcoal-lighter)]">{step}</span>
-      <h3 className="font-display text-lg uppercase tracking-wide text-offwhite mt-3 mb-3">
-        {title}
-      </h3>
-      <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
-        {description}
-      </p>
+      <h3 className="font-display text-lg uppercase tracking-wide text-offwhite mt-3 mb-3">{title}</h3>
+      <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">{description}</p>
     </div>
   );
 }
