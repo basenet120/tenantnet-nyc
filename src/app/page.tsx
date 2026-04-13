@@ -381,6 +381,13 @@ export default async function Home() {
           <div className="max-w-lg mx-auto">
             <BuildingSignupForm />
           </div>
+
+          <p className="text-center text-sm text-[var(--color-text-secondary)] mt-10">
+            Questions? Press inquiries? Reach us at{" "}
+            <a href="mailto:hello@tenantnet.nyc" className="text-terracotta-light hover:text-terracotta">
+              hello@tenantnet.nyc
+            </a>
+          </p>
         </div>
       </section>
 
@@ -399,6 +406,7 @@ export default async function Home() {
               </span>
             </div>
             <div className="flex items-center gap-6 text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--color-text-secondary)]">
+              <a href="mailto:hello@tenantnet.nyc" className="hover:text-offwhite transition-colors no-underline">Contact</a>
               <Link href="/login" className="hover:text-offwhite transition-colors no-underline">Log In</Link>
               <a href="#how-it-works" className="hover:text-offwhite transition-colors no-underline">How It Works</a>
               <Link href="/admin/login" className="hover:text-offwhite transition-colors no-underline">Admin</Link>
