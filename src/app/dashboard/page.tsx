@@ -5,7 +5,10 @@ import { prisma } from "@/lib/db";
 import { PostCard } from "@/components/post-card";
 import { SectionNav } from "@/components/section-nav";
 import { BuildingRecords } from "@/components/building-records";
+import { LanguagePicker } from "@/components/language-picker";
 import { postVisibilityWhere } from "@/lib/post-filters";
+import { getLang } from "@/lib/get-lang";
+import { RTL_LANGS, type LangCode } from "@/lib/i18n";
 
 type PostWithRelations = {
   id: string;
@@ -50,6 +53,9 @@ export default async function DashboardPage() {
   const buildingId = sessionBuildingId(session);
   if (!buildingId) redirect("/admin/system");
 
+  const lang = await getLang();
+  const dir = RTL_LANGS.includes(lang) ? "rtl" : "ltr";
+
   const building = await prisma.building.findUnique({
     where: { id: buildingId },
     select: { name: true, address: true },
@@ -85,7 +91,7 @@ export default async function DashboardPage() {
   const isMgmtRep = isAdmin && session.role === "mgmt_rep";
 
   return (
-    <div className="min-h-dvh">
+    <div className="min-h-dvh" dir={dir}>
       {/* Header */}
       <header className="border-b-2 border-[var(--color-border)] px-4 py-5">
         <div className="container-narrow flex items-center justify-between">
@@ -98,6 +104,7 @@ export default async function DashboardPage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <LanguagePicker currentLang={lang} />
             <Link
               href="/settings"
               className="hover:opacity-70 transition-opacity no-underline"

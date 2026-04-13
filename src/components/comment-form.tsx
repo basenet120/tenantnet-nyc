@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ImageUpload } from "@/components/image-upload";
 
+function getLangFromCookie(): string {
+  if (typeof document === "undefined") return "en";
+  const match = document.cookie.match(/tn_lang=([a-z]{2})/);
+  return match?.[1] ?? "en";
+}
+
 export function CommentForm({ postId }: { postId: string }) {
   const router = useRouter();
   const [content, setContent] = useState("");
@@ -21,7 +27,7 @@ export function CommentForm({ postId }: { postId: string }) {
       const res = await fetch("/api/comments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ postId, content, imageUrls }),
+        body: JSON.stringify({ postId, content, imageUrls, language: getLangFromCookie() }),
       });
 
       if (!res.ok) {

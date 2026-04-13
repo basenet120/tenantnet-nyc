@@ -4,6 +4,7 @@ import { getSession, sessionBuildingId } from "@/lib/auth";
 import { IMAGE_LIMITS } from "@/lib/constants";
 import { PostStatus } from "@/generated/prisma/client";
 import { sendPostForwardEmail } from "@/lib/email";
+import { getEnglishContent } from "@/lib/i18n";
 
 export async function POST(request: Request) {
   const session = await getSession();
@@ -17,12 +18,13 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { title, sectionId, content, imageUrls, visibility } = body as {
+  const { title, sectionId, content, imageUrls, visibility, language } = body as {
     title?: string;
     sectionId?: string;
     content?: string;
     imageUrls?: string[];
     visibility?: "public" | "private";
+    language?: string;
   };
 
   if (!title || !sectionId || !content) {
@@ -48,11 +50,19 @@ export async function POST(request: Request) {
   }
 
   const isAdmin = session.type === "admin";
+  const lang = language || "en";
+
+  // Translate title and body to English if not already English
+  const titleContent = await getEnglishContent(title, lang);
+  const bodyContent = await getEnglishContent(content, lang);
 
   const post = await prisma.post.create({
     data: {
-      title,
-      body: content,
+      title: titleContent.original,
+      titleEn: lang !== "en" ? titleContent.english : null,
+      body: bodyContent.original,
+      bodyEn: lang !== "en" ? bodyContent.english : null,
+      language: lang,
       sectionId,
       buildingId,
       visibility: visibility === "private" ? "private" : "public",

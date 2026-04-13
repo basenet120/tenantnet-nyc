@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession, sessionBuildingId } from "@/lib/auth";
 import { IMAGE_LIMITS } from "@/lib/constants";
+import { getEnglishContent } from "@/lib/i18n";
 
 export async function POST(request: Request) {
   const session = await getSession();
@@ -12,10 +13,11 @@ export async function POST(request: Request) {
   const buildingId = sessionBuildingId(session);
 
   const body = await request.json();
-  const { postId, content, imageUrls } = body as {
+  const { postId, content, imageUrls, language } = body as {
     postId?: string;
     content?: string;
     imageUrls?: string[];
+    language?: string;
   };
 
   if (!postId || !content) {
@@ -39,6 +41,9 @@ export async function POST(request: Request) {
   }
 
   const isAdmin = session.type === "admin";
+  const lang = language || "en";
+
+  const bodyContent = await getEnglishContent(content, lang);
 
   const comment = await prisma.comment.create({
     data: {
@@ -46,7 +51,9 @@ export async function POST(request: Request) {
       ...(isAdmin
         ? { adminId: session.adminId }
         : { unitId: session.unitId }),
-      body: content,
+      body: bodyContent.original,
+      bodyEn: lang !== "en" ? bodyContent.english : null,
+      language: lang,
       images:
         imageUrls && imageUrls.length > 0
           ? { create: imageUrls.map((url) => ({ url })) }

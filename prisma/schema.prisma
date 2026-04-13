@@ -137,6 +137,7 @@ model Unit {
   username     String?  @unique
   passwordHash String?  @map("password_hash")
   phone        String?
+  language     String   @default("en")
 
   // Notification preferences
   notifyNewPosts     Boolean @default(true)  @map("notify_new_posts")
@@ -213,6 +214,9 @@ model Post {
   adminId    String?        @map("admin_id")
   title      String
   body       String
+  bodyEn     String?        @map("body_en")
+  titleEn    String?        @map("title_en")
+  language   String         @default("en")
   isPinned   Boolean        @default(false) @map("is_pinned")
   status     PostStatus?
   visibility PostVisibility @default(public)
@@ -235,6 +239,8 @@ model Comment {
   unitId    String?  @map("unit_id")
   adminId   String?  @map("admin_id")
   body      String
+  bodyEn    String?  @map("body_en")
+  language  String   @default("en")
   createdAt DateTime @default(now()) @map("created_at")
 
   post   Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
@@ -256,4 +262,17 @@ model Image {
   comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
   @@map("images")
+}
+
+model Translation {
+  id         String   @id @default(uuid())
+  lang       String
+  sourceType String   @map("source_type")
+  sourceId   String   @map("source_id")
+  sourceHash String   @map("source_hash")
+  content    String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@unique([lang, sourceType, sourceId, sourceHash])
+  @@map("translations")
 }

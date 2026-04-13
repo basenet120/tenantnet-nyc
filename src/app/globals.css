@@ -560,3 +560,27 @@ label {
   .container-narrow { padding-inline: var(--space-xl); }
   .container-wide { padding-inline: var(--space-xl); }
 }
+
+/* ============================================
+   RTL Support
+   ============================================ */
+
+[dir="rtl"] .pinned-accent {
+  border-left: none;
+  border-right: 3px solid var(--color-amber);
+}
+
+[dir="rtl"] .card:hover {
+  border-left: 2px solid var(--color-border);
+  border-right: 4px solid var(--color-terracotta);
+}
+
+[dir="rtl"] .card-dark.border-l-terracotta,
+[dir="rtl"] .card-dark.border-l-amber,
+[dir="rtl"] .card-dark.border-l-sage {
+  border-left: none;
+}
+
+[dir="rtl"] .border-l-terracotta { border-left: none; border-right-color: var(--color-terracotta); border-right-width: 3px; }
+[dir="rtl"] .border-l-amber { border-left: none; border-right-color: var(--color-amber); border-right-width: 3px; }
+[dir="rtl"] .border-l-sage { border-left: none; border-right-color: var(--color-sage); border-right-width: 3px; }

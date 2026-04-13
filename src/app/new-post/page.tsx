@@ -61,7 +61,14 @@ function NewPostForm() {
       const res = await fetch("/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title.trim(), sectionId, content: content.trim(), imageUrls, visibility }),
+        body: JSON.stringify({
+          title: title.trim(),
+          sectionId,
+          content: content.trim(),
+          imageUrls,
+          visibility,
+          language: document.cookie.match(/tn_lang=([a-z]{2})/)?.[1] ?? "en",
+        }),
       });
 
       if (!res.ok) {

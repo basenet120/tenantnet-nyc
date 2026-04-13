@@ -5,6 +5,8 @@ import { prisma } from "@/lib/db";
 import { StatusBadge } from "@/components/status-badge";
 import { CommentForm } from "@/components/comment-form";
 import { ModerationToolbar } from "@/components/moderation-toolbar";
+import { TranslatedText } from "@/components/translated-text";
+import { getLang } from "@/lib/get-lang";
 
 function roleLabel(admin: { role: string; name: string | null }) {
   const tag = admin.role === "system_admin" ? "System Admin"
@@ -27,6 +29,7 @@ export default async function PostPage({
   const canModerate = isAdmin && session.role !== "mgmt_rep";
 
   const buildingId = sessionBuildingId(session);
+  const lang = await getLang();
   const { id } = await params;
 
   const post = await prisma.post.findUnique({
@@ -96,9 +99,14 @@ export default async function PostPage({
         {/* Post */}
         <article className="card">
           <div className="mb-4">
-            <h2 className="font-display text-xl sm:text-2xl uppercase leading-tight text-[var(--color-text-on-surface)]">
-              {post.title}
-            </h2>
+            <TranslatedText
+              as="h2"
+              className="font-display text-xl sm:text-2xl uppercase leading-tight text-[var(--color-text-on-surface)]"
+              text={post.titleEn || post.title}
+              lang={lang}
+              sourceType="post_title"
+              sourceId={post.id}
+            />
             <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-[var(--color-charcoal-lighter)]">
               <span className="font-semibold">{authorLabelText}</span>
               <span aria-hidden="true">|</span>
@@ -124,9 +132,14 @@ export default async function PostPage({
             </div>
           </div>
 
-          <div className="text-sm text-[var(--color-text-on-surface)] whitespace-pre-wrap leading-relaxed">
-            {post.body}
-          </div>
+          <TranslatedText
+            as="div"
+            className="text-sm text-[var(--color-text-on-surface)] whitespace-pre-wrap leading-relaxed"
+            text={post.bodyEn || post.body}
+            lang={lang}
+            sourceType="post_body"
+            sourceId={post.id}
+          />
 
           {/* Post images */}
           {post.images.length > 0 && (
@@ -186,9 +199,14 @@ export default async function PostPage({
                       })}
                     </time>
                   </div>
-                  <p className="text-sm text-offwhite whitespace-pre-wrap leading-relaxed">
-                    {comment.body}
-                  </p>
+                  <TranslatedText
+                    as="p"
+                    className="text-sm text-offwhite whitespace-pre-wrap leading-relaxed"
+                    text={comment.bodyEn || comment.body}
+                    lang={lang}
+                    sourceType="comment_body"
+                    sourceId={comment.id}
+                  />
                   {comment.images.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-3">
                       {comment.images.map((image) => (
