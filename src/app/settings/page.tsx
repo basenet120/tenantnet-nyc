@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 
@@ -18,8 +19,10 @@ type Settings = {
 };
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   // Profile form
   const [firstName, setFirstName] = useState("");
@@ -312,6 +315,44 @@ export default function SettingsPage() {
               className="btn btn-primary"
             >
               {savingNotifications ? "Saving..." : "Save Preferences"}
+            </button>
+          </div>
+        </section>
+
+        {/* ── LOGOUT ── */}
+        <section>
+          <h2
+            className="font-display text-sm uppercase tracking-widest pb-2 mb-6 border-b-2"
+            style={{ color: "var(--color-danger)", borderColor: "var(--color-border)" }}
+          >
+            Account
+          </h2>
+          <div
+            className="flex items-center justify-between p-4 border-2"
+            style={{ borderColor: "var(--color-border)", backgroundColor: "var(--color-charcoal-light)" }}
+          >
+            <div>
+              <p className="text-sm font-bold" style={{ color: "var(--color-offwhite)" }}>Log Out</p>
+              <p className="text-xs mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
+                End your session on this device
+              </p>
+            </div>
+            <button
+              onClick={async () => {
+                setLoggingOut(true);
+                try {
+                  await fetch("/api/auth/logout", { method: "POST" });
+                  toast.success("Logged out");
+                  router.push("/");
+                } catch {
+                  toast.error("Failed to log out");
+                  setLoggingOut(false);
+                }
+              }}
+              disabled={loggingOut}
+              className="btn btn-danger btn-sm"
+            >
+              {loggingOut ? "Logging out..." : "Log Out"}
             </button>
           </div>
         </section>
