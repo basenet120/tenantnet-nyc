@@ -2,6 +2,8 @@ import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { BuildingSignupForm } from "@/components/building-signup-form";
+import { LanguagePicker } from "@/components/language-picker";
+import { getLang } from "@/lib/get-lang";
 
 export default async function Home() {
   const session = await getSession();
@@ -16,8 +18,15 @@ export default async function Home() {
     redirect("/dashboard");
   }
 
+  const lang = await getLang();
+
   return (
     <div className="min-h-dvh">
+      {/* Fixed language picker — top left */}
+      <div className="fixed top-4 left-4 z-50">
+        <LanguagePicker currentLang={lang} />
+      </div>
+
       {/* ═══════════════════════════════════════════
           HERO
           ═══════════════════════════════════════════ */}
