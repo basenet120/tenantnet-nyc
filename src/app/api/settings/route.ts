@@ -80,6 +80,10 @@ export async function PATCH(request: NextRequest) {
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
     }
+    const existingEmail = await prisma.unit.findFirst({ where: { email: email.trim().toLowerCase() } });
+    if (existingEmail && existingEmail.id !== session.unitId) {
+      return NextResponse.json({ error: "Email is already in use" }, { status: 409 });
+    }
     data.email = email.trim();
   }
 

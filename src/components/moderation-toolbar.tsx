@@ -78,6 +78,7 @@ export function ModerationToolbar({
       router.push("/dashboard");
     } catch {
       toast.error("Failed to delete post");
+      setConfirmDelete(false);
       setLoading(false);
     }
   }

@@ -138,7 +138,7 @@ export default async function SectionFeedPage({
                 title={post.title}
                 body={post.body}
                 authorLabel={
-                  post.unit?.label ?? post.admin?.email ?? "Unknown"
+                  post.admin ? "Tenant Manager" : post.unit ? `Unit ${post.unit.label}` : "Unknown"
                 }
                 sectionName={post.section.name}
                 status={post.status ?? null}

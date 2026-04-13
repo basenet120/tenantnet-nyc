@@ -10,6 +10,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Prevent re-registration
+  if (session.isRegistered) {
+    return NextResponse.json({ error: "Already registered. Use settings to update your profile." }, { status: 409 });
+  }
+
   const body = await request.json();
   const { firstName, lastName, email, username, password, phone } = body as {
     firstName: string;
@@ -51,9 +56,15 @@ export async function POST(request: NextRequest) {
   }
 
   // Check username uniqueness
-  const existing = await prisma.unit.findUnique({ where: { username: cleanUsername } });
-  if (existing && existing.id !== session.unitId) {
+  const existingUsername = await prisma.unit.findUnique({ where: { username: cleanUsername } });
+  if (existingUsername && existingUsername.id !== session.unitId) {
     return NextResponse.json({ error: "Username is already taken" }, { status: 409 });
+  }
+
+  // Check email uniqueness
+  const existingEmail = await prisma.unit.findFirst({ where: { email: email.trim().toLowerCase() } });
+  if (existingEmail && existingEmail.id !== session.unitId) {
+    return NextResponse.json({ error: "Email is already in use" }, { status: 409 });
   }
 
   // Hash the password

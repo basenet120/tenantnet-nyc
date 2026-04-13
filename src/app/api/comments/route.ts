@@ -30,6 +30,12 @@ export async function POST(request: Request) {
     );
   }
 
+  // Verify post exists
+  const post = await prisma.post.findUnique({ where: { id: postId } });
+  if (!post) {
+    return NextResponse.json({ error: "Post not found" }, { status: 404 });
+  }
+
   const isAdmin = session.type === "admin";
 
   const comment = await prisma.comment.create({

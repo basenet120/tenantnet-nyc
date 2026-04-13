@@ -28,7 +28,10 @@ function NewPostForm() {
 
   useEffect(() => {
     fetch("/api/sections")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to load sections");
+        return res.json();
+      })
       .then((data: Section[]) => {
         setSections(data);
         const preselect = searchParams.get("section");
@@ -36,6 +39,9 @@ function NewPostForm() {
           const match = data.find((s) => s.slug === preselect || s.id === preselect);
           if (match) setSectionId(match.id);
         }
+      })
+      .catch(() => {
+        setError("Failed to load sections. Please refresh the page.");
       });
   }, [searchParams]);
 

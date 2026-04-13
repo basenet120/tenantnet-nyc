@@ -32,11 +32,19 @@ export async function POST(request: Request) {
   }
 
   // Compress image with sharp: resize to max 1920px wide, convert to JPEG at 75% quality
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const compressed = await sharp(buffer)
-    .resize(1920, 1920, { fit: "inside", withoutEnlargement: true })
-    .jpeg({ quality: 75, mozjpeg: true })
-    .toBuffer();
+  let compressed: Buffer;
+  try {
+    const buffer = Buffer.from(await file.arrayBuffer());
+    compressed = await sharp(buffer)
+      .resize(1920, 1920, { fit: "inside", withoutEnlargement: true })
+      .jpeg({ quality: 75, mozjpeg: true })
+      .toBuffer();
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to process image. The file may be corrupted." },
+      { status: 422 },
+    );
+  }
 
   const filename = file.name.replace(/\.[^.]+$/, "") + ".jpg";
 

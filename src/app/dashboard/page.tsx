@@ -171,6 +171,7 @@ export default async function DashboardPage() {
                 createdAt={post.createdAt}
                 commentCount={post._count.comments}
                 imageCount={post._count.images}
+                isAdmin={isAdmin}
               />
             ))}
             {recentPosts.length === 0 && (

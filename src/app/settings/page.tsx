@@ -47,7 +47,10 @@ export default function SettingsPage() {
 
   useEffect(() => {
     fetch("/api/settings")
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error("Failed to load settings");
+        return r.json();
+      })
       .then((data: Settings) => {
         setSettings(data);
         setFirstName(data.firstName || "");
@@ -59,6 +62,10 @@ export default function SettingsPage() {
         setNotifyComments(data.notifyComments);
         setNotifyStatusChange(data.notifyStatusChange);
         setNotifyBulletins(data.notifyBulletins);
+        setLoading(false);
+      })
+      .catch(() => {
+        toast.error("Failed to load settings");
         setLoading(false);
       });
   }, []);
