@@ -92,17 +92,13 @@ export default function LoginPage() {
                 color: "var(--color-text-secondary)",
               }}
             >
-              Username
+              Username or Email
             </label>
             <input
               type="text"
               value={username}
-              onChange={(e) =>
-                setUsername(
-                  e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "")
-                )
-              }
-              placeholder="your_username"
+              onChange={(e) => setUsername(e.target.value.toLowerCase())}
+              placeholder="your_username or email@example.com"
               required
             />
           </div>

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
-import { createUnitSession, setSessionCookie } from "@/lib/auth";
+import { createUnitSession, createAdminSession, setSessionCookie } from "@/lib/auth";
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -10,35 +10,45 @@ export async function POST(request: Request) {
 
   if (!username || !password) {
     return NextResponse.json(
-      { error: "Username and password are required" },
+      { error: "Username or email and password are required" },
       { status: 400 },
     );
   }
 
-  const cleanUsername = username.trim().toLowerCase();
+  const identifier = username.trim().toLowerCase();
+  const isEmail = identifier.includes("@");
 
-  const unit = await prisma.unit.findUnique({
-    where: { username: cleanUsername },
-  });
+  // Try tenant first
+  const unit = isEmail
+    ? await prisma.unit.findFirst({ where: { email: identifier } })
+    : await prisma.unit.findUnique({ where: { username: identifier } });
 
-  if (!unit || !unit.isRegistered || !unit.passwordHash) {
-    return NextResponse.json(
-      { error: "Invalid username or password" },
-      { status: 401 },
-    );
+  if (unit?.isRegistered && unit.passwordHash) {
+    const valid = await bcrypt.compare(password, unit.passwordHash);
+    if (valid) {
+      const token = await createUnitSession(unit.id);
+      const cookieStore = await cookies();
+      cookieStore.set(setSessionCookie(token));
+      return NextResponse.json({ success: true });
+    }
   }
 
-  const valid = await bcrypt.compare(password, unit.passwordHash);
-  if (!valid) {
-    return NextResponse.json(
-      { error: "Invalid username or password" },
-      { status: 401 },
-    );
+  // Try admin (email only)
+  if (isEmail) {
+    const admin = await prisma.admin.findUnique({ where: { email: identifier } });
+    if (admin) {
+      const valid = await bcrypt.compare(password, admin.passwordHash);
+      if (valid) {
+        const token = await createAdminSession(admin.id);
+        const cookieStore = await cookies();
+        cookieStore.set(setSessionCookie(token));
+        return NextResponse.json({ success: true });
+      }
+    }
   }
 
-  const token = await createUnitSession(unit.id);
-  const cookieStore = await cookies();
-  cookieStore.set(setSessionCookie(token));
-
-  return NextResponse.json({ success: true });
+  return NextResponse.json(
+    { error: "Invalid credentials" },
+    { status: 401 },
+  );
 }

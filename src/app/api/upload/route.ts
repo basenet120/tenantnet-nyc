@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
+import sharp from "sharp";
 import { getSession } from "@/lib/auth";
 import { IMAGE_LIMITS } from "@/lib/constants";
 
@@ -30,7 +31,19 @@ export async function POST(request: Request) {
     );
   }
 
-  const blob = await put(file.name, file, { access: "public" });
+  // Compress image with sharp: resize to max 1920px wide, convert to JPEG at 75% quality
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const compressed = await sharp(buffer)
+    .resize(1920, 1920, { fit: "inside", withoutEnlargement: true })
+    .jpeg({ quality: 75, mozjpeg: true })
+    .toBuffer();
+
+  const filename = file.name.replace(/\.[^.]+$/, "") + ".jpg";
+
+  const blob = await put(`uploads/${Date.now()}-${filename}`, compressed, {
+    access: "public",
+    contentType: "image/jpeg",
+  });
 
   return NextResponse.json({ url: blob.url });
 }
