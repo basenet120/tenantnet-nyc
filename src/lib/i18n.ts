@@ -106,7 +106,9 @@ ${JSON.stringify(strings, null, 2)}`,
 
     const block = response.content[0];
     if (block.type === "text") {
-      const parsed = JSON.parse(block.text.trim());
+      let raw = block.text.trim();
+      raw = raw.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "");
+      const parsed = JSON.parse(raw);
       // Backfill missing keys with English
       for (const k of Object.keys(strings)) {
         if (!parsed[k]) parsed[k] = strings[k];
