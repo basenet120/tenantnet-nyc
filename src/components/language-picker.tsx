@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 
 const LANGUAGES = [
   { code: "en", native: "English" },
@@ -18,8 +19,11 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
   const [lang, setLang] = useState(currentLang ?? "en");
   const [switching, setSwitching] = useState(false);
   const [dropdownPos, setDropdownPos] = useState<{ top: number; right: number } | null>(null);
+  const [mounted, setMounted] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => setMounted(true), []);
 
   // Auto-detect from cookie if no prop was provided
   useEffect(() => {
@@ -104,11 +108,11 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
         </span>
       </button>
 
-      {open && dropdownPos && (
+      {mounted && open && dropdownPos && createPortal(
         <div
           ref={dropdownRef}
-          className="fixed z-[100] border-2 border-[var(--color-border)] bg-[var(--color-charcoal)] shadow-lg min-w-[160px]"
-          style={{ top: dropdownPos.top, right: dropdownPos.right }}
+          className="fixed border-2 border-[var(--color-border)] bg-[var(--color-charcoal)] shadow-lg min-w-[160px]"
+          style={{ top: dropdownPos.top, right: dropdownPos.right, zIndex: 2147483647 }}
         >
           {LANGUAGES.map((l) => (
             <button
@@ -124,7 +128,8 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
               <span className="text-[0.625rem] text-[var(--color-text-secondary)] uppercase">{l.code}</span>
             </button>
           ))}
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
