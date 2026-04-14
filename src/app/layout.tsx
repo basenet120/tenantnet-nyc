@@ -48,11 +48,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { strings, lang } = await getAppStrings();
+  const { strings, lang, dir } = await getAppStrings();
 
   return (
     <html
       lang={lang}
+      dir={dir}
       className={`${dmSans.variable} ${archivoBlack.variable}`}
     >
       <head>

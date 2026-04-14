@@ -86,7 +86,7 @@ export function ImageUpload({ maxImages, onImagesChange }: ImageUploadProps) {
               <button
                 type="button"
                 onClick={() => removeImage(i)}
-                className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-none bg-danger text-[0.625rem] font-bold text-offwhite hover:bg-[#a33535] transition-colors"
+                className="absolute -top-2 -end-2 flex h-6 w-6 items-center justify-center rounded-none bg-danger text-[0.625rem] font-bold text-offwhite hover:bg-[#a33535] transition-colors"
               >
                 x
               </button>

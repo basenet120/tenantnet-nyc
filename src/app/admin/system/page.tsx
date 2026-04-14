@@ -73,7 +73,7 @@ export default async function SystemDashboardPage() {
                       {b._count.units} units &middot; {b._count.posts} posts &middot; {b._count.admins} admins
                     </p>
                   </div>
-                  <time className="ml-4 shrink-0 text-xs text-[var(--color-text-secondary)]">
+                  <time className="ms-4 shrink-0 text-xs text-[var(--color-text-secondary)]">
                     {b.createdAt.toLocaleDateString()}
                   </time>
                 </Link>

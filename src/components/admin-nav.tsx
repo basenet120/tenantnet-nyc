@@ -47,7 +47,7 @@ export default function AdminNav({
             {item.label}
           </Link>
         ))}
-        <div className="ml-auto flex items-center gap-1">
+        <div className="ms-auto flex items-center gap-1">
           <LanguagePicker />
           {role === "system_admin" && !isSystemAdminInBuilding && (
             <Link

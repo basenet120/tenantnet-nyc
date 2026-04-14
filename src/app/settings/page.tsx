@@ -396,7 +396,7 @@ function NotificationToggle({
       <button
         type="button"
         onClick={() => onChange(!checked)}
-        className="relative w-12 h-6 transition-colors shrink-0 ml-4"
+        className="relative w-12 h-6 transition-colors shrink-0 ms-4"
         style={{
           backgroundColor: checked ? "var(--color-terracotta)" : "var(--color-charcoal-lighter)",
           border: "2px solid",
