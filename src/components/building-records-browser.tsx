@@ -390,10 +390,49 @@ function ViolationsList({ type, externalUrl }: { type: string; externalUrl?: str
   );
 }
 
+function getRecordUrl(type: string, item: any): string | null {
+  // HPD complaints have per-complaint deep links
+  if (type === "hpd_complaints" && item.complaint_id) {
+    return `https://hpdonline.nyc.gov/hpdonline/complaint/${item.complaint_id}`;
+  }
+  // HPD violations link to building violations page
+  if (type === "hpd_violations" && item.boroid && item.block && item.lot) {
+    return `https://hpdonline.nyc.gov/hpdonline/building/${item.boroid}/${item.block}/${item.lot}/violations`;
+  }
+  // DOB records link to DOB NOW building profile
+  if ((type === "dob_violations" || type === "dob_complaints") && item.boro && item.block && item.lot) {
+    return `https://a810-dobnow.nyc.gov/Publish/#!/BISProfile?boro=${item.boro}&block=${item.block}&lot=${item.lot}`;
+  }
+  return null;
+}
+
 function RecordRow({ type, item }: { type: string; item: any }) {
+  const url = getRecordUrl(type, item);
+  const content = <RecordRowContent type={type} item={item} />;
+
+  if (url) {
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block card-dark py-3 px-4 no-underline hover:border-l-4 hover:border-l-terracotta transition-all group cursor-pointer"
+      >
+        {content}
+        <p className="text-[0.5625rem] text-[var(--color-text-secondary)] mt-2 flex items-center gap-1 group-hover:text-terracotta-light transition-colors">
+          View on city website <ExternalLinkIcon />
+        </p>
+      </a>
+    );
+  }
+
+  return <div className="card-dark py-3 px-4">{content}</div>;
+}
+
+function RecordRowContent({ type, item }: { type: string; item: any }) {
   if (type === "hpd_violations") {
     return (
-      <div className="card-dark py-3 px-4">
+      <>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-offwhite">
@@ -425,14 +464,13 @@ function RecordRow({ type, item }: { type: string; item: any }) {
             {new Date(item.novissueddate).toLocaleDateString()}
           </p>
         )}
-      </div>
+      </>
     );
   }
 
   if (type === "hpd_complaints") {
-    // Dataset ygpa-z7cr: major_category, minor_category, complaint_status, received_date, apartment, space_type, type, status_description
     return (
-      <div className="card-dark py-3 px-4">
+      <>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-offwhite">
@@ -464,15 +502,14 @@ function RecordRow({ type, item }: { type: string; item: any }) {
             {item.status_description}
           </p>
         )}
-      </div>
+      </>
     );
   }
 
   if (type === "dob_violations") {
-    // Dataset 3h2n-5cm9: issue_date (YYYYMMDD), violation_type, violation_category, description, disposition_date, disposition_comments
     const issueDate = item.issue_date ? parseYYYYMMDD(item.issue_date) : null;
     return (
-      <div className="card-dark py-3 px-4">
+      <>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-offwhite">
@@ -499,13 +536,13 @@ function RecordRow({ type, item }: { type: string; item: any }) {
             {item.disposition_comments}
           </p>
         )}
-      </div>
+      </>
     );
   }
 
   if (type === "dob_complaints") {
     return (
-      <div className="card-dark py-3 px-4">
+      <>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-offwhite">
@@ -536,16 +573,12 @@ function RecordRow({ type, item }: { type: string; item: any }) {
             {item.disposition_code && ` · Disposition: ${item.disposition_code}`}
           </p>
         )}
-      </div>
+      </>
     );
   }
 
   // Fallback
-  return (
-    <div className="card-dark py-3 px-4">
-      <p className="text-sm text-offwhite">{JSON.stringify(item).slice(0, 200)}</p>
-    </div>
-  );
+  return <p className="text-sm text-offwhite">{JSON.stringify(item).slice(0, 200)}</p>;
 }
 
 function StatusPill({
