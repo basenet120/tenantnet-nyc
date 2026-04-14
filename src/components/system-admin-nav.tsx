@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { LanguagePicker } from "./language-picker";
 import { useAdminI18n } from "./admin-i18n-provider";
 
 const navItems = [
@@ -27,15 +26,12 @@ export default function SystemAdminNav({ current }: { current: string }) {
           {t(item.key)}
         </Link>
       ))}
-      <div className="ms-auto flex items-center gap-1">
-        <LanguagePicker />
-        <Link
-          href="/admin/onboard"
-          className="px-5 py-3 font-display text-[0.8125rem] tracking-[0.08em] uppercase no-underline transition-colors duration-150 text-terracotta hover:text-terracotta-light -mb-[2px] border-b-[3px] border-b-transparent"
-        >
-          {t("system_onboard")}
-        </Link>
-      </div>
+      <Link
+        href="/admin/onboard"
+        className="ms-auto px-5 py-3 font-display text-[0.8125rem] tracking-[0.08em] uppercase no-underline transition-colors duration-150 text-terracotta hover:text-terracotta-light -mb-[2px] border-b-[3px] border-b-transparent"
+      >
+        {t("system_onboard")}
+      </Link>
     </nav>
   );
 }

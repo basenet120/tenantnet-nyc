@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { ExitBuildingButton } from "./exit-building-button";
-import { LanguagePicker } from "./language-picker";
 import { useAdminI18n } from "./admin-i18n-provider";
 
 const allNavItems = [
@@ -51,17 +50,14 @@ export default function AdminNav({
             {t(item.key)}
           </Link>
         ))}
-        <div className="ms-auto flex items-center gap-1">
-          <LanguagePicker />
-          {role === "system_admin" && !isSystemAdminInBuilding && (
-            <Link
-              href="/admin/system"
-              className="px-5 py-3 font-display text-[0.8125rem] tracking-[0.08em] uppercase no-underline transition-colors duration-150 text-offwhite-dim hover:text-offwhite -mb-[2px] border-b-[3px] border-b-transparent"
-            >
-              {t("admin_system")}
-            </Link>
-          )}
-        </div>
+        {role === "system_admin" && !isSystemAdminInBuilding && (
+          <Link
+            href="/admin/system"
+            className="ms-auto px-5 py-3 font-display text-[0.8125rem] tracking-[0.08em] uppercase no-underline transition-colors duration-150 text-offwhite-dim hover:text-offwhite -mb-[2px] border-b-[3px] border-b-transparent"
+          >
+            {t("admin_system")}
+          </Link>
+        )}
       </nav>
     </div>
   );
