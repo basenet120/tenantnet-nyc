@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ImageUpload } from "@/components/image-upload";
+import { useI18n } from "./i18n-provider";
 
 function getLangFromCookie(): string {
   if (typeof document === "undefined") return "en";
@@ -13,6 +14,7 @@ function getLangFromCookie(): string {
 
 export function CommentForm({ postId }: { postId: string }) {
   const router = useRouter();
+  const { t } = useI18n();
   const [content, setContent] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -38,9 +40,9 @@ export function CommentForm({ postId }: { postId: string }) {
       setContent("");
       setImageUrls([]);
       router.refresh();
-      toast.success("Comment posted");
+      toast.success(t("comment_posted"));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to post comment");
+      toast.error(err instanceof Error ? err.message : t("comment_failed"));
     } finally {
       setSubmitting(false);
     }
@@ -51,7 +53,7 @@ export function CommentForm({ postId }: { postId: string }) {
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder="Write a comment..."
+        placeholder={t("comment_placeholder")}
         rows={3}
         className="w-full rounded-none border-2 border-border bg-charcoal-light text-offwhite placeholder-[var(--color-text-secondary)] px-3 py-3 text-sm focus:border-terracotta focus:outline-none transition-colors"
       />
@@ -61,7 +63,7 @@ export function CommentForm({ postId }: { postId: string }) {
         disabled={!content.trim() || submitting}
         className="btn btn-primary rounded-none font-display text-[0.8125rem] tracking-[0.08em] uppercase disabled:opacity-40 disabled:cursor-not-allowed transition-all"
       >
-        {submitting ? "Posting..." : "Post Comment"}
+        {submitting ? t("comment_posting") : t("comment_post")}
       </button>
     </form>
   );

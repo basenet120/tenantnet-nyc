@@ -6,7 +6,7 @@ import { PostCard } from "@/components/post-card";
 import { LanguagePicker } from "@/components/language-picker";
 import { PostStatus } from "@/generated/prisma/client";
 import { postVisibilityWhere } from "@/lib/post-filters";
-import { getLang } from "@/lib/get-lang";
+import { getAppStrings } from "@/lib/get-app-strings";
 
 const STATUS_OPTIONS = ["all", "reported", "acknowledged", "fixed", "unresolved"] as const;
 
@@ -46,7 +46,7 @@ export default async function SectionFeedPage({
   const buildingId = sessionBuildingId(session);
   if (!buildingId) redirect("/admin/system");
 
-  const lang = await getLang();
+  const { t, lang } = await getAppStrings();
   const { slug } = await params;
   const { status } = await searchParams;
 
@@ -139,7 +139,7 @@ export default async function SectionFeedPage({
                       : "bg-transparent border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-light)]"
                   }`}
                 >
-                  {option}
+                  {t(`section_${option}` as "section_all" | "section_reported" | "section_acknowledged" | "section_fixed" | "section_unresolved")}
                 </Link>
               );
             })}
@@ -151,7 +151,7 @@ export default async function SectionFeedPage({
           href={`/new-post?section=${slug}`}
           className="btn btn-primary w-full mb-8 no-underline"
         >
-          + New Post
+          {t("section_new_post")}
         </Link>
 
         {/* Post list */}
@@ -159,7 +159,7 @@ export default async function SectionFeedPage({
           {posts.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-[var(--color-text-secondary)] text-sm">
-                No posts yet. Be the first to post!
+                {t("section_no_posts")}
               </p>
             </div>
           ) : (

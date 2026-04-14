@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 import { LanguagePicker } from "@/components/language-picker";
+import { useI18n } from "@/components/i18n-provider";
 
 type Settings = {
   firstName: string | null;
@@ -21,6 +22,7 @@ type Settings = {
 
 export default function SettingsPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -155,7 +157,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>Loading settings...</p>
+        <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>{t("loading")}</p>
       </div>
     );
   }
@@ -180,7 +182,7 @@ export default function SettingsPage() {
           </Link>
           <div className="flex-1">
             <h1 className="font-display text-xl uppercase tracking-tight" style={{ color: "var(--color-offwhite)" }}>
-              Settings
+              {t("settings_title")}
             </h1>
             <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Unit {settings?.label}</p>
           </div>
@@ -196,19 +198,19 @@ export default function SettingsPage() {
             className="font-display text-sm uppercase tracking-widest pb-2 mb-6 border-b-2"
             style={{ color: "var(--color-terracotta)", borderColor: "var(--color-border)" }}
           >
-            Profile
+            {t("settings_profile")}
           </h2>
           <form onSubmit={saveProfile} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs uppercase tracking-wider mb-1 font-bold" style={{ color: "var(--color-text-secondary)" }}>
-                  First Name <span style={{ color: "var(--color-terracotta)" }}>*</span>
+                  {t("settings_first_name")} <span style={{ color: "var(--color-terracotta)" }}>*</span>
                 </label>
                 <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
               </div>
               <div>
                 <label className="block text-xs uppercase tracking-wider mb-1 font-bold" style={{ color: "var(--color-text-secondary)" }}>
-                  Last Name
+                  {t("settings_last_name")}
                 </label>
                 <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
               </div>
@@ -216,7 +218,7 @@ export default function SettingsPage() {
 
             <div>
               <label className="block text-xs uppercase tracking-wider mb-1 font-bold" style={{ color: "var(--color-text-secondary)" }}>
-                Email <span style={{ color: "var(--color-terracotta)" }}>*</span>
+                {t("settings_email")} <span style={{ color: "var(--color-terracotta)" }}>*</span>
               </label>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
@@ -224,7 +226,7 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs uppercase tracking-wider mb-1 font-bold" style={{ color: "var(--color-text-secondary)" }}>
-                  Username <span style={{ color: "var(--color-terracotta)" }}>*</span>
+                  {t("settings_username")} <span style={{ color: "var(--color-terracotta)" }}>*</span>
                 </label>
                 <input
                   type="text"
@@ -237,14 +239,14 @@ export default function SettingsPage() {
               </div>
               <div>
                 <label className="block text-xs uppercase tracking-wider mb-1 font-bold" style={{ color: "var(--color-text-secondary)" }}>
-                  Phone
+                  {t("settings_phone")}
                 </label>
                 <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(555) 555-5555" />
               </div>
             </div>
 
             <button type="submit" disabled={savingProfile} className="btn btn-primary">
-              {savingProfile ? "Saving..." : "Save Profile"}
+              {savingProfile ? t("settings_saving") : t("settings_save_profile")}
             </button>
           </form>
         </section>
@@ -255,31 +257,31 @@ export default function SettingsPage() {
             className="font-display text-sm uppercase tracking-widest pb-2 mb-6 border-b-2"
             style={{ color: "var(--color-terracotta)", borderColor: "var(--color-border)" }}
           >
-            Change Password
+            {t("settings_change_password")}
           </h2>
           <form onSubmit={savePassword} className="space-y-4">
             <div>
               <label className="block text-xs uppercase tracking-wider mb-1 font-bold" style={{ color: "var(--color-text-secondary)" }}>
-                Current Password
+                {t("settings_current_password")}
               </label>
               <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs uppercase tracking-wider mb-1 font-bold" style={{ color: "var(--color-text-secondary)" }}>
-                  New Password
+                  {t("settings_new_password")}
                 </label>
                 <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required minLength={8} />
               </div>
               <div>
                 <label className="block text-xs uppercase tracking-wider mb-1 font-bold" style={{ color: "var(--color-text-secondary)" }}>
-                  Confirm New Password
+                  {t("settings_confirm_password")}
                 </label>
                 <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
               </div>
             </div>
             <button type="submit" disabled={savingPassword} className="btn btn-outline">
-              {savingPassword ? "Changing..." : "Change Password"}
+              {savingPassword ? t("settings_changing") : t("settings_change_password")}
             </button>
           </form>
         </section>
@@ -290,30 +292,30 @@ export default function SettingsPage() {
             className="font-display text-sm uppercase tracking-widest pb-2 mb-6 border-b-2"
             style={{ color: "var(--color-terracotta)", borderColor: "var(--color-border)" }}
           >
-            Email Notifications
+            {t("settings_notifications")}
           </h2>
           <div className="space-y-4">
             <NotificationToggle
-              label="New Posts"
-              description="Get notified when someone posts in any section"
+              label={t("settings_notify_posts")}
+              description={t("settings_notify_posts_desc")}
               checked={notifyNewPosts}
               onChange={setNotifyNewPosts}
             />
             <NotificationToggle
-              label="Comments"
-              description="Get notified when someone comments on your posts"
+              label={t("settings_notify_comments")}
+              description={t("settings_notify_comments_desc")}
               checked={notifyComments}
               onChange={setNotifyComments}
             />
             <NotificationToggle
-              label="Status Changes"
-              description="Get notified when an issue you reported changes status"
+              label={t("settings_notify_status")}
+              description={t("settings_notify_status_desc")}
               checked={notifyStatusChange}
               onChange={setNotifyStatusChange}
             />
             <NotificationToggle
-              label="Bulletins"
-              description="Get notified when a new building bulletin is posted"
+              label={t("settings_notify_bulletins")}
+              description={t("settings_notify_bulletins_desc")}
               checked={notifyBulletins}
               onChange={setNotifyBulletins}
             />
@@ -323,7 +325,7 @@ export default function SettingsPage() {
               disabled={savingNotifications}
               className="btn btn-primary"
             >
-              {savingNotifications ? "Saving..." : "Save Preferences"}
+              {savingNotifications ? t("settings_saving") : t("settings_save_prefs")}
             </button>
           </div>
         </section>
@@ -334,16 +336,16 @@ export default function SettingsPage() {
             className="font-display text-sm uppercase tracking-widest pb-2 mb-6 border-b-2"
             style={{ color: "var(--color-danger)", borderColor: "var(--color-border)" }}
           >
-            Account
+            {t("settings_account")}
           </h2>
           <div
             className="flex items-center justify-between p-4 border-2"
             style={{ borderColor: "var(--color-border)", backgroundColor: "var(--color-charcoal-light)" }}
           >
             <div>
-              <p className="text-sm font-bold" style={{ color: "var(--color-offwhite)" }}>Log Out</p>
+              <p className="text-sm font-bold" style={{ color: "var(--color-offwhite)" }}>{t("settings_logout")}</p>
               <p className="text-xs mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
-                End your session on this device
+                {t("settings_logout_desc")}
               </p>
             </div>
             <button
@@ -361,7 +363,7 @@ export default function SettingsPage() {
               disabled={loggingOut}
               className="btn btn-danger btn-sm"
             >
-              {loggingOut ? "Logging out..." : "Log Out"}
+              {loggingOut ? t("settings_logging_out") : t("settings_logout")}
             </button>
           </div>
         </section>

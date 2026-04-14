@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { IMAGE_LIMITS } from "@/lib/constants";
+import { useI18n } from "./i18n-provider";
 
 interface ImageUploadProps {
   maxImages: number;
@@ -10,6 +11,7 @@ interface ImageUploadProps {
 }
 
 export function ImageUpload({ maxImages, onImagesChange }: ImageUploadProps) {
+  const { t } = useI18n();
   const [urls, setUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -55,7 +57,7 @@ export function ImageUpload({ maxImages, onImagesChange }: ImageUploadProps) {
       setUrls(updated);
       onImagesChange(updated);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Upload failed");
+      toast.error(err instanceof Error ? err.message : t("upload_failed"));
     } finally {
       setUploading(false);
       if (fileInputRef.current) {
@@ -95,7 +97,7 @@ export function ImageUpload({ maxImages, onImagesChange }: ImageUploadProps) {
 
       {urls.length < maxImages && (
         <label className="btn btn-outline rounded-none cursor-pointer text-[0.75rem]">
-          {uploading ? "Uploading..." : "Add Photos"}
+          {uploading ? t("upload_uploading") : t("upload_add")}
           <input
             ref={fileInputRef}
             type="file"

@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { ImageUpload } from "@/components/image-upload";
 import { LanguagePicker } from "@/components/language-picker";
+import { useI18n } from "@/components/i18n-provider";
 import { IMAGE_LIMITS } from "@/lib/constants";
 
 interface Section {
@@ -17,6 +18,7 @@ interface Section {
 
 function NewPostForm() {
   const router = useRouter();
+  const { t } = useI18n();
   const searchParams = useSearchParams();
 
   const [sections, setSections] = useState<Section[]>([]);
@@ -111,7 +113,7 @@ function NewPostForm() {
             </svg>
           </Link>
           <h1 className="font-display text-xl uppercase tracking-tight text-offwhite flex-1">
-            New Post
+            {t("new_post_title")}
           </h1>
           <LanguagePicker />
         </div>
@@ -127,7 +129,7 @@ function NewPostForm() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="section" className="section-label block">
-              Section
+              {t("new_post_section_label")}
             </label>
             <select
               id="section"
@@ -135,7 +137,7 @@ function NewPostForm() {
               onChange={(e) => setSectionId(e.target.value)}
               required
             >
-              <option value="">Select a section...</option>
+              <option value="">{t("new_post_section_placeholder")}</option>
               {sections.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
@@ -146,34 +148,34 @@ function NewPostForm() {
 
           <div>
             <label htmlFor="title" className="section-label block">
-              Title
+              {t("new_post_title_label")}
             </label>
             <input
               id="title"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="What's this about?"
+              placeholder={t("new_post_title_placeholder")}
               required
             />
           </div>
 
           <div>
             <label htmlFor="body" className="section-label block">
-              Details
+              {t("new_post_details_label")}
             </label>
             <textarea
               id="body"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Describe the issue or topic..."
+              placeholder={t("new_post_details_placeholder")}
               rows={6}
               required
             />
           </div>
 
           <div>
-            <label className="section-label block">Visibility</label>
+            <label className="section-label block">{t("new_post_visibility")}</label>
             <div className="flex gap-4">
               <label className="flex items-center gap-2 text-sm text-offwhite cursor-pointer">
                 <input
@@ -184,7 +186,7 @@ function NewPostForm() {
                   onChange={() => setVisibility("public")}
                   className="accent-[var(--color-terracotta)]"
                 />
-                Public — visible to all tenants
+                {t("new_post_public")}
               </label>
               <label className="flex items-center gap-2 text-sm text-offwhite cursor-pointer">
                 <input
@@ -195,13 +197,13 @@ function NewPostForm() {
                   onChange={() => setVisibility("private")}
                   className="accent-[var(--color-terracotta)]"
                 />
-                Private — only you and admins
+                {t("new_post_private")}
               </label>
             </div>
           </div>
 
           <div>
-            <label className="section-label block">Photos</label>
+            <label className="section-label block">{t("new_post_photos")}</label>
             <ImageUpload
               maxImages={IMAGE_LIMITS.maxPerPost}
               onImagesChange={setImageUrls}
@@ -213,7 +215,7 @@ function NewPostForm() {
             disabled={submitting}
             className="btn btn-primary w-full disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {submitting ? "Posting..." : "Create Post"}
+            {submitting ? t("new_post_posting") : t("new_post_create")}
           </button>
         </form>
       </main>

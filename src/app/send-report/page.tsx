@@ -5,12 +5,13 @@ import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 import { LanguagePicker } from "@/components/language-picker";
+import { useI18n } from "@/components/i18n-provider";
 
 const QUICK_RECIPIENTS = [
-  { label: "Building Management", key: "management" },
-  { label: "HPD Complaints", key: "hpd", email: "complaints@hpd.nyc.gov" },
-  { label: "NYC 311", key: "311", email: "311@nyc.gov" },
-  { label: "Custom Email", key: "custom" },
+  { labelKey: "report_mgmt" as const, key: "management" },
+  { labelKey: "report_hpd" as const, key: "hpd", email: "complaints@hpd.nyc.gov" },
+  { labelKey: "report_311" as const, key: "311", email: "311@nyc.gov" },
+  { labelKey: "report_custom" as const, key: "custom" },
 ];
 
 function SendReportForm() {
@@ -23,6 +24,7 @@ function SendReportForm() {
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const { t } = useI18n();
 
   function getRecipientEmail(): string {
     if (recipientType === "custom" || recipientType === "management") {
@@ -72,7 +74,7 @@ function SendReportForm() {
                 <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
               </svg>
             </Link>
-            <h1 className="font-display text-xl uppercase tracking-tight text-offwhite flex-1">Send Report</h1>
+            <h1 className="font-display text-xl uppercase tracking-tight text-offwhite flex-1">{t("report_title")}</h1>
             <LanguagePicker />
           </div>
         </header>
@@ -81,17 +83,17 @@ function SendReportForm() {
             <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-[var(--color-sage)] mb-4" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
             </svg>
-            <p className="font-display text-lg uppercase text-[var(--color-sage)]">Report Sent</p>
+            <p className="font-display text-lg uppercase text-[var(--color-sage)]">{t("report_sent_title")}</p>
             <p className="text-sm text-[var(--color-text-secondary)] mt-2">
               Your report was sent to <strong className="text-offwhite">{getRecipientEmail()}</strong>.
-              Any replies will go directly to your building&apos;s tenant rep.
+              {" "}{t("report_sent_desc")}
             </p>
             <div className="mt-6 flex gap-3 justify-center">
               <button onClick={() => { setSent(false); setSubject(""); setMessage(""); }} className="btn btn-outline">
-                Send Another
+                {t("report_send_another")}
               </button>
               <Link href="/dashboard" className="btn btn-primary no-underline">
-                Back to Dashboard
+                {t("report_back")}
               </Link>
             </div>
           </div>
@@ -109,20 +111,19 @@ function SendReportForm() {
               <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
             </svg>
           </Link>
-          <h1 className="font-display text-xl uppercase tracking-tight text-offwhite">Send Report</h1>
+          <h1 className="font-display text-xl uppercase tracking-tight text-offwhite">{t("report_title")}</h1>
         </div>
       </header>
 
       <main className="container-narrow py-8">
         <p className="text-sm text-[var(--color-text-secondary)] mb-6">
-          Send a report to your landlord, management company, HPD, 311, or any email address.
-          Replies will go to your building&apos;s tenant rep.
+          {t("report_desc")}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Recipient */}
           <div>
-            <label className="section-label block">Send To</label>
+            <label className="section-label block">{t("report_send_to")}</label>
             <div className="grid grid-cols-2 gap-2 mb-3">
               {QUICK_RECIPIENTS.map((r) => (
                 <button
@@ -139,7 +140,7 @@ function SendReportForm() {
                       : "border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-light)]"
                   }`}
                 >
-                  <span className="font-display text-xs uppercase tracking-wider">{r.label}</span>
+                  <span className="font-display text-xs uppercase tracking-wider">{t(r.labelKey)}</span>
                   {r.email && <span className="block text-[0.6875rem] mt-0.5 opacity-60">{r.email}</span>}
                 </button>
               ))}
@@ -158,7 +159,7 @@ function SendReportForm() {
 
           {/* Subject */}
           <div>
-            <label className="section-label block">Subject</label>
+            <label className="section-label block">{t("report_subject")}</label>
             <input
               type="text"
               value={subject}
@@ -170,20 +171,19 @@ function SendReportForm() {
 
           {/* Message */}
           <div>
-            <label className="section-label block">Message</label>
+            <label className="section-label block">{t("report_message")}</label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={10}
-              placeholder="Describe the issue in detail. Include dates, unit number, and any prior communication..."
+              placeholder={t("report_message_placeholder")}
               required
             />
           </div>
 
           <div className="border-2 border-[var(--color-border)] bg-[var(--color-charcoal-light)] p-4">
             <p className="text-xs text-[var(--color-text-secondary)]">
-              <strong className="text-offwhite">How it works:</strong> This email will be sent from your building&apos;s
-              TENANTNET.NYC address. Any replies will go directly to your building&apos;s tenant representative&apos;s personal email.
+              <strong className="text-offwhite">{t("report_how")}</strong> {t("report_how_desc")}
             </p>
           </div>
 
@@ -192,7 +192,7 @@ function SendReportForm() {
             disabled={sending || !recipientType || !getRecipientEmail()}
             className="btn btn-primary w-full disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {sending ? "Sending..." : "Send Report"}
+            {sending ? t("report_sending") : t("report_send")}
           </button>
         </form>
       </main>

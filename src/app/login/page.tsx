@@ -4,9 +4,11 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LanguagePicker } from "@/components/language-picker";
+import { useI18n } from "@/components/i18n-provider";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -62,7 +64,7 @@ export default function LoginPage() {
             className="mt-4 text-sm"
             style={{ color: "var(--color-text-secondary)" }}
           >
-            Sign in to your building forum
+            {t("login_title")}
           </p>
         </div>
 
@@ -96,7 +98,7 @@ export default function LoginPage() {
                 color: "var(--color-text-secondary)",
               }}
             >
-              Username or Email
+              {t("login_username_label")}
             </label>
             <input
               type="text"
@@ -121,7 +123,7 @@ export default function LoginPage() {
                 color: "var(--color-text-secondary)",
               }}
             >
-              Password
+              {t("login_password_label")}
             </label>
             <input
               type="password"
@@ -137,7 +139,7 @@ export default function LoginPage() {
             disabled={loading}
             className="btn btn-primary w-full mt-6"
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? t("login_signing_in") : t("login_sign_in")}
           </button>
         </form>
 
@@ -149,9 +151,9 @@ export default function LoginPage() {
             color: "var(--color-text-secondary)",
           }}
         >
-          First time?{" "}
+          {t("login_first_time")}{" "}
           <Link href="/" style={{ color: "var(--color-terracotta-light)" }}>
-            Scan the QR code on your apartment door
+            {t("login_scan_qr")}
           </Link>
         </div>
       </div>

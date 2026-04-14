@@ -8,8 +8,7 @@ import { BuildingRecordsBrowser } from "@/components/building-records-browser";
 import { RentStabilizedNotice } from "@/components/rent-stabilized-notice";
 import { LanguagePicker } from "@/components/language-picker";
 import { postVisibilityWhere } from "@/lib/post-filters";
-import { getLang } from "@/lib/get-lang";
-import { RTL_LANGS, type LangCode } from "@/lib/i18n";
+import { getAppStrings } from "@/lib/get-app-strings";
 
 type PostWithRelations = {
   id: string;
@@ -56,8 +55,7 @@ export default async function DashboardPage() {
   const buildingId = sessionBuildingId(session);
   if (!buildingId) redirect("/admin/system");
 
-  const lang = await getLang();
-  const dir = RTL_LANGS.includes(lang) ? "rtl" : "ltr";
+  const { t, lang, dir } = await getAppStrings();
 
   const building = await prisma.building.findUnique({
     where: { id: buildingId },
@@ -103,7 +101,7 @@ export default async function DashboardPage() {
               {building?.name ?? "Building"}
             </h1>
             <p className="text-xs uppercase tracking-[0.15em] text-[var(--color-text-secondary)] mt-0.5">
-              Tenantnet.nyc
+              {t("dashboard_tenantnet")}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -124,7 +122,7 @@ export default async function DashboardPage() {
                   href="/admin"
                   className="btn btn-outline btn-sm no-underline"
                 >
-                  Admin Panel
+                  {t("dashboard_admin_panel")}
                 </Link>
                 <span className="badge badge-terracotta">{roleBadgeLabel(session)}</span>
               </>
@@ -132,11 +130,11 @@ export default async function DashboardPage() {
               <span className="badge badge-terracotta">Unit {session.unitLabel}</span>
             )}
             <Link href="/send-report" className="btn btn-outline btn-sm no-underline">
-              Send Report
+              {t("dashboard_send_report")}
             </Link>
             {!isMgmtRep && (
               <Link href="/new-post" className="btn btn-primary btn-sm no-underline">
-                + New Post
+                {t("dashboard_new_post")}
               </Link>
             )}
           </div>
@@ -147,7 +145,7 @@ export default async function DashboardPage() {
         {/* Pinned Bulletins */}
         {pinnedBulletins.length > 0 && (
           <section>
-            <h2 className="section-label">Pinned Bulletins</h2>
+            <h2 className="section-label">{t("dashboard_pinned_bulletins")}</h2>
             <div className="space-y-3">
               {pinnedBulletins.map((post: PostWithRelations) => (
                 <PostCard
@@ -176,7 +174,7 @@ export default async function DashboardPage() {
         {/* NYC Building Records */}
         {records.length > 0 && (
           <section>
-            <h2 className="section-label">NYC Public Records</h2>
+            <h2 className="section-label">{t("dashboard_nyc_records")}</h2>
             <BuildingRecordsBrowser records={records} />
           </section>
         )}
@@ -184,7 +182,7 @@ export default async function DashboardPage() {
         {/* Your Open Issues */}
         {myIssues.length > 0 && (
           <section>
-            <h2 className="section-label">Your Open Issues</h2>
+            <h2 className="section-label">{t("dashboard_your_issues")}</h2>
             <div className="space-y-3">
               {myIssues.map((post: PostWithRelations) => (
                 <PostCard
@@ -212,13 +210,13 @@ export default async function DashboardPage() {
 
         {/* Sections */}
         <section>
-          <h2 className="section-label">Sections</h2>
+          <h2 className="section-label">{t("dashboard_sections")}</h2>
           <SectionNav sections={sections} />
         </section>
 
         {/* Recent Posts */}
         <section>
-          <h2 className="section-label">Recent Posts</h2>
+          <h2 className="section-label">{t("dashboard_recent_posts")}</h2>
           <div className="space-y-3">
             {recentPosts.map((post: PostWithRelations) => (
               <PostCard
@@ -242,7 +240,7 @@ export default async function DashboardPage() {
             ))}
             {recentPosts.length === 0 && (
               <p className="text-sm text-[var(--color-text-secondary)] text-center py-12">
-                No posts yet. Be the first to post!
+                {t("dashboard_no_posts")}
               </p>
             )}
           </div>

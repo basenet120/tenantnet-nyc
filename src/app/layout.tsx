@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, Archivo_Black } from "next/font/google";
 import { ToasterProvider } from "@/components/toaster-provider";
+import { I18nProvider } from "@/components/i18n-provider";
+import { getAppStrings } from "@/lib/get-app-strings";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -39,14 +41,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { strings, lang } = await getAppStrings();
+
   return (
     <html
-      lang="en"
+      lang={lang}
       className={`${dmSans.variable} ${archivoBlack.variable}`}
     >
       <head>
@@ -54,7 +58,9 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="//fnoiyvxqwrb0zrdo.public.blob.vercel-storage.com" />
       </head>
       <body>
-        {children}
+        <I18nProvider strings={strings} lang={lang}>
+          {children}
+        </I18nProvider>
         <ToasterProvider />
       </body>
     </html>

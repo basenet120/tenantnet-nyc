@@ -7,7 +7,7 @@ import { CommentForm } from "@/components/comment-form";
 import { ModerationToolbar } from "@/components/moderation-toolbar";
 import { TranslatedText } from "@/components/translated-text";
 import { LanguagePicker } from "@/components/language-picker";
-import { getLang } from "@/lib/get-lang";
+import { getAppStrings } from "@/lib/get-app-strings";
 
 function roleLabel(admin: { role: string; name: string | null }) {
   const tag = admin.role === "system_admin" ? "System Admin"
@@ -30,7 +30,7 @@ export default async function PostPage({
   const canModerate = isAdmin && session.role !== "mgmt_rep";
 
   const buildingId = sessionBuildingId(session);
-  const lang = await getLang();
+  const { t, lang } = await getAppStrings();
   const { id } = await params;
 
   const post = await prisma.post.findUnique({
@@ -65,7 +65,7 @@ export default async function PostPage({
     ? roleLabel(post.admin)
     : post.unit
       ? `Unit ${post.unit.label}`
-      : "Unknown";
+      : t("post_unknown_author");
 
   return (
     <div className="min-h-dvh">
@@ -120,7 +120,7 @@ export default async function PostPage({
                 })}
               </time>
               {post.isPinned && (
-                <span className="badge badge-amber">Pinned</span>
+                <span className="badge badge-amber">{t("post_pinned")}</span>
               )}
               {post.status && <StatusBadge status={post.status} />}
               {post.visibility === "private" && (
@@ -128,7 +128,7 @@ export default async function PostPage({
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                   </svg>
-                  Private
+                  {t("post_private")}
                 </span>
               )}
             </div>
@@ -178,7 +178,7 @@ export default async function PostPage({
         <section className="mt-8">
           <h3 className="section-label">
             {post.comments.length}{" "}
-            {post.comments.length === 1 ? "Comment" : "Comments"}
+            {post.comments.length === 1 ? t("post_comment") : t("post_comments")}
           </h3>
 
           {post.comments.length > 0 && (
@@ -190,7 +190,7 @@ export default async function PostPage({
                 >
                   <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] mb-2">
                     <span className="font-display uppercase tracking-wide text-offwhite">
-                      {comment.admin ? roleLabel(comment.admin) : comment.unit ? `Unit ${comment.unit.label}` : "Unknown"}
+                      {comment.admin ? roleLabel(comment.admin) : comment.unit ? `Unit ${comment.unit.label}` : t("post_unknown_author")}
                     </span>
                     <span aria-hidden="true">|</span>
                     <time dateTime={comment.createdAt.toISOString()}>
