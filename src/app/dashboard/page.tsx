@@ -25,24 +25,26 @@ type PostWithRelations = {
   _count: { comments: number; images: number };
 };
 
-function authorLabel(post: { admin: { email: string; role: string; name: string | null } | null; unit: { label: string } | null }) {
-  if (post.admin) {
-    const roleLabel = post.admin.role === "system_admin" ? "System Admin"
-      : post.admin.role === "tenant_rep" ? "Tenant Rep"
-      : post.admin.role === "mgmt_rep" ? "Mgmt Rep"
-      : "Admin";
-    return post.admin.name ? `${post.admin.name} (${roleLabel})` : roleLabel;
-  }
-  if (post.unit) return `Unit ${post.unit.label}`;
-  return "Unknown";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function roleText(role: string, t: (key: any) => string) {
+  if (role === "system_admin") return t("role_system_admin");
+  if (role === "tenant_rep") return t("role_tenant_rep");
+  if (role === "mgmt_rep") return t("role_mgmt_rep");
+  return t("role_admin");
 }
 
-function roleBadgeLabel(session: NonNullable<Awaited<ReturnType<typeof getSession>>>) {
-  if (session.type === "unit") return `Unit ${session.unitLabel}`;
-  if (session.role === "system_admin") return "System Admin";
-  if (session.role === "tenant_rep") return "Tenant Rep";
-  if (session.role === "mgmt_rep") return "Mgmt Rep";
-  return "Admin";
+function authorLabel(post: { admin: { email: string; role: string; name: string | null } | null; unit: { label: string } | null }, t: (key: any) => string) {
+  if (post.admin) {
+    const role = roleText(post.admin.role, t);
+    return post.admin.name ? `${post.admin.name} (${role})` : role;
+  }
+  if (post.unit) return `${t("common_unit")} ${post.unit.label}`;
+  return t("post_unknown_author");
+}
+
+function roleBadgeLabel(session: NonNullable<Awaited<ReturnType<typeof getSession>>>, t: (key: any) => string) {
+  if (session.type === "unit") return `${t("common_unit")} ${session.unitLabel}`;
+  return roleText(session.role, t);
 }
 
 export default async function DashboardPage() {
@@ -112,10 +114,10 @@ export default async function DashboardPage() {
                 >
                   {t("dashboard_admin_panel")}
                 </Link>
-                <span className="badge badge-terracotta">{roleBadgeLabel(session)}</span>
+                <span className="badge badge-terracotta">{roleBadgeLabel(session, t)}</span>
               </>
             ) : (
-              <span className="badge badge-terracotta">Unit {session.unitLabel}</span>
+              <span className="badge badge-terracotta">{t("common_unit")} {session.unitLabel}</span>
             )}
             <Link href="/send-report" className="btn btn-outline btn-sm no-underline">
               {t("dashboard_send_report")}
@@ -143,7 +145,7 @@ export default async function DashboardPage() {
                   body={post.body}
                   titleEn={post.titleEn}
                   bodyEn={post.bodyEn}
-                  authorLabel={authorLabel(post)}
+                  authorLabel={authorLabel(post, t)}
                   sectionName={post.section.name}
                   status={post.status}
                   isPinned={post.isPinned}
@@ -180,7 +182,7 @@ export default async function DashboardPage() {
                   body={post.body}
                   titleEn={post.titleEn}
                   bodyEn={post.bodyEn}
-                  authorLabel={authorLabel(post)}
+                  authorLabel={authorLabel(post, t)}
                   sectionName={post.section.name}
                   status={post.status}
                   isPinned={post.isPinned}
@@ -214,7 +216,7 @@ export default async function DashboardPage() {
                 body={post.body}
                 titleEn={post.titleEn}
                 bodyEn={post.bodyEn}
-                authorLabel={authorLabel(post)}
+                authorLabel={authorLabel(post, t)}
                 sectionName={post.section.name}
                 status={post.status}
                 isPinned={post.isPinned}
