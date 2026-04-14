@@ -23,6 +23,7 @@ function SendReportForm() {
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [ccTenantRep, setCcTenantRep] = useState(true);
   const { t } = useI18n();
 
   function getRecipientEmail(): string {
@@ -45,7 +46,7 @@ function SendReportForm() {
       const res = await fetch("/api/send-report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ to, subject: subject.trim(), message: message.trim() }),
+        body: JSON.stringify({ to, subject: subject.trim(), message: message.trim(), ccTenantRep }),
       });
 
       if (!res.ok) {
@@ -178,6 +179,19 @@ function SendReportForm() {
               required
             />
           </div>
+
+          <label className="flex items-start gap-3 cursor-pointer p-3 border-2 border-[var(--color-border)] hover:border-[var(--color-border-light)] transition-colors">
+            <input
+              type="checkbox"
+              checked={ccTenantRep}
+              onChange={(e) => setCcTenantRep(e.target.checked)}
+              className="mt-0.5 accent-[var(--color-terracotta)]"
+            />
+            <div className="flex-1">
+              <p className="text-sm text-offwhite">{t("report_cc_rep")}</p>
+              <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">{t("report_cc_rep_desc")}</p>
+            </div>
+          </label>
 
           <div className="border-2 border-[var(--color-border)] bg-[var(--color-charcoal-light)] p-4">
             <p className="text-xs text-[var(--color-text-secondary)]">

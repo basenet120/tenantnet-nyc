@@ -19,10 +19,11 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { to, subject, message } = body as {
+  const { to, subject, message, ccTenantRep = true } = body as {
     to?: string;
     subject?: string;
     message?: string;
+    ccTenantRep?: boolean;
   };
 
   if (!to?.trim() || !subject?.trim() || !message?.trim()) {
@@ -77,11 +78,12 @@ export async function POST(request: Request) {
     }
   }
 
-  // Build CC list: sender + tenant rep (if sender is a tenant, to keep building org in the loop)
+  // Build CC list: always CC the sender; optionally CC the tenant rep when a tenant opts in
   const ccList: string[] = [];
   if (senderEmail) ccList.push(senderEmail);
   if (
     session.type === "unit" &&
+    ccTenantRep &&
     tenantRep?.email &&
     tenantRep.email.toLowerCase() !== senderEmail?.toLowerCase()
   ) {

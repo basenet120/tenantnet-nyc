@@ -166,6 +166,8 @@
   "report_subject": "Subject",
   "report_message": "Message",
   "report_message_placeholder": "Describe the issue in detail. Include dates, unit number, and any prior communication...",
+  "report_cc_rep": "Also CC my building's tenant representative",
+  "report_cc_rep_desc": "Keep your tenant rep in the loop so they can follow up if needed.",
   "report_how": "How it works:",
   "report_how_desc": "This email will be sent from your building's TENANTNET.NYC address. You will be CC'd so you stay on the thread with the recipient. Replies go to you and the tenant representative.",
   "report_sending": "Sending...",
