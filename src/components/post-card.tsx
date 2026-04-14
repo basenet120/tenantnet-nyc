@@ -48,14 +48,9 @@ export function PostCard({
   return (
     <Link href={`/post/${id}`} className="block group no-underline">
       <div
-        className={`relative border-2 rounded-none p-5 transition-all duration-150 hover:border-l-terracotta hover:border-l-4 ${
+        className={`card relative border-2 rounded-none p-5 transition-all duration-150 hover:border-l-terracotta hover:border-l-4 ${
           isPinned ? "border-l-4 border-l-amber" : ""
         }`}
-        style={{
-          backgroundColor: "var(--color-surface)",
-          color: "var(--color-text-on-surface)",
-          borderColor: "var(--color-border)",
-        }}
       >
         {/* Top row: section label + status badge */}
         <div className="flex items-start justify-between gap-3 mb-2">
