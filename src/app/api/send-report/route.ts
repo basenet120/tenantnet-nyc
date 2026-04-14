@@ -58,12 +58,34 @@ export async function POST(request: Request) {
     ? `${building.name} via TENANTNET.NYC <${building.replyEmail}>`
     : `${building.name} via TENANTNET.NYC <notifications@tenantnet.nyc>`;
 
-  // Identify the sender
+  // Identify the sender and their email (to CC them on the outgoing report)
   let senderLabel: string;
+  let senderEmail: string | null = null;
   if (session.type === "admin") {
     senderLabel = session.name ?? session.email;
+    senderEmail = session.email;
   } else {
     senderLabel = `Unit ${session.unitLabel}`;
+    const unit = await prisma.unit.findUnique({
+      where: { id: session.unitId },
+      select: { email: true, firstName: true, lastName: true },
+    });
+    if (unit?.email) {
+      senderEmail = unit.email;
+      const name = [unit.firstName, unit.lastName].filter(Boolean).join(" ");
+      if (name) senderLabel = `${name} (Unit ${session.unitLabel})`;
+    }
+  }
+
+  // Build CC list: sender + tenant rep (if sender is a tenant, to keep building org in the loop)
+  const ccList: string[] = [];
+  if (senderEmail) ccList.push(senderEmail);
+  if (
+    session.type === "unit" &&
+    tenantRep?.email &&
+    tenantRep.email.toLowerCase() !== senderEmail?.toLowerCase()
+  ) {
+    ccList.push(tenantRep.email);
   }
 
   if (!resend) {
@@ -75,6 +97,7 @@ export async function POST(request: Request) {
     await resend.emails.send({
       from: fromAddress,
       to: to.trim(),
+      cc: ccList.length > 0 ? ccList : undefined,
       replyTo: replyTo,
       subject: subject.trim(),
       html: `
@@ -93,7 +116,8 @@ export async function POST(request: Request) {
     <div style="margin-top:32px;border-top:1px solid #ddd;padding-top:16px;">
       <p style="margin:0;font-size:12px;color:#999;">
         Sent by ${senderLabel} at ${building.name}.<br>
-        ${replyTo ? `Reply to this email to respond directly to <strong>${replyTo}</strong>.` : ""}
+        ${ccList.length > 0 ? `CC: <strong>${ccList.join(", ")}</strong><br>` : ""}
+        ${replyTo ? `Reply to this email — responses go to <strong>${replyTo}</strong> and the people on CC.` : ""}
       </p>
     </div>
   </div>
