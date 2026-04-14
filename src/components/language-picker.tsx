@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { createPortal } from "react-dom";
 
 const LANGUAGES = [
   { code: "en", native: "English" },
@@ -13,18 +12,12 @@ const LANGUAGES = [
 ] as const;
 
 const RTL_LANGS = ["yi", "ar"];
-const DROPDOWN_WIDTH = 160;
 
 export function LanguagePicker({ currentLang }: { currentLang?: string }) {
   const [open, setOpen] = useState(false);
   const [lang, setLang] = useState(currentLang ?? "en");
   const [switching, setSwitching] = useState(false);
-  const [pos, setPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
-  const [mounted, setMounted] = useState(false);
-  const btnRef = useRef<HTMLButtonElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => setMounted(true), []);
+  const ref = useRef<HTMLDivElement>(null);
 
   // Auto-detect from cookie if no prop was provided
   useEffect(() => {
@@ -34,51 +27,20 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
     }
   }, [currentLang]);
 
-  function toggleOpen() {
-    if (open) {
-      setOpen(false);
-      return;
-    }
-    if (btnRef.current) {
-      const rect = btnRef.current.getBoundingClientRect();
-      setPos({
-        top: rect.bottom + 4,
-        left: Math.max(8, rect.right - DROPDOWN_WIDTH),
-      });
-    }
-    setOpen(true);
-  }
-
   // Close on outside click
   useEffect(() => {
     if (!open) return;
     function handleClick(e: MouseEvent) {
-      if (
-        btnRef.current && !btnRef.current.contains(e.target as Node) &&
-        dropdownRef.current && !dropdownRef.current.contains(e.target as Node)
-      ) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
       }
     }
-    // Add on next tick so the click that opened us doesn't immediately close us
     const t = setTimeout(() => {
       document.addEventListener("mousedown", handleClick);
     }, 0);
     return () => {
       clearTimeout(t);
       document.removeEventListener("mousedown", handleClick);
-    };
-  }, [open]);
-
-  // Close on scroll/resize so dropdown doesn't hang in a stale position
-  useEffect(() => {
-    if (!open) return;
-    const close = () => setOpen(false);
-    window.addEventListener("scroll", close, true);
-    window.addEventListener("resize", close);
-    return () => {
-      window.removeEventListener("scroll", close, true);
-      window.removeEventListener("resize", close);
     };
   }, [open]);
 
@@ -109,10 +71,9 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
   const current = LANGUAGES.find((l) => l.code === lang) ?? LANGUAGES[0];
 
   return (
-    <>
+    <div ref={ref} className="relative" style={{ zIndex: 9999 }}>
       <button
-        ref={btnRef}
-        onClick={toggleOpen}
+        onClick={() => setOpen((v) => !v)}
         disabled={switching}
         className="flex items-center gap-1.5 px-2 py-1.5 text-[var(--color-text-secondary)] hover:text-offwhite transition-colors"
         aria-label="Change language"
@@ -127,22 +88,16 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
         </span>
       </button>
 
-      {mounted && open && createPortal(
+      {open && (
         <div
-          ref={dropdownRef}
-          className="fixed border-2 border-[var(--color-border)] bg-[var(--color-charcoal)] shadow-lg"
-          style={{
-            top: pos.top,
-            left: pos.left,
-            width: DROPDOWN_WIDTH,
-            zIndex: 2147483647,
-          }}
+          className="absolute top-full end-0 mt-1 border-2 border-[var(--color-border)] bg-[var(--color-charcoal)] shadow-lg min-w-[160px]"
+          style={{ zIndex: 9999 }}
         >
           {LANGUAGES.map((l) => (
             <button
               key={l.code}
               onClick={() => switchLang(l.code)}
-              className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between ${
+              className={`w-full text-start px-4 py-2.5 text-sm transition-colors flex items-center justify-between ${
                 l.code === lang
                   ? "text-terracotta bg-[var(--color-charcoal-light)]"
                   : "text-offwhite hover:bg-[var(--color-charcoal-light)]"
@@ -152,9 +107,8 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
               <span className="text-[0.625rem] text-[var(--color-text-secondary)] uppercase">{l.code}</span>
             </button>
           ))}
-        </div>,
-        document.body
+        </div>
       )}
-    </>
+    </div>
   );
 }
