@@ -75,7 +75,9 @@ ${text}`,
  * Translate a JSON object of UI strings from English to target language.
  * Returns translated object with same keys.
  */
-async function llmTranslateJson(
+const CHUNK_SIZE = 50; // Max keys per LLM call to stay within token limits
+
+async function llmTranslateJsonChunk(
   strings: Record<string, string>,
   toLang: string,
 ): Promise<Record<string, string>> {
@@ -88,7 +90,7 @@ async function llmTranslateJson(
   try {
     const response = await client.messages.create({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 4096,
+      max_tokens: 8192,
       messages: [
         {
           role: "user",
@@ -109,7 +111,6 @@ ${JSON.stringify(strings, null, 2)}`,
       let raw = block.text.trim();
       raw = raw.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "");
       const parsed = JSON.parse(raw);
-      // Backfill missing keys with English
       for (const k of Object.keys(strings)) {
         if (!parsed[k]) parsed[k] = strings[k];
       }
@@ -117,9 +118,44 @@ ${JSON.stringify(strings, null, 2)}`,
     }
     return strings;
   } catch (err) {
-    console.error("[i18n] JSON translation failed:", err);
+    console.error("[i18n] JSON translation chunk failed:", err);
     return strings;
   }
+}
+
+async function llmTranslateJson(
+  strings: Record<string, string>,
+  toLang: string,
+): Promise<Record<string, string>> {
+  const keys = Object.keys(strings);
+
+  // Small enough to translate in one call
+  if (keys.length <= CHUNK_SIZE) {
+    return llmTranslateJsonChunk(strings, toLang);
+  }
+
+  // Split into chunks and translate in parallel
+  const chunks: Record<string, string>[] = [];
+  for (let i = 0; i < keys.length; i += CHUNK_SIZE) {
+    const chunkKeys = keys.slice(i, i + CHUNK_SIZE);
+    const chunk: Record<string, string> = {};
+    for (const k of chunkKeys) chunk[k] = strings[k];
+    chunks.push(chunk);
+  }
+
+  const results = await Promise.all(
+    chunks.map((chunk) => llmTranslateJsonChunk(chunk, toLang)),
+  );
+
+  const merged: Record<string, string> = {};
+  for (const result of results) {
+    Object.assign(merged, result);
+  }
+  // Backfill any missing keys
+  for (const k of keys) {
+    if (!merged[k]) merged[k] = strings[k];
+  }
+  return merged;
 }
 
 // ─── Cached content translation ──────────────────────────

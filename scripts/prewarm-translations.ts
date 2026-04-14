@@ -22,7 +22,9 @@ function hash(s: string): string {
   return createHash("sha256").update(s).digest("hex").slice(0, 16);
 }
 
-async function translateJson(
+const CHUNK_SIZE = 50;
+
+async function translateJsonChunk(
   strings: Record<string, string>,
   toLang: string,
 ): Promise<Record<string, string>> {
@@ -30,8 +32,8 @@ async function translateJson(
   const isRtl = RTL_LANGS.includes(toLang);
 
   const response = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 4096,
+    model: "claude-sonnet-4-6",
+    max_tokens: 8192,
     messages: [
       {
         role: "user",
@@ -61,7 +63,7 @@ ${JSON.stringify(strings, null, 2)}`,
       console.warn(`  [warn] JSON parse failed for ${toLang}, retrying...`);
       // Retry once
       const retry = await anthropic.messages.create({
-        model: "claude-haiku-4-5-20251001",
+        model: "claude-sonnet-4-6",
         max_tokens: 8192,
         messages: [
           { role: "user", content: `You MUST return ONLY valid JSON. No explanation. Translate these JSON values to ${LANG_NAMES[toLang]}:\n${JSON.stringify(strings)}` },
@@ -81,11 +83,41 @@ ${JSON.stringify(strings, null, 2)}`,
   return strings;
 }
 
+async function translateJson(
+  strings: Record<string, string>,
+  toLang: string,
+): Promise<Record<string, string>> {
+  const keys = Object.keys(strings);
+  if (keys.length <= CHUNK_SIZE) {
+    return translateJsonChunk(strings, toLang);
+  }
+
+  // Split into chunks
+  const chunks: Record<string, string>[] = [];
+  for (let i = 0; i < keys.length; i += CHUNK_SIZE) {
+    const chunk: Record<string, string> = {};
+    for (const k of keys.slice(i, i + CHUNK_SIZE)) chunk[k] = strings[k];
+    chunks.push(chunk);
+  }
+
+  console.log(`    splitting into ${chunks.length} chunks of ~${CHUNK_SIZE} keys...`);
+  const results = await Promise.all(
+    chunks.map((chunk) => translateJsonChunk(chunk, toLang)),
+  );
+
+  const merged: Record<string, string> = {};
+  for (const r of results) Object.assign(merged, r);
+  for (const k of keys) {
+    if (!merged[k]) merged[k] = strings[k];
+  }
+  return merged;
+}
+
 async function translateText(text: string, toLang: string): Promise<string> {
   const toName = LANG_NAMES[toLang];
   const response = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 4096,
+    model: "claude-sonnet-4-6",
+    max_tokens: 8192,
     messages: [
       {
         role: "user",
