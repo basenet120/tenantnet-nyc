@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useAdminI18n } from "@/components/admin-i18n-provider";
 
 const BOROUGHS = [
   { value: "manhattan", label: "Manhattan" },
@@ -48,10 +49,19 @@ type FormData = {
   unitPattern: string;
 };
 
-const STEP_TITLES = ["Address", "Building Details", "NYC Identifiers", "Amenities", "Management", "Tenant Rep", "Review"];
-
 export default function OnboardWizardPage() {
   const router = useRouter();
+  const { t } = useAdminI18n();
+
+  const STEP_TITLES = [
+    t("onboard_step_address"),
+    t("onboard_step_details"),
+    t("onboard_step_nyc"),
+    t("onboard_step_amenities"),
+    t("onboard_step_management"),
+    t("onboard_step_rep"),
+    t("onboard_step_review"),
+  ];
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState<FormData>({
@@ -117,7 +127,7 @@ export default function OnboardWizardPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        toast.error(data.error || "Failed to onboard building");
+        toast.error(data.error || t("onboard_failed"));
         return;
       }
 
@@ -125,7 +135,7 @@ export default function OnboardWizardPage() {
       toast.success(`${data.buildingName} onboarded! ${data.unitCount} units, ${data.recordCount} NYC records.`);
       router.push("/admin/system/buildings");
     } catch {
-      toast.error("Something went wrong");
+      toast.error(t("onboard_error"));
     } finally {
       setSubmitting(false);
     }
@@ -134,8 +144,8 @@ export default function OnboardWizardPage() {
   return (
     <div className="container-narrow py-8">
       <div className="mb-6">
-        <p className="section-label border-b-0 mb-1">System Administration</p>
-        <h1 className="text-3xl tracking-tight">ONBOARD BUILDING</h1>
+        <p className="section-label border-b-0 mb-1">{t("system_title")}</p>
+        <h1 className="text-3xl tracking-tight">{t("onboard_title")}</h1>
       </div>
 
       {/* Step indicator */}
@@ -160,22 +170,22 @@ export default function OnboardWizardPage() {
         {step === 0 && (
           <>
             <div>
-              <label>Building Name (optional)</label>
+              <label>{t("onboard_building_name")}</label>
               <input type="text" value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="e.g. 449 West 125th Street" />
             </div>
             <div>
-              <label>Street Address *</label>
+              <label>{t("onboard_address")} *</label>
               <input type="text" value={form.address} onChange={(e) => update("address", e.target.value)} placeholder="449 West 125th Street" required />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label>Borough *</label>
+                <label>{t("onboard_borough")} *</label>
                 <select value={form.borough} onChange={(e) => update("borough", e.target.value)} required>
                   {BOROUGHS.map((b) => <option key={b.value} value={b.value}>{b.label}</option>)}
                 </select>
               </div>
               <div>
-                <label>ZIP Code *</label>
+                <label>{t("onboard_zip")} *</label>
                 <input type="text" value={form.zip} onChange={(e) => update("zip", e.target.value)} placeholder="10027" required />
               </div>
             </div>
@@ -186,31 +196,31 @@ export default function OnboardWizardPage() {
           <>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label>Floors *</label>
+                <label>{t("onboard_floors")} *</label>
                 <input type="number" value={form.floors} onChange={(e) => update("floors", e.target.value)} min="1" required />
               </div>
               <div>
-                <label>Total Units *</label>
+                <label>{t("onboard_units")} *</label>
                 <input type="number" value={form.totalUnits} onChange={(e) => update("totalUnits", e.target.value)} min="1" required />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label>Year Built</label>
+                <label>{t("onboard_year")}</label>
                 <input type="number" value={form.yearBuilt} onChange={(e) => update("yearBuilt", e.target.value)} placeholder="1920" />
               </div>
               <div>
-                <label>Building Type</label>
+                <label>{t("onboard_type")}</label>
                 <select value={form.buildingType} onChange={(e) => update("buildingType", e.target.value)}>
-                  {BUILDING_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  {BUILDING_TYPES.map((bt) => <option key={bt.value} value={bt.value}>{bt.label}</option>)}
                 </select>
               </div>
             </div>
             <div>
-              <label>Unit Naming Pattern</label>
+              <label>{t("onboard_pattern")}</label>
               <select value={form.unitPattern} onChange={(e) => update("unitPattern", e.target.value)}>
-                <option value="floor_letter">Floor + Letter (1A, 2B, etc.)</option>
-                <option value="sequential">Sequential (1, 2, 3, etc.)</option>
+                <option value="floor_letter">{t("onboard_pattern_floor")}</option>
+                <option value="sequential">{t("onboard_pattern_seq")}</option>
               </select>
             </div>
           </>
@@ -225,7 +235,7 @@ export default function OnboardWizardPage() {
 
         {step === 3 && (
           <>
-            <p className="text-sm text-[var(--color-text-secondary)] mb-2">Select building amenities:</p>
+            <p className="text-sm text-[var(--color-text-secondary)] mb-2">{t("onboard_amenities_desc")}</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {AMENITIES_LIST.map((amenity) => (
                 <label key={amenity} className="flex items-center gap-2 text-sm text-offwhite cursor-pointer p-2 border-2 border-[var(--color-border)] hover:border-[var(--color-border-light)] transition-colors">
@@ -245,16 +255,16 @@ export default function OnboardWizardPage() {
         {step === 4 && (
           <>
             <div>
-              <label>Management Company</label>
+              <label>{t("onboard_mgmt_company")}</label>
               <input type="text" value={form.managementCompany} onChange={(e) => update("managementCompany", e.target.value)} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label>Management Phone</label>
+                <label>{t("onboard_mgmt_phone")}</label>
                 <input type="tel" value={form.managementPhone} onChange={(e) => update("managementPhone", e.target.value)} />
               </div>
               <div>
-                <label>Management Email</label>
+                <label>{t("onboard_mgmt_email")}</label>
                 <input type="email" value={form.managementEmail} onChange={(e) => update("managementEmail", e.target.value)} />
               </div>
             </div>
@@ -264,18 +274,18 @@ export default function OnboardWizardPage() {
         {step === 5 && (
           <>
             <p className="text-sm text-[var(--color-text-secondary)] mb-2">
-              Create the tenant representative account for this building.
+              {t("onboard_rep_desc")}
             </p>
             <div>
-              <label>Name</label>
+              <label>{t("onboard_rep_name")}</label>
               <input type="text" value={form.tenantRepName} onChange={(e) => update("tenantRepName", e.target.value)} />
             </div>
             <div>
-              <label>Email *</label>
+              <label>{t("onboard_rep_email")} *</label>
               <input type="email" value={form.tenantRepEmail} onChange={(e) => update("tenantRepEmail", e.target.value)} required />
             </div>
             <div>
-              <label>Password *</label>
+              <label>{t("onboard_rep_password")} *</label>
               <input type="password" value={form.tenantRepPassword} onChange={(e) => update("tenantRepPassword", e.target.value)} required minLength={8} />
             </div>
           </>
@@ -283,23 +293,23 @@ export default function OnboardWizardPage() {
 
         {step === 6 && (
           <>
-            <h3 className="font-display text-lg uppercase text-offwhite">Review</h3>
+            <h3 className="font-display text-lg uppercase text-offwhite">{t("onboard_review_title")}</h3>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
-                <span className="text-[var(--color-text-secondary)]">Address</span>
+                <span className="text-[var(--color-text-secondary)]">{t("onboard_review_address")}</span>
                 <span className="text-offwhite">{form.address}</span>
               </div>
               <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
-                <span className="text-[var(--color-text-secondary)]">Borough / ZIP</span>
+                <span className="text-[var(--color-text-secondary)]">{t("onboard_review_borough_zip")}</span>
                 <span className="text-offwhite">{BOROUGHS.find((b) => b.value === form.borough)?.label}, {form.zip}</span>
               </div>
               <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
-                <span className="text-[var(--color-text-secondary)]">Floors / Units</span>
+                <span className="text-[var(--color-text-secondary)]">{t("onboard_review_floors")}</span>
                 <span className="text-offwhite">{form.floors} floors, {form.totalUnits} units</span>
               </div>
               {(form.block || form.lot || form.bin) && (
                 <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
-                  <span className="text-[var(--color-text-secondary)]">NYC IDs</span>
+                  <span className="text-[var(--color-text-secondary)]">{t("onboard_review_nyc")}</span>
                   <span className="text-offwhite">
                     {[form.block && `Block ${form.block}`, form.lot && `Lot ${form.lot}`, form.bin && `BIN ${form.bin}`].filter(Boolean).join(", ")}
                   </span>
@@ -307,12 +317,12 @@ export default function OnboardWizardPage() {
               )}
               {form.managementCompany && (
                 <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
-                  <span className="text-[var(--color-text-secondary)]">Management</span>
+                  <span className="text-[var(--color-text-secondary)]">{t("onboard_review_mgmt")}</span>
                   <span className="text-offwhite">{form.managementCompany}</span>
                 </div>
               )}
               <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
-                <span className="text-[var(--color-text-secondary)]">Tenant Rep</span>
+                <span className="text-[var(--color-text-secondary)]">{t("onboard_review_rep")}</span>
                 <span className="text-offwhite">{form.tenantRepEmail}</span>
               </div>
             </div>
@@ -327,7 +337,7 @@ export default function OnboardWizardPage() {
           disabled={step === 0}
           className="btn btn-outline disabled:opacity-30"
         >
-          Back
+          {t("onboard_back")}
         </button>
         {step < STEP_TITLES.length - 1 ? (
           <button
@@ -335,7 +345,7 @@ export default function OnboardWizardPage() {
             disabled={!canAdvance()}
             className="btn btn-primary disabled:opacity-30"
           >
-            Next
+            {t("onboard_next")}
           </button>
         ) : (
           <button
@@ -343,7 +353,7 @@ export default function OnboardWizardPage() {
             disabled={submitting}
             className="btn btn-primary disabled:opacity-50"
           >
-            {submitting ? "Creating Building..." : "Create Building"}
+            {submitting ? t("onboard_creating") : t("onboard_create")}
           </button>
         )}
       </div>
@@ -358,12 +368,13 @@ function NycIdentifiersStep({
   form: FormData;
   update: (field: keyof FormData, value: string | string[]) => void;
 }) {
+  const { t } = useAdminI18n();
   const [looking, setLooking] = useState(false);
   const [lookupDone, setLookupDone] = useState(false);
 
   async function lookupFromAddress() {
     if (!form.address.trim() || !form.borough) {
-      toast.error("Enter the building address and borough first (Step 1)");
+      toast.error(t("onboard_lookup_error_step1"));
       return;
     }
     setLooking(true);
@@ -375,7 +386,7 @@ function NycIdentifiersStep({
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error || "Lookup failed");
+        toast.error(data.error || t("onboard_lookup_failed"));
         return;
       }
       if (data.block) update("block", data.block);
@@ -387,7 +398,7 @@ function NycIdentifiersStep({
       setLookupDone(true);
       toast.success(`Found: Block ${data.block}, Lot ${data.lot}${data.bin ? `, BIN ${data.bin}` : ""}`);
     } catch {
-      toast.error("Failed to look up address");
+      toast.error(t("onboard_lookup_failed"));
     } finally {
       setLooking(false);
     }
@@ -396,8 +407,7 @@ function NycIdentifiersStep({
   return (
     <>
       <p className="text-sm text-[var(--color-text-secondary)]">
-        NYC identifiers enable automatic links to DOB, HPD, ACRIS, and other public databases,
-        plus inline violation and complaint browsing.
+        {t("onboard_nyc_desc")}
       </p>
 
       <button
@@ -406,13 +416,13 @@ function NycIdentifiersStep({
         disabled={looking}
         className="btn btn-outline w-full disabled:opacity-50"
       >
-        {looking ? "Looking up address..." : lookupDone ? "Look Up Again" : "Auto-fill from NYC Records"}
+        {looking ? t("onboard_lookup_loading") : lookupDone ? t("onboard_lookup_again") : t("onboard_lookup_btn")}
       </button>
 
       {lookupDone && (
         <div className="border-2 border-[var(--color-sage)]/30 bg-[var(--color-sage)]/5 px-4 py-3">
           <p className="text-xs text-[var(--color-sage)]">
-            Identifiers auto-filled from NYC PLUTO database. Verify below and adjust if needed.
+            {t("onboard_lookup_success")}
           </p>
         </div>
       )}
@@ -433,7 +443,7 @@ function NycIdentifiersStep({
       </div>
 
       <p className="text-xs text-[var(--color-text-secondary)]">
-        Don&apos;t know these? Click &ldquo;Auto-fill from NYC Records&rdquo; above to look them up from the building address.
+        {t("onboard_lookup_help")}
       </p>
     </>
   );

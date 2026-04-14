@@ -264,5 +264,17 @@
   "mod_deleted": "Post deleted",
   "mod_delete_failed": "Failed to delete post",
 
+  "breadcrumb_post": "Post",
+  "breadcrumb_section": "Section",
+  "breadcrumb_system": "System",
+  "breadcrumb_buildings": "Buildings",
+  "breadcrumb_building": "Building",
+  "breadcrumb_signups": "Signups",
+  "breadcrumb_admin": "Admin",
+  "breadcrumb_units": "Units",
+  "breadcrumb_sections": "Sections",
+  "breadcrumb_moderation": "Moderation",
+  "breadcrumb_onboard": "Onboard",
+
   "loading": "Loading..."
 }

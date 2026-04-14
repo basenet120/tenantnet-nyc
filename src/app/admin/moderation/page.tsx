@@ -80,9 +80,9 @@ export default function ModerationPage() {
       setBulletinBody("");
       const postsRes = await fetch("/api/admin/posts");
       setPosts(await postsRes.json());
-      toast.success("Bulletin created");
+      toast.success(t("mod_bulletin_created"));
     } else {
-      toast.error("Failed to create bulletin");
+      toast.error(t("mod_bulletin_failed"));
     }
     setSubmitting(false);
   }
@@ -99,9 +99,9 @@ export default function ModerationPage() {
           p.id === post.id ? { ...p, isPinned: !p.isPinned } : p,
         ),
       );
-      toast.success(post.isPinned ? "Post unpinned" : "Post pinned");
+      toast.success(post.isPinned ? t("mod_unpinned") : t("mod_pinned"));
     } else {
-      toast.error("Failed to update pin status");
+      toast.error(t("mod_pin_failed"));
     }
   }
 
@@ -115,9 +115,9 @@ export default function ModerationPage() {
       setPosts((prev) =>
         prev.map((p) => (p.id === postId ? { ...p, status } : p)),
       );
-      toast.success(`Status changed to ${status}`);
+      toast.success(t("mod_status_changed").replace("{status}", status));
     } else {
-      toast.error("Failed to change status");
+      toast.error(t("mod_status_failed"));
     }
   }
 
@@ -127,21 +127,21 @@ export default function ModerationPage() {
     const res = await fetch(`/api/admin/posts/${postId}`, { method: "DELETE" });
     if (res.ok) {
       setPosts((prev) => prev.filter((p) => p.id !== postId));
-      toast.success("Post deleted");
+      toast.success(t("mod_deleted"));
     } else {
-      toast.error("Failed to delete post");
+      toast.error(t("mod_delete_failed"));
     }
   }
 
   function postAuthorLabel(post: Post) {
     if (post.admin) {
-      const tag = post.admin.role === "system_admin" ? "System Admin"
-        : post.admin.role === "tenant_rep" ? "Tenant Rep"
-        : post.admin.role === "mgmt_rep" ? "Mgmt Rep"
-        : "Admin";
+      const tag = post.admin.role === "system_admin" ? t("mod_role_system_admin")
+        : post.admin.role === "tenant_rep" ? t("mod_role_tenant_rep")
+        : post.admin.role === "mgmt_rep" ? t("mod_role_mgmt_rep")
+        : t("mod_role_admin");
       return post.admin.name ? `${post.admin.name} (${tag})` : post.admin.email;
     }
-    return post.unit?.label ?? "Unknown";
+    return post.unit?.label ?? t("mod_unknown_author");
   }
 
   if (loading) {
@@ -152,7 +152,7 @@ export default function ModerationPage() {
           <h1 className="text-3xl tracking-tight">{t("mod_title")}</h1>
         </div>
         <AdminNav current="/admin/moderation" role={role} buildingName={buildingName} />
-        <p className="mt-8 text-sm text-[var(--color-text-secondary)]">Loading...</p>
+        <p className="mt-8 text-sm text-[var(--color-text-secondary)]">{t("mod_loading")}</p>
       </div>
     );
   }
@@ -235,14 +235,14 @@ export default function ModerationPage() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       {post.isPinned && (
-                        <span className="badge badge-amber">Pinned</span>
+                        <span className="badge badge-amber">{t("mod_pinned_badge")}</span>
                       )}
                       <p className="text-sm font-semibold text-offwhite truncate">
                         {post.title}
                       </p>
                     </div>
                     <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
-                      {postAuthorLabel(post)} in{" "}
+                      {postAuthorLabel(post)} {t("mod_in")}{" "}
                       <span className="text-terracotta-light">{post.section.name}</span>
                       {" "}&middot;{" "}
                       {new Date(post.createdAt).toLocaleDateString()}

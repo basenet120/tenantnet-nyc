@@ -8,11 +8,12 @@ import { ModerationToolbar } from "@/components/moderation-toolbar";
 import { TranslatedText } from "@/components/translated-text";
 import { getAppStrings } from "@/lib/get-app-strings";
 
-function roleLabel(admin: { role: string; name: string | null }) {
-  const tag = admin.role === "system_admin" ? "System Admin"
-    : admin.role === "tenant_rep" ? "Tenant Rep"
-    : admin.role === "mgmt_rep" ? "Mgmt Rep"
-    : "Admin";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function roleLabel(admin: { role: string; name: string | null }, t: (key: any) => string) {
+  const tag = admin.role === "system_admin" ? t("role_system_admin")
+    : admin.role === "tenant_rep" ? t("role_tenant_rep")
+    : admin.role === "mgmt_rep" ? t("role_mgmt_rep")
+    : t("role_admin");
   return admin.name ? `${admin.name} (${tag})` : tag;
 }
 
@@ -61,9 +62,9 @@ export default async function PostPage({
   }
 
   const authorLabelText = post.admin
-    ? roleLabel(post.admin)
+    ? roleLabel(post.admin, t)
     : post.unit
-      ? `Unit ${post.unit.label}`
+      ? `${t("common_unit")} ${post.unit.label}`
       : t("post_unknown_author");
 
   return (
@@ -188,7 +189,7 @@ export default async function PostPage({
                 >
                   <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] mb-2">
                     <span className="font-display uppercase tracking-wide text-offwhite">
-                      {comment.admin ? roleLabel(comment.admin) : comment.unit ? `Unit ${comment.unit.label}` : t("post_unknown_author")}
+                      {comment.admin ? roleLabel(comment.admin, t) : comment.unit ? `${t("common_unit")} ${comment.unit.label}` : t("post_unknown_author")}
                     </span>
                     <span aria-hidden="true">|</span>
                     <time dateTime={comment.createdAt.toISOString()}>

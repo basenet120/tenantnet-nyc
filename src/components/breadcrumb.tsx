@@ -20,7 +20,7 @@ export function Breadcrumb() {
     return null;
   }
 
-  const segments = buildBreadcrumb(pathname);
+  const segments = buildBreadcrumb(pathname, t);
 
   return (
     <div className="border-b border-[var(--color-border)] bg-[var(--color-charcoal-light)]">
@@ -52,34 +52,35 @@ export function Breadcrumb() {
 
 type Segment = { href: string; label: string };
 
-function buildBreadcrumb(pathname: string): Segment[] {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function buildBreadcrumb(pathname: string, t: (key: any) => string): Segment[] {
   // Admin routes
   if (pathname.startsWith("/admin")) {
-    return buildAdminBreadcrumb(pathname);
+    return buildAdminBreadcrumb(pathname, t);
   }
 
   // Tenant routes
   const crumbs: Segment[] = [
-    { href: "/dashboard", label: "Dashboard" },
+    { href: "/dashboard", label: t("nav_dashboard") },
   ];
 
   if (pathname === "/dashboard") return crumbs;
 
   if (pathname.startsWith("/section/")) {
     const slug = pathname.split("/")[2];
-    crumbs.push({ href: pathname, label: slug?.replace(/-/g, " ") ?? "Section" });
+    crumbs.push({ href: pathname, label: slug?.replace(/-/g, " ") ?? t("breadcrumb_section") });
     return crumbs;
   }
 
   if (pathname.startsWith("/post/")) {
-    crumbs.push({ href: pathname, label: "Post" });
+    crumbs.push({ href: pathname, label: t("breadcrumb_post") });
     return crumbs;
   }
 
   const TENANT_ROUTES: Record<string, string> = {
-    "/settings": "Settings",
-    "/new-post": "New Post",
-    "/send-report": "Send Report",
+    "/settings": t("settings_title"),
+    "/new-post": t("new_post_title"),
+    "/send-report": t("report_title"),
   };
   if (TENANT_ROUTES[pathname]) {
     crumbs.push({ href: pathname, label: TENANT_ROUTES[pathname] });
@@ -88,28 +89,29 @@ function buildBreadcrumb(pathname: string): Segment[] {
   return crumbs;
 }
 
-function buildAdminBreadcrumb(pathname: string): Segment[] {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function buildAdminBreadcrumb(pathname: string, t: (key: any) => string): Segment[] {
   // System admin routes
   if (pathname.startsWith("/admin/system")) {
     const crumbs: Segment[] = [
-      { href: "/admin/system", label: "System" },
+      { href: "/admin/system", label: t("breadcrumb_system") },
     ];
 
     if (pathname === "/admin/system") return crumbs;
 
     if (pathname === "/admin/system/buildings") {
-      crumbs.push({ href: pathname, label: "Buildings" });
+      crumbs.push({ href: pathname, label: t("breadcrumb_buildings") });
       return crumbs;
     }
 
     if (pathname.startsWith("/admin/system/buildings/")) {
-      crumbs.push({ href: "/admin/system/buildings", label: "Buildings" });
-      crumbs.push({ href: pathname, label: "Building" });
+      crumbs.push({ href: "/admin/system/buildings", label: t("breadcrumb_buildings") });
+      crumbs.push({ href: pathname, label: t("breadcrumb_building") });
       return crumbs;
     }
 
     if (pathname === "/admin/system/signups") {
-      crumbs.push({ href: pathname, label: "Signups" });
+      crumbs.push({ href: pathname, label: t("breadcrumb_signups") });
       return crumbs;
     }
 
@@ -118,16 +120,16 @@ function buildAdminBreadcrumb(pathname: string): Segment[] {
 
   // Building admin routes
   const crumbs: Segment[] = [
-    { href: "/admin", label: "Admin" },
+    { href: "/admin", label: t("breadcrumb_admin") },
   ];
 
   if (pathname === "/admin") return crumbs;
 
   const ADMIN_ROUTES: Record<string, string> = {
-    "/admin/units": "Units",
-    "/admin/sections": "Sections",
-    "/admin/moderation": "Moderation",
-    "/admin/onboard": "Onboard",
+    "/admin/units": t("breadcrumb_units"),
+    "/admin/sections": t("breadcrumb_sections"),
+    "/admin/moderation": t("breadcrumb_moderation"),
+    "/admin/onboard": t("breadcrumb_onboard"),
   };
 
   if (ADMIN_ROUTES[pathname]) {

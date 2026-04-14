@@ -62,21 +62,25 @@ ${JSON.stringify(strings, null, 2)}`,
     } catch {
       console.warn(`  [warn] JSON parse failed for ${toLang}, retrying...`);
       // Retry once
-      const retry = await anthropic.messages.create({
-        model: "claude-sonnet-4-6",
-        max_tokens: 8192,
-        messages: [
-          { role: "user", content: `You MUST return ONLY valid JSON. No explanation. Translate these JSON values to ${LANG_NAMES[toLang]}:\n${JSON.stringify(strings)}` },
-        ],
-      });
-      const rb = retry.content[0];
-      if (rb.type === "text") {
-        let rr = rb.text.trim().replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "");
-        const parsed = JSON.parse(rr);
-        for (const k of Object.keys(strings)) {
-          if (!parsed[k]) parsed[k] = strings[k];
+      try {
+        const retry = await anthropic.messages.create({
+          model: "claude-sonnet-4-6",
+          max_tokens: 8192,
+          messages: [
+            { role: "user", content: `You MUST return ONLY valid JSON. No explanation. Translate these JSON values to ${LANG_NAMES[toLang]}:\n${JSON.stringify(strings)}` },
+          ],
+        });
+        const rb = retry.content[0];
+        if (rb.type === "text") {
+          const rr = rb.text.trim().replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "");
+          const parsed = JSON.parse(rr);
+          for (const k of Object.keys(strings)) {
+            if (!parsed[k]) parsed[k] = strings[k];
+          }
+          return parsed;
         }
-        return parsed;
+      } catch {
+        console.warn(`  [warn] retry also failed for ${toLang} — falling back to English`);
       }
     }
   }

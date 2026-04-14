@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAdminI18n } from "./admin-i18n-provider";
 
 export function EnterBuildingButton({
   buildingId,
@@ -11,6 +12,7 @@ export function EnterBuildingButton({
   target: "admin" | "forum";
 }) {
   const router = useRouter();
+  const { t } = useAdminI18n();
   const [loading, setLoading] = useState(false);
 
   async function handleClick() {
@@ -34,10 +36,10 @@ export function EnterBuildingButton({
       className={`btn ${target === "admin" ? "btn-primary" : "btn-outline"} disabled:opacity-50`}
     >
       {loading
-        ? "Switching..."
+        ? t("admin_switching")
         : target === "admin"
-          ? "Enter Admin Panel"
-          : "View Forum"}
+          ? t("admin_enter_panel")
+          : t("admin_view_forum")}
     </button>
   );
 }
