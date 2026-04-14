@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import AdminNav from "@/components/admin-nav";
+import { useAdminContext } from "@/lib/use-admin-context";
 
 type Section = {
   id: string;
@@ -19,6 +20,7 @@ function generateSlug(name: string): string {
 }
 
 export default function AdminSectionsPage() {
+  const { role, buildingName } = useAdminContext();
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
   const [newName, setNewName] = useState("");
@@ -97,7 +99,7 @@ export default function AdminSectionsPage() {
         <h1 className="text-3xl tracking-tight">SECTIONS</h1>
       </div>
 
-      <AdminNav current="/admin/sections" role="tenant_rep" />
+      <AdminNav current="/admin/sections" role={role} buildingName={buildingName} />
 
       {/* Section List */}
       <div className="mt-8">

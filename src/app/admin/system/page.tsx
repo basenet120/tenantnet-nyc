@@ -59,19 +59,32 @@ export default async function SystemDashboardPage() {
         ) : (
           <ul className="divide-y divide-[var(--color-border)]">
             {recentBuildings.map((b) => (
-              <li key={b.id} className="flex items-baseline justify-between py-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-offwhite truncate">{b.name}</p>
-                  <p className="text-xs text-[var(--color-text-secondary)]">
-                    {b._count.units} units &middot; {b._count.posts} posts &middot; {b._count.admins} admins
-                  </p>
-                </div>
-                <time className="ml-4 shrink-0 text-xs text-[var(--color-text-secondary)]">
-                  {b.createdAt.toLocaleDateString()}
-                </time>
+              <li key={b.id}>
+                <Link
+                  href={`/admin/system/buildings/${b.id}`}
+                  className="flex items-baseline justify-between py-3 no-underline hover:bg-[var(--color-charcoal-light)] -mx-2 px-2 transition-colors"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-offwhite truncate">{b.name}</p>
+                    <p className="text-xs text-[var(--color-text-secondary)]">
+                      {b._count.units} units &middot; {b._count.posts} posts &middot; {b._count.admins} admins
+                    </p>
+                  </div>
+                  <time className="ml-4 shrink-0 text-xs text-[var(--color-text-secondary)]">
+                    {b.createdAt.toLocaleDateString()}
+                  </time>
+                </Link>
               </li>
             ))}
           </ul>
+        )}
+        {recentBuildings.length > 0 && (
+          <Link
+            href="/admin/system/buildings"
+            className="mt-4 block text-sm text-terracotta-light hover:text-terracotta"
+          >
+            View all buildings &rarr;
+          </Link>
         )}
       </div>
     </div>

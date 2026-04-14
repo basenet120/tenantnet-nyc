@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LanguagePicker } from "./language-picker";
 
 const navItems = [
   { label: "Dashboard", href: "/admin/system" },
@@ -22,12 +23,15 @@ export default function SystemAdminNav({ current }: { current: string }) {
           {item.label}
         </Link>
       ))}
-      <Link
-        href="/admin/onboard"
-        className="ml-auto px-5 py-3 font-display text-[0.8125rem] tracking-[0.08em] uppercase no-underline transition-colors duration-150 text-terracotta hover:text-terracotta-light -mb-[2px] border-b-[3px] border-b-transparent"
-      >
-        + Onboard Building
-      </Link>
+      <div className="ml-auto flex items-center gap-1">
+        <LanguagePicker />
+        <Link
+          href="/admin/onboard"
+          className="px-5 py-3 font-display text-[0.8125rem] tracking-[0.08em] uppercase no-underline transition-colors duration-150 text-terracotta hover:text-terracotta-light -mb-[2px] border-b-[3px] border-b-transparent"
+        >
+          + Onboard Building
+        </Link>
+      </div>
     </nav>
   );
 }

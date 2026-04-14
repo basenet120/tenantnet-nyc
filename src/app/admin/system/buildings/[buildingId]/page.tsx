@@ -2,7 +2,8 @@ import { redirect, notFound } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import SystemAdminNav from "@/components/system-admin-nav";
-import { BuildingRecords } from "@/components/building-records";
+import { BuildingRecordsBrowser } from "@/components/building-records-browser";
+import { EnterBuildingButton } from "@/components/enter-building-button";
 import Link from "next/link";
 
 export default async function BuildingDetailPage({
@@ -43,6 +44,12 @@ export default async function BuildingDetailPage({
       </div>
 
       <SystemAdminNav current="/admin/system/buildings" />
+
+      {/* Quick Actions */}
+      <div className="mt-6 flex gap-3">
+        <EnterBuildingButton buildingId={building.id} target="admin" />
+        <EnterBuildingButton buildingId={building.id} target="forum" />
+      </div>
 
       {/* Building Info */}
       <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -127,7 +134,7 @@ export default async function BuildingDetailPage({
       {building.records.length > 0 && (
         <div className="mt-8">
           <h2 className="section-label">NYC Public Records</h2>
-          <BuildingRecords records={building.records} />
+          <BuildingRecordsBrowser records={building.records} />
         </div>
       )}
 

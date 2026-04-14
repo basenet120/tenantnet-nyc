@@ -3,6 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { LanguagePicker } from "@/components/language-picker";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,6 +40,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
+      <div className="fixed top-4 left-4 z-50">
+        <LanguagePicker />
+      </div>
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-10">

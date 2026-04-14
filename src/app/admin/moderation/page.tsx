@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import AdminNav from "@/components/admin-nav";
 import { POST_STATUS } from "@/lib/constants";
+import { useAdminContext } from "@/lib/use-admin-context";
 
 type Section = {
   id: string;
@@ -25,6 +26,7 @@ type Post = {
 };
 
 export default function ModerationPage() {
+  const { role, buildingName } = useAdminContext();
   const [posts, setPosts] = useState<Post[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
@@ -147,7 +149,7 @@ export default function ModerationPage() {
           <p className="section-label border-b-0 mb-1">Administration</p>
           <h1 className="text-3xl tracking-tight">MODERATION</h1>
         </div>
-        <AdminNav current="/admin/moderation" role="tenant_rep" />
+        <AdminNav current="/admin/moderation" role={role} buildingName={buildingName} />
         <p className="mt-8 text-sm text-[var(--color-text-secondary)]">Loading...</p>
       </div>
     );
@@ -161,7 +163,7 @@ export default function ModerationPage() {
         <h1 className="text-3xl tracking-tight">MODERATION</h1>
       </div>
 
-      <AdminNav current="/admin/moderation" role="tenant_rep" />
+      <AdminNav current="/admin/moderation" role={role} buildingName={buildingName} />
 
       {/* Create Bulletin */}
       <div className="mt-8 card-dark border-l-[3px] border-l-terracotta">

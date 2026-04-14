@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 import { ImageUpload } from "@/components/image-upload";
+import { LanguagePicker } from "@/components/language-picker";
 import { IMAGE_LIMITS } from "@/lib/constants";
 
 interface Section {
@@ -109,9 +110,10 @@ function NewPostForm() {
               />
             </svg>
           </Link>
-          <h1 className="font-display text-xl uppercase tracking-tight text-offwhite">
+          <h1 className="font-display text-xl uppercase tracking-tight text-offwhite flex-1">
             New Post
           </h1>
+          <LanguagePicker />
         </div>
       </header>
 

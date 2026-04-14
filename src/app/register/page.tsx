@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { LanguagePicker } from "@/components/language-picker";
 
 type Step = 1 | 2 | 3;
 
@@ -91,6 +92,9 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
+      <div className="fixed top-4 left-4 z-50">
+        <LanguagePicker />
+      </div>
       <div className="w-full max-w-lg">
         {/* Progress indicator */}
         <div className="flex items-center gap-0 mb-10">

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import QRCode from "qrcode";
 import AdminNav from "@/components/admin-nav";
+import { useAdminContext } from "@/lib/use-admin-context";
 
 type UnitData = {
   id: string;
@@ -56,6 +57,7 @@ function ConfirmModal({
 }
 
 export default function AdminUnitsPage() {
+  const { role, buildingName } = useAdminContext();
   const [units, setUnits] = useState<UnitData[]>([]);
   const [loading, setLoading] = useState(true);
   const [qrImages, setQrImages] = useState<Record<string, string>>({});
@@ -116,7 +118,7 @@ export default function AdminUnitsPage() {
         <h1 className="text-3xl tracking-tight">UNIT MANAGEMENT</h1>
       </div>
 
-      <AdminNav current="/admin/units" role="tenant_rep" />
+      <AdminNav current="/admin/units" role={role} buildingName={buildingName} />
 
       {loading ? (
         <p className="mt-8 text-sm text-[var(--color-text-secondary)]">Loading units...</p>

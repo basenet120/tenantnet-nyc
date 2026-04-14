@@ -13,11 +13,19 @@ const LANGUAGES = [
 
 const RTL_LANGS = ["yi", "ar"];
 
-export function LanguagePicker({ currentLang }: { currentLang: string }) {
+export function LanguagePicker({ currentLang }: { currentLang?: string }) {
   const [open, setOpen] = useState(false);
-  const [lang, setLang] = useState(currentLang);
+  const [lang, setLang] = useState(currentLang ?? "en");
   const [switching, setSwitching] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  // Auto-detect from cookie if no prop was provided
+  useEffect(() => {
+    if (!currentLang) {
+      const match = document.cookie.match(/tn_lang=([a-z]{2})/);
+      if (match?.[1]) setLang(match[1]);
+    }
+  }, [currentLang]);
 
   // Close on outside click
   useEffect(() => {

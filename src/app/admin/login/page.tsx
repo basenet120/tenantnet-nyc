@@ -3,6 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { LanguagePicker } from "@/components/language-picker";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -48,6 +49,9 @@ export default function AdminLoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
+      <div className="fixed top-4 left-4 z-50">
+        <LanguagePicker />
+      </div>
       <div className="w-full max-w-sm">
         {/* Header */}
         <div className="mb-8 text-center">

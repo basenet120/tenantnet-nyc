@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
+import { LanguagePicker } from "@/components/language-picker";
 
 const QUICK_RECIPIENTS = [
   { label: "Building Management", key: "management" },
@@ -71,7 +72,8 @@ function SendReportForm() {
                 <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
               </svg>
             </Link>
-            <h1 className="font-display text-xl uppercase tracking-tight text-offwhite">Send Report</h1>
+            <h1 className="font-display text-xl uppercase tracking-tight text-offwhite flex-1">Send Report</h1>
+            <LanguagePicker />
           </div>
         </header>
         <main className="container-narrow py-16 text-center">

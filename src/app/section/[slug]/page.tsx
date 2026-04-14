@@ -3,8 +3,10 @@ import Link from "next/link";
 import { getSession, sessionBuildingId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PostCard } from "@/components/post-card";
+import { LanguagePicker } from "@/components/language-picker";
 import { PostStatus } from "@/generated/prisma/client";
 import { postVisibilityWhere } from "@/lib/post-filters";
+import { getLang } from "@/lib/get-lang";
 
 const STATUS_OPTIONS = ["all", "reported", "acknowledged", "fixed", "unresolved"] as const;
 
@@ -44,6 +46,7 @@ export default async function SectionFeedPage({
   const buildingId = sessionBuildingId(session);
   if (!buildingId) redirect("/admin/system");
 
+  const lang = await getLang();
   const { slug } = await params;
   const { status } = await searchParams;
 
@@ -109,6 +112,7 @@ export default async function SectionFeedPage({
               {roleBadgeLabel(session)}
             </p>
           </div>
+          <LanguagePicker currentLang={lang} />
         </div>
       </header>
 

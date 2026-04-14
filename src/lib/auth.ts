@@ -5,7 +5,7 @@ import { randomBytes } from "crypto";
 
 export type SessionData =
   | { type: "unit"; unitId: string; unitLabel: string; buildingId: string; isRegistered: boolean }
-  | { type: "admin"; adminId: string; email: string; role: "system_admin"; buildingId: null; name: string | null }
+  | { type: "admin"; adminId: string; email: string; role: "system_admin"; buildingId: string | null; name: string | null }
   | { type: "admin"; adminId: string; email: string; role: "tenant_rep" | "mgmt_rep"; buildingId: string; name: string | null }
   | null;
 
@@ -40,7 +40,7 @@ export async function getSession(): Promise<SessionData> {
         adminId: session.admin.id,
         email: session.admin.email,
         role: "system_admin",
-        buildingId: null,
+        buildingId: session.buildingId ?? null,
         name: session.admin.name,
       };
     }

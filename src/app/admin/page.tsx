@@ -56,7 +56,7 @@ export default async function AdminDashboardPage() {
         <h1 className="text-3xl tracking-tight">{building?.name ?? "TENANTNET.NYC"}</h1>
       </div>
 
-      <AdminNav current="/admin" role={session.role} />
+      <AdminNav current="/admin" role={session.role} buildingName={session.role === "system_admin" ? building?.name ?? undefined : undefined} />
 
       {/* Stat Cards */}
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">

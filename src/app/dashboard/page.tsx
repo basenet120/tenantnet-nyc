@@ -4,7 +4,8 @@ import { getSession, sessionBuildingId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PostCard } from "@/components/post-card";
 import { SectionNav } from "@/components/section-nav";
-import { BuildingRecords } from "@/components/building-records";
+import { BuildingRecordsBrowser } from "@/components/building-records-browser";
+import { RentStabilizedNotice } from "@/components/rent-stabilized-notice";
 import { LanguagePicker } from "@/components/language-picker";
 import { postVisibilityWhere } from "@/lib/post-filters";
 import { getLang } from "@/lib/get-lang";
@@ -58,7 +59,7 @@ export default async function DashboardPage() {
 
   const building = await prisma.building.findUnique({
     where: { id: buildingId },
-    select: { name: true, address: true },
+    select: { name: true, address: true, buildingType: true },
   });
 
   const visibilityFilter = postVisibilityWhere(session);
@@ -171,7 +172,7 @@ export default async function DashboardPage() {
         {records.length > 0 && (
           <section>
             <h2 className="section-label">NYC Public Records</h2>
-            <BuildingRecords records={records} />
+            <BuildingRecordsBrowser records={records} />
           </section>
         )}
 
@@ -236,6 +237,11 @@ export default async function DashboardPage() {
           </div>
         </section>
       </main>
+
+      {/* Rent stabilization notice for tenants */}
+      {!isAdmin && building?.buildingType && (
+        <RentStabilizedNotice buildingType={building.buildingType} />
+      )}
     </div>
   );
 }
