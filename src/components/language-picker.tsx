@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
 
 const LANGUAGES = [
@@ -13,12 +13,13 @@ const LANGUAGES = [
 ] as const;
 
 const RTL_LANGS = ["yi", "ar"];
+const DROPDOWN_WIDTH = 160;
 
 export function LanguagePicker({ currentLang }: { currentLang?: string }) {
   const [open, setOpen] = useState(false);
   const [lang, setLang] = useState(currentLang ?? "en");
   const [switching, setSwitching] = useState(false);
-  const [dropdownPos, setDropdownPos] = useState<{ top: number; right: number } | null>(null);
+  const [pos, setPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
   const [mounted, setMounted] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -33,6 +34,16 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
     }
   }, [currentLang]);
 
+  // Position the dropdown below the button each time it opens
+  useLayoutEffect(() => {
+    if (!open || !btnRef.current) return;
+    const rect = btnRef.current.getBoundingClientRect();
+    // Align dropdown's right edge with button's right edge
+    const left = Math.max(8, rect.right - DROPDOWN_WIDTH);
+    const top = rect.bottom + 4;
+    setPos({ top, left });
+  }, [open]);
+
   // Close on outside click
   useEffect(() => {
     if (!open) return;
@@ -44,19 +55,26 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
         setOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    // Add on next tick so the click that opened us doesn't immediately close us
+    const t = setTimeout(() => {
+      document.addEventListener("mousedown", handleClick);
+    }, 0);
+    return () => {
+      clearTimeout(t);
+      document.removeEventListener("mousedown", handleClick);
+    };
   }, [open]);
 
-  const toggleOpen = useCallback(() => {
-    if (!open && btnRef.current) {
-      const rect = btnRef.current.getBoundingClientRect();
-      setDropdownPos({
-        top: rect.bottom + 4,
-        right: window.innerWidth - rect.right,
-      });
-    }
-    setOpen((v) => !v);
+  // Close on scroll/resize so dropdown doesn't hang in a stale position
+  useEffect(() => {
+    if (!open) return;
+    const close = () => setOpen(false);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+    return () => {
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    };
   }, [open]);
 
   async function switchLang(code: string) {
@@ -72,12 +90,8 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
         body: JSON.stringify({ lang: code }),
       });
       setLang(code);
-
-      // Set RTL/LTR on document
       document.documentElement.setAttribute("dir", RTL_LANGS.includes(code) ? "rtl" : "ltr");
       document.documentElement.setAttribute("lang", code);
-
-      // Reload to re-render with new language
       window.location.reload();
     } catch {
       // Silently fail
@@ -93,7 +107,7 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
     <>
       <button
         ref={btnRef}
-        onClick={toggleOpen}
+        onClick={() => setOpen((v) => !v)}
         disabled={switching}
         className="flex items-center gap-1.5 px-2 py-1.5 text-[var(--color-text-secondary)] hover:text-offwhite transition-colors"
         aria-label="Change language"
@@ -108,11 +122,16 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
         </span>
       </button>
 
-      {mounted && open && dropdownPos && createPortal(
+      {mounted && open && createPortal(
         <div
           ref={dropdownRef}
-          className="fixed border-2 border-[var(--color-border)] bg-[var(--color-charcoal)] shadow-lg min-w-[160px]"
-          style={{ top: dropdownPos.top, right: dropdownPos.right, zIndex: 2147483647 }}
+          className="fixed border-2 border-[var(--color-border)] bg-[var(--color-charcoal)] shadow-lg"
+          style={{
+            top: pos.top,
+            left: pos.left,
+            width: DROPDOWN_WIDTH,
+            zIndex: 2147483647,
+          }}
         >
           {LANGUAGES.map((l) => (
             <button
