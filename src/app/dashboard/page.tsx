@@ -6,7 +6,6 @@ import { PostCard } from "@/components/post-card";
 import { SectionNav } from "@/components/section-nav";
 import { BuildingRecordsBrowser } from "@/components/building-records-browser";
 import { RentStabilizedNotice } from "@/components/rent-stabilized-notice";
-import { LanguagePicker } from "@/components/language-picker";
 import { postVisibilityWhere } from "@/lib/post-filters";
 import { getAppStrings } from "@/lib/get-app-strings";
 
@@ -105,7 +104,6 @@ export default async function DashboardPage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <LanguagePicker currentLang={lang} />
             {isAdmin ? (
               <>
                 <Link

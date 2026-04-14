@@ -6,7 +6,6 @@ import { StatusBadge } from "@/components/status-badge";
 import { CommentForm } from "@/components/comment-form";
 import { ModerationToolbar } from "@/components/moderation-toolbar";
 import { TranslatedText } from "@/components/translated-text";
-import { LanguagePicker } from "@/components/language-picker";
 import { getAppStrings } from "@/lib/get-app-strings";
 
 function roleLabel(admin: { role: string; name: string | null }) {
@@ -93,7 +92,6 @@ export default async function PostPage({
           <h1 className="font-display text-lg uppercase tracking-tight text-offwhite flex-1">
             {post.section.name}
           </h1>
-          <LanguagePicker currentLang={lang} />
         </div>
       </header>
 

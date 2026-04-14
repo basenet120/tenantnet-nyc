@@ -3,7 +3,6 @@ import Link from "next/link";
 import { getSession, sessionBuildingId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PostCard } from "@/components/post-card";
-import { LanguagePicker } from "@/components/language-picker";
 import { PostStatus } from "@/generated/prisma/client";
 import { postVisibilityWhere } from "@/lib/post-filters";
 import { getAppStrings } from "@/lib/get-app-strings";
@@ -112,7 +111,6 @@ export default async function SectionFeedPage({
               {roleBadgeLabel(session)}
             </p>
           </div>
-          <LanguagePicker currentLang={lang} />
         </div>
       </header>
 

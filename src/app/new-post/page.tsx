@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 import { ImageUpload } from "@/components/image-upload";
-import { LanguagePicker } from "@/components/language-picker";
 import { useI18n } from "@/components/i18n-provider";
 import { IMAGE_LIMITS } from "@/lib/constants";
 
@@ -115,7 +114,6 @@ function NewPostForm() {
           <h1 className="font-display text-xl uppercase tracking-tight text-offwhite flex-1">
             {t("new_post_title")}
           </h1>
-          <LanguagePicker />
         </div>
       </header>
 

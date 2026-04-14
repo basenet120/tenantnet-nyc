@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useI18n } from "./i18n-provider";
+import { LanguagePicker } from "./language-picker";
 
 const ROUTE_LABELS: Record<string, string> = {
   "/dashboard": "nav_dashboard",
@@ -16,34 +17,41 @@ export function Breadcrumb() {
   const pathname = usePathname();
 
   // Don't show on landing, login, register, admin, or auth pages
-  const hiddenPrefixes = ["/", "/login", "/register", "/admin", "/auth"];
-  if (hiddenPrefixes.some((p) => pathname === p) || pathname.startsWith("/admin") || pathname.startsWith("/auth")) {
+  if (
+    pathname === "/" ||
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/auth")
+  ) {
     return null;
   }
 
   const segments = buildBreadcrumb(pathname, t);
-  if (segments.length <= 1) return null;
 
   return (
     <div className="border-b border-[var(--color-border)] bg-[var(--color-charcoal-light)]">
-      <div className="container-narrow px-4 py-2 flex items-center gap-1.5 text-[0.6875rem] font-display uppercase tracking-wider overflow-x-auto">
-        {segments.map((seg, i) => (
-          <span key={seg.href} className="flex items-center gap-1.5 shrink-0">
-            {i > 0 && (
-              <span className="text-[var(--color-border-light)]" aria-hidden="true">/</span>
-            )}
-            {i < segments.length - 1 ? (
-              <Link
-                href={seg.href}
-                className="text-[var(--color-text-secondary)] hover:text-offwhite transition-colors no-underline"
-              >
-                {seg.label}
-              </Link>
-            ) : (
-              <span className="text-terracotta">{seg.label}</span>
-            )}
-          </span>
-        ))}
+      <div className="container-narrow px-4 py-1.5 flex items-center justify-between">
+        <div className="flex items-center gap-1.5 text-[0.6875rem] font-display uppercase tracking-wider">
+          {segments.map((seg, i) => (
+            <span key={seg.href} className="flex items-center gap-1.5 shrink-0">
+              {i > 0 && (
+                <span className="text-[var(--color-border-light)]" aria-hidden="true">/</span>
+              )}
+              {i < segments.length - 1 ? (
+                <Link
+                  href={seg.href}
+                  className="text-[var(--color-text-secondary)] hover:text-offwhite transition-colors no-underline"
+                >
+                  {seg.label}
+                </Link>
+              ) : (
+                <span className="text-terracotta">{seg.label}</span>
+              )}
+            </span>
+          ))}
+        </div>
+        <LanguagePicker />
       </div>
     </div>
   );
@@ -59,6 +67,8 @@ function buildBreadcrumb(
   const crumbs: Segment[] = [
     { href: "/dashboard", label: t("nav_dashboard") },
   ];
+
+  if (pathname === "/dashboard") return crumbs;
 
   // /section/[slug]
   if (pathname.startsWith("/section/")) {

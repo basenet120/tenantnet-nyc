@@ -4,7 +4,6 @@ import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
-import { LanguagePicker } from "@/components/language-picker";
 import { useI18n } from "@/components/i18n-provider";
 
 type Settings = {
@@ -186,7 +185,6 @@ export default function SettingsPage() {
             </h1>
             <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Unit {settings?.label}</p>
           </div>
-          <LanguagePicker />
         </div>
       </header>
 

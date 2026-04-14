@@ -4,7 +4,6 @@ import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
-import { LanguagePicker } from "@/components/language-picker";
 import { useI18n } from "@/components/i18n-provider";
 
 const QUICK_RECIPIENTS = [
@@ -75,7 +74,6 @@ function SendReportForm() {
               </svg>
             </Link>
             <h1 className="font-display text-xl uppercase tracking-tight text-offwhite flex-1">{t("report_title")}</h1>
-            <LanguagePicker />
           </div>
         </header>
         <main className="container-narrow py-16 text-center">
