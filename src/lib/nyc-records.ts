@@ -25,22 +25,45 @@ export function generateBuildingRecordUrls(building: BuildingInfo): RecordUrl[] 
   const records: RecordUrl[] = [];
   const boroughId = BOROUGH_IDS[building.borough];
 
-  if (building.bin) {
+  if (building.bin && boroughId && building.block && building.lot) {
+    const paddedBlock = building.block.padStart(5, "0");
+    const paddedLot = building.lot.padStart(5, "0");
     records.push({
       recordType: "dob_profile",
-      url: `https://a810-dobnow.nyc.gov/Publish/#!/BISProfile/${building.bin}/1`,
+      url: `https://a810-dobnow.nyc.gov/Publish/#!/BISProfile?boro=${boroughId}&block=${paddedBlock}&lot=${paddedLot}`,
       label: "DOB Building Profile",
       description: "NYC Department of Buildings property overview, permits, and certificates of occupancy",
     });
     records.push({
       recordType: "dob_violations",
-      url: `https://a810-dobnow.nyc.gov/Publish/#!/BISProfile/${building.bin}/2`,
+      url: `https://a810-dobnow.nyc.gov/Publish/#!/BISProfile?boro=${boroughId}&block=${paddedBlock}&lot=${paddedLot}`,
       label: "DOB Violations",
       description: "Environmental Control Board violations and penalties",
     });
     records.push({
       recordType: "dob_complaints",
-      url: `https://a810-dobnow.nyc.gov/Publish/#!/BISProfile/${building.bin}/3`,
+      url: `https://a810-dobnow.nyc.gov/Publish/#!/BISProfile?boro=${boroughId}&block=${paddedBlock}&lot=${paddedLot}`,
+      label: "DOB Complaints",
+      description: "Building complaints filed with the Department of Buildings",
+    });
+  } else if (building.bin) {
+    // Fallback if no BBL — link to DOB NOW search
+    const dobUrl = `https://a810-dobnow.nyc.gov/Publish/#!/BISProfile?bin=${building.bin}`;
+    records.push({
+      recordType: "dob_profile",
+      url: dobUrl,
+      label: "DOB Building Profile",
+      description: "NYC Department of Buildings property overview, permits, and certificates of occupancy",
+    });
+    records.push({
+      recordType: "dob_violations",
+      url: dobUrl,
+      label: "DOB Violations",
+      description: "Environmental Control Board violations and penalties",
+    });
+    records.push({
+      recordType: "dob_complaints",
+      url: dobUrl,
       label: "DOB Complaints",
       description: "Building complaints filed with the Department of Buildings",
     });

@@ -162,66 +162,70 @@ function RentStabilizationTab({ externalUrl }: { externalUrl?: string }) {
     );
   }
 
-  const uc = data?.unitCounts;
+  const reg = data?.registration;
 
   return (
     <div className="space-y-4">
-      {uc ? (
-        <>
-          {/* Unit count timeline */}
-          <div className="card-dark">
-            <h3 className="font-display text-xs uppercase tracking-[0.12em] text-terracotta mb-4">
-              Stabilized Unit Counts Over Time
-            </h3>
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-              {["2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"].map((year) => {
-                const key = `uc${year}`;
-                const val = uc[key];
-                if (!val && val !== 0) return null;
-                const count = parseInt(val);
-                return (
-                  <div key={year} className="text-center p-2 border border-[var(--color-border)]">
-                    <p className="font-display text-xl text-offwhite">{count}</p>
-                    <p className="text-[0.5625rem] uppercase tracking-wider text-[var(--color-text-secondary)]">{year}</p>
-                  </div>
-                );
-              })}
+      {reg ? (
+        <div className="card-dark">
+          <h3 className="font-display text-xs uppercase tracking-[0.12em] text-terracotta mb-4">
+            HPD Registration
+          </h3>
+          <dl className="space-y-2 text-sm">
+            {reg.housenumber && reg.streetname && (
+              <div className="flex justify-between">
+                <dt className="text-[var(--color-text-secondary)]">Address</dt>
+                <dd className="text-offwhite">{reg.housenumber} {reg.streetname}</dd>
+              </div>
+            )}
+            {reg.boro && (
+              <div className="flex justify-between">
+                <dt className="text-[var(--color-text-secondary)]">Borough</dt>
+                <dd className="text-offwhite capitalize">{reg.boro.toLowerCase()}</dd>
+              </div>
+            )}
+            {reg.zip && (
+              <div className="flex justify-between">
+                <dt className="text-[var(--color-text-secondary)]">ZIP</dt>
+                <dd className="text-offwhite">{reg.zip}</dd>
+              </div>
+            )}
+            {reg.registrationid && (
+              <div className="flex justify-between">
+                <dt className="text-[var(--color-text-secondary)]">Registration ID</dt>
+                <dd className="text-offwhite">{reg.registrationid}</dd>
+              </div>
+            )}
+            {reg.lastregistrationdate && (
+              <div className="flex justify-between">
+                <dt className="text-[var(--color-text-secondary)]">Last Registered</dt>
+                <dd className="text-offwhite">
+                  {new Date(reg.lastregistrationdate).toLocaleDateString("en-US", {
+                    month: "short", day: "numeric", year: "numeric",
+                  })}
+                </dd>
+              </div>
+            )}
+            {reg.registrationenddate && (
+              <div className="flex justify-between">
+                <dt className="text-[var(--color-text-secondary)]">Registration Expires</dt>
+                <dd className="text-offwhite">
+                  {new Date(reg.registrationenddate).toLocaleDateString("en-US", {
+                    month: "short", day: "numeric", year: "numeric",
+                  })}
+                </dd>
+              </div>
+            )}
+            <div className="flex justify-between">
+              <dt className="text-[var(--color-text-secondary)]">Building Type</dt>
+              <dd className="text-offwhite capitalize">{data?.buildingType?.replace("_", " ") ?? "—"}</dd>
             </div>
-          </div>
-
-          {/* Building info from dataset */}
-          {(uc.ownername || uc.unitstotal) && (
-            <div className="card-dark">
-              <h3 className="font-display text-xs uppercase tracking-[0.12em] text-terracotta mb-3">
-                Registration Details
-              </h3>
-              <dl className="space-y-2 text-sm">
-                {uc.ownername && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--color-text-secondary)]">Owner</dt>
-                    <dd className="text-offwhite">{uc.ownername}</dd>
-                  </div>
-                )}
-                {uc.unitstotal && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--color-text-secondary)]">Total Units</dt>
-                    <dd className="text-offwhite">{uc.unitstotal}</dd>
-                  </div>
-                )}
-                {uc.bldgzip && (
-                  <div className="flex justify-between">
-                    <dt className="text-[var(--color-text-secondary)]">ZIP</dt>
-                    <dd className="text-offwhite">{uc.bldgzip}</dd>
-                  </div>
-                )}
-              </dl>
-            </div>
-          )}
-        </>
+          </dl>
+        </div>
       ) : (
         <div className="text-center py-6">
           <p className="text-sm text-[var(--color-text-secondary)]">
-            {data?.message || "No stabilization count data found for this building."}
+            {data?.message || "No registration data found for this building."}
           </p>
         </div>
       )}
@@ -426,17 +430,20 @@ function RecordRow({ type, item }: { type: string; item: any }) {
   }
 
   if (type === "hpd_complaints") {
+    // Dataset ygpa-z7cr: major_category, minor_category, complaint_status, received_date, apartment, space_type, type, status_description
     return (
       <div className="card-dark py-3 px-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-offwhite">
-              {item.complaint_type || item.majorcategory || "Complaint"}
+              {item.major_category || item.type || "Complaint"}
+              {item.minor_category && ` — ${item.minor_category}`}
             </p>
             <p className="text-xs text-[var(--color-text-secondary)] mt-1">
               {item.apartment && `Apt ${item.apartment} · `}
-              {item.receiveddate &&
-                new Date(item.receiveddate).toLocaleDateString("en-US", {
+              {item.space_type && `${item.space_type} · `}
+              {item.received_date &&
+                new Date(item.received_date).toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
                   year: "numeric",
@@ -444,18 +451,17 @@ function RecordRow({ type, item }: { type: string; item: any }) {
             </p>
           </div>
           <StatusPill
-            status={item.status}
+            status={item.complaint_status || item.problem_status}
             colorMap={{
-              "Open": "terracotta",
-              "Close": "sage",
-              "Closed": "sage",
+              "OPEN": "terracotta",
+              "CLOSE": "sage",
+              "CLOSED": "sage",
             }}
           />
         </div>
-        {(item.majorcategory || item.minorcategory) && (
-          <p className="text-[0.6875rem] text-[var(--color-text-secondary)] mt-2">
-            {item.majorcategory}
-            {item.minorcategory && ` — ${item.minorcategory}`}
+        {item.status_description && (
+          <p className="text-[0.6875rem] text-[var(--color-text-secondary)] mt-2 line-clamp-2">
+            {item.status_description}
           </p>
         )}
       </div>
@@ -463,37 +469,34 @@ function RecordRow({ type, item }: { type: string; item: any }) {
   }
 
   if (type === "dob_violations") {
+    // Dataset 3h2n-5cm9: issue_date (YYYYMMDD), violation_type, violation_category, description, disposition_date, disposition_comments
+    const issueDate = item.issue_date ? parseYYYYMMDD(item.issue_date) : null;
     return (
       <div className="card-dark py-3 px-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-offwhite">
-              {item.violation_type || item.infraction_codes || "DOB Violation"}
+              {item.description || item.violation_type || "DOB Violation"}
             </p>
             <p className="text-xs text-[var(--color-text-secondary)] mt-1">
-              {item.violation_date &&
-                new Date(item.violation_date).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              {item.penalty_balance_due &&
-                ` · $${parseFloat(item.penalty_balance_due).toLocaleString()} due`}
+              {issueDate && `Issued ${issueDate}`}
+              {item.violation_number && ` · #${item.violation_number}`}
             </p>
           </div>
           <StatusPill
-            status={item.violation_status || item.hearing_status}
+            status={item.violation_category?.includes("DISMISSED") ? "DISMISSED"
+              : item.violation_category?.includes("ACTIVE") ? "ACTIVE"
+              : item.disposition_date ? "RESOLVED" : undefined}
             colorMap={{
-              "RESOLVE": "sage",
               "RESOLVED": "sage",
-              "DEFAULT": "terracotta",
-              "PENALIZE": "amber",
+              "DISMISSED": "sage",
+              "ACTIVE": "terracotta",
             }}
           />
         </div>
-        {item.respondent_name && (
-          <p className="text-[0.6875rem] text-[var(--color-text-secondary)] mt-2">
-            Respondent: {item.respondent_name}
+        {item.disposition_comments && (
+          <p className="text-[0.6875rem] text-[var(--color-text-secondary)] mt-2 line-clamp-2">
+            {item.disposition_comments}
           </p>
         )}
       </div>
@@ -571,6 +574,15 @@ function ExternalLinkIcon() {
       <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
     </svg>
   );
+}
+
+function parseYYYYMMDD(s: string): string | null {
+  if (!s || s.length < 8) return null;
+  const y = s.slice(0, 4);
+  const m = parseInt(s.slice(4, 6));
+  const d = parseInt(s.slice(6, 8));
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${months[m - 1]} ${d}, ${y}`;
 }
 
 function getTypeDescription(type: string): string {

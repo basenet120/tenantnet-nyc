@@ -33,28 +33,8 @@ export function RentStabilizedNotice({ buildingType }: { buildingType: string })
 
   if (!visible) return null;
 
-  // Extract stabilization counts from NYC Open Data response
-  const unitCounts = stabData?.unitCounts;
-  const stabUnits2007 = unitCounts?.uc2007 ? parseInt(unitCounts.uc2007) : null;
-  const stabUnitsLatest = unitCounts?.uc2022
-    ? parseInt(unitCounts.uc2022)
-    : unitCounts?.uc2021
-      ? parseInt(unitCounts.uc2021)
-      : unitCounts?.uc2020
-        ? parseInt(unitCounts.uc2020)
-        : null;
-  const latestYear = unitCounts?.uc2022
-    ? "2022"
-    : unitCounts?.uc2021
-      ? "2021"
-      : unitCounts?.uc2020
-        ? "2020"
-        : null;
-
-  const unitsLost =
-    stabUnits2007 !== null && stabUnitsLatest !== null
-      ? stabUnits2007 - stabUnitsLatest
-      : null;
+  // Extract HPD registration info from NYC Open Data response
+  const reg = stabData?.registration;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" style={{ backgroundColor: "rgba(0,0,0,0.6)" }}>
@@ -85,41 +65,15 @@ export function RentStabilizedNotice({ buildingType }: { buildingType: string })
 
         <div className="h-[2px] w-12 bg-[var(--color-terracotta)] mb-5" />
 
-        {/* Stabilization unit counts from NYC data */}
-        {stabUnitsLatest !== null && (
+        {/* HPD registration info from NYC data */}
+        {reg && (
           <div className="border-2 border-[var(--color-terracotta)]/30 bg-[var(--color-terracotta)]/5 p-4 mb-5">
-            <div className="flex items-center gap-6">
-              <div className="text-center">
-                <p className="font-display text-3xl text-offwhite">{stabUnitsLatest}</p>
-                <p className="text-[0.625rem] uppercase tracking-wider text-[var(--color-text-secondary)]">
-                  stabilized units ({latestYear})
-                </p>
-              </div>
-              {stabUnits2007 !== null && stabUnits2007 !== stabUnitsLatest && (
-                <div className="text-center">
-                  <p className="font-display text-3xl text-[var(--color-text-secondary)]">{stabUnits2007}</p>
-                  <p className="text-[0.625rem] uppercase tracking-wider text-[var(--color-text-secondary)]">
-                    stabilized units (2007)
-                  </p>
-                </div>
-              )}
-              {unitsLost !== null && unitsLost > 0 && (
-                <div className="text-center">
-                  <p className="font-display text-3xl text-[var(--color-danger)]">-{unitsLost}</p>
-                  <p className="text-[0.625rem] uppercase tracking-wider text-[var(--color-danger)]">
-                    units lost
-                  </p>
-                </div>
-              )}
-            </div>
-            {unitsLost !== null && unitsLost > 0 && (
-              <p className="text-xs text-amber mt-3">
-                This building has lost {unitsLost} rent-stabilized unit{unitsLost !== 1 ? "s" : ""} since 2007.
-                Some may have been illegally deregulated.
-              </p>
-            )}
-            <p className="text-[0.625rem] text-[var(--color-text-secondary)] mt-2">
-              Source: NYC Rent Stabilization Unit Counts (Open Data)
+            <p className="text-xs text-[var(--color-text-secondary)] mb-2">
+              HPD Registration #{reg.registrationid}
+              {reg.lastregistrationdate && ` · Last registered ${new Date(reg.lastregistrationdate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`}
+            </p>
+            <p className="text-[0.625rem] text-[var(--color-text-secondary)]">
+              Source: NYC HPD Building Registrations (Open Data)
             </p>
           </div>
         )}
