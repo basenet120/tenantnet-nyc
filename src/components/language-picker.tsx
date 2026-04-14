@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useLayoutEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 
 const LANGUAGES = [
@@ -34,15 +34,20 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
     }
   }, [currentLang]);
 
-  // Position the dropdown below the button each time it opens
-  useLayoutEffect(() => {
-    if (!open || !btnRef.current) return;
-    const rect = btnRef.current.getBoundingClientRect();
-    // Align dropdown's right edge with button's right edge
-    const left = Math.max(8, rect.right - DROPDOWN_WIDTH);
-    const top = rect.bottom + 4;
-    setPos({ top, left });
-  }, [open]);
+  function toggleOpen() {
+    if (open) {
+      setOpen(false);
+      return;
+    }
+    if (btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setPos({
+        top: rect.bottom + 4,
+        left: Math.max(8, rect.right - DROPDOWN_WIDTH),
+      });
+    }
+    setOpen(true);
+  }
 
   // Close on outside click
   useEffect(() => {
@@ -107,7 +112,7 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
     <>
       <button
         ref={btnRef}
-        onClick={() => setOpen((v) => !v)}
+        onClick={toggleOpen}
         disabled={switching}
         className="flex items-center gap-1.5 px-2 py-1.5 text-[var(--color-text-secondary)] hover:text-offwhite transition-colors"
         aria-label="Change language"
