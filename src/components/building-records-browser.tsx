@@ -82,7 +82,7 @@ export function BuildingRecordsBrowser({ records }: { records: BuildingRecord[] 
         ) : activeTab === "rent_stabilization" ? (
           <RentStabilizationTab externalUrl={externalRecord?.url} />
         ) : (
-          <ViolationsList type={activeTab} externalUrl={externalRecord?.url} />
+          <ViolationsList key={activeTab} type={activeTab} externalUrl={externalRecord?.url} />
         )}
       </div>
     </div>
