@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 const LANGUAGES = [
   { code: "en", native: "English" },
@@ -17,7 +17,9 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
   const [open, setOpen] = useState(false);
   const [lang, setLang] = useState(currentLang ?? "en");
   const [switching, setSwitching] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const [dropdownPos, setDropdownPos] = useState<{ top: number; right: number } | null>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Auto-detect from cookie if no prop was provided
   useEffect(() => {
@@ -29,14 +31,29 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
 
   // Close on outside click
   useEffect(() => {
+    if (!open) return;
     function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
+      if (
+        btnRef.current && !btnRef.current.contains(e.target as Node) &&
+        dropdownRef.current && !dropdownRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
+  }, [open]);
+
+  const toggleOpen = useCallback(() => {
+    if (!open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setDropdownPos({
+        top: rect.bottom + 4,
+        right: window.innerWidth - rect.right,
+      });
+    }
+    setOpen((v) => !v);
+  }, [open]);
 
   async function switchLang(code: string) {
     if (code === lang) {
@@ -69,9 +86,10 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
   const current = LANGUAGES.find((l) => l.code === lang) ?? LANGUAGES[0];
 
   return (
-    <div ref={ref} className="relative">
+    <>
       <button
-        onClick={() => setOpen(!open)}
+        ref={btnRef}
+        onClick={toggleOpen}
         disabled={switching}
         className="flex items-center gap-1.5 px-2 py-1.5 text-[var(--color-text-secondary)] hover:text-offwhite transition-colors"
         aria-label="Change language"
@@ -86,8 +104,12 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
         </span>
       </button>
 
-      {open && (
-        <div className="absolute top-full right-0 mt-1 z-50 border-2 border-[var(--color-border)] bg-[var(--color-charcoal)] shadow-lg min-w-[160px]">
+      {open && dropdownPos && (
+        <div
+          ref={dropdownRef}
+          className="fixed z-[100] border-2 border-[var(--color-border)] bg-[var(--color-charcoal)] shadow-lg min-w-[160px]"
+          style={{ top: dropdownPos.top, right: dropdownPos.right }}
+        >
           {LANGUAGES.map((l) => (
             <button
               key={l.code}
@@ -104,6 +126,6 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 }

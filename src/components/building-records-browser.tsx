@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { useI18n } from "./i18n-provider";
 import type { AppStrings } from "@/lib/get-app-strings";
 
@@ -427,10 +428,28 @@ function getRecordUrl(type: string, item: any, externalUrl?: string): string | n
   return null;
 }
 
+function getExternalSiteName(url: string): string {
+  if (url.includes("hpdonline.nyc.gov")) return "HPD Online (nyc.gov)";
+  if (url.includes("dobnow.nyc.gov")) return "DOB NOW (nyc.gov)";
+  return "NYC.gov";
+}
+
 function RecordRow({ type, item, externalUrl }: { type: string; item: any; externalUrl?: string }) {
   const { t } = useI18n();
   const url = getRecordUrl(type, item, externalUrl);
   const content = <RecordRowContent type={type} item={item} />;
+
+  function handleClick(e: React.MouseEvent) {
+    if (!url) return;
+    e.preventDefault();
+    const siteName = getExternalSiteName(url);
+    toast.info(`Opening ${siteName} — you're leaving TENANTNET.NYC`, {
+      duration: 3000,
+    });
+    setTimeout(() => {
+      window.open(url, "_blank", "noopener,noreferrer");
+    }, 600);
+  }
 
   if (url) {
     return (
@@ -438,6 +457,7 @@ function RecordRow({ type, item, externalUrl }: { type: string; item: any; exter
         href={url}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={handleClick}
         className="block card-dark py-3 px-4 no-underline hover:border-l-4 hover:border-l-terracotta transition-all group cursor-pointer"
       >
         {content}
