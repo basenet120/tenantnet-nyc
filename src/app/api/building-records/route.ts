@@ -24,7 +24,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const buildingId = sessionBuildingId(session);
+  // System admins can pass buildingId as a query param to view any building's records
+  const queryBuildingId = req.nextUrl.searchParams.get("buildingId");
+  let buildingId = sessionBuildingId(session);
+
+  if (queryBuildingId && session.type === "admin" && session.role === "system_admin") {
+    buildingId = queryBuildingId;
+  }
+
   if (!buildingId) {
     return NextResponse.json({ error: "No building context" }, { status: 400 });
   }

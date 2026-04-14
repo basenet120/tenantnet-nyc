@@ -38,7 +38,7 @@ const RECORD_ICONS: Record<string, string> = {
   nyc_311: "3",
 };
 
-export function BuildingRecordsBrowser({ records }: { records: BuildingRecord[] }) {
+export function BuildingRecordsBrowser({ records, buildingId }: { records: BuildingRecord[]; buildingId?: string }) {
   const { t } = useI18n();
   const [activeTab, setActiveTab] = useState("hpd_violations");
 
@@ -95,9 +95,9 @@ export function BuildingRecordsBrowser({ records }: { records: BuildingRecord[] 
         {activeTab === "resources" ? (
           <ResourceLinks records={infoRecords} />
         ) : activeTab === "rent_stabilization" ? (
-          <RentStabilizationTab externalUrl={externalRecord?.url} />
+          <RentStabilizationTab externalUrl={externalRecord?.url} buildingId={buildingId} />
         ) : (
-          <ViolationsList key={activeTab} type={activeTab} externalUrl={externalRecord?.url} />
+          <ViolationsList key={activeTab} type={activeTab} externalUrl={externalRecord?.url} buildingId={buildingId} />
         )}
       </div>
     </div>
@@ -134,7 +134,7 @@ function ResourceLinks({ records }: { records: BuildingRecord[] }) {
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-function RentStabilizationTab({ externalUrl }: { externalUrl?: string }) {
+function RentStabilizationTab({ externalUrl, buildingId }: { externalUrl?: string; buildingId?: string }) {
   const { t } = useI18n();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -143,7 +143,9 @@ function RentStabilizationTab({ externalUrl }: { externalUrl?: string }) {
   async function loadData() {
     setLoading(true);
     try {
-      const res = await fetch("/api/building-records?type=rent_stabilization");
+      const params = new URLSearchParams({ type: "rent_stabilization" });
+      if (buildingId) params.set("buildingId", buildingId);
+      const res = await fetch(`/api/building-records?${params}`);
       if (res.ok) {
         setData(await res.json());
       }
@@ -277,7 +279,7 @@ function RentStabilizationTab({ externalUrl }: { externalUrl?: string }) {
   );
 }
 
-function ViolationsList({ type, externalUrl }: { type: string; externalUrl?: string }) {
+function ViolationsList({ type, externalUrl, buildingId }: { type: string; externalUrl?: string; buildingId?: string }) {
   const { t } = useI18n();
   const [data, setData] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -288,7 +290,9 @@ function ViolationsList({ type, externalUrl }: { type: string; externalUrl?: str
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`/api/building-records?type=${type}`);
+      const params = new URLSearchParams({ type });
+      if (buildingId) params.set("buildingId", buildingId);
+      const res = await fetch(`/api/building-records?${params}`);
       if (!res.ok) {
         const err = await res.json();
         setError(err.error || "Failed to load data");

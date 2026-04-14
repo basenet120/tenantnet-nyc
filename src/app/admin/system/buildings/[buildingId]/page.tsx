@@ -137,7 +137,7 @@ export default async function BuildingDetailPage({
       {building.records.length > 0 && (
         <div className="mt-8">
           <h2 className="section-label">{t("building_records")}</h2>
-          <BuildingRecordsBrowser records={building.records} />
+          <BuildingRecordsBrowser records={building.records} buildingId={building.id} />
         </div>
       )}
 
