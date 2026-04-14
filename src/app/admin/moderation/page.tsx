@@ -268,7 +268,7 @@ export default function ModerationPage() {
 
                 {/* Status buttons for issue-tracking sections */}
                 {post.section.hasIssueTracking && (
-                  <div className="mt-3 flex gap-0 border-2 border-[var(--color-border)] inline-flex">
+                  <div className="mt-3 flex flex-wrap gap-0 border-2 border-[var(--color-border)] inline-flex">
                     {POST_STATUS.map((s) => (
                       <button
                         key={s}

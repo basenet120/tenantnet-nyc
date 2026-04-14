@@ -119,7 +119,7 @@ export default async function SectionFeedPage({
       <main className="container-narrow py-8">
         {/* Status filter pills */}
         {section.hasIssueTracking && (
-          <div className="flex gap-2 overflow-x-auto pb-6">
+          <div className="flex flex-wrap gap-2 pb-6">
             {STATUS_OPTIONS.map((option) => {
               const isActive =
                 option === "all"
@@ -169,6 +169,8 @@ export default async function SectionFeedPage({
                 id={post.id}
                 title={post.title}
                 body={post.body}
+                titleEn={post.titleEn}
+                bodyEn={post.bodyEn}
                 authorLabel={authorLabel(post)}
                 sectionName={post.section.name}
                 status={post.status ?? null}
@@ -178,6 +180,7 @@ export default async function SectionFeedPage({
                 commentCount={post._count.comments}
                 imageCount={post._count.images}
                 isAdmin={isAdmin}
+                lang={lang}
               />
             ))
           )}

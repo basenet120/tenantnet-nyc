@@ -59,12 +59,12 @@ export function BuildingRecordsBrowser({ records }: { records: BuildingRecord[] 
   return (
     <div>
       {/* Tab bar */}
-      <div className="flex gap-0 border-b-2 border-[var(--color-border)] overflow-x-auto">
+      <div className="flex flex-wrap gap-0 border-b-2 border-[var(--color-border)]">
         {availableTabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2.5 font-display text-[0.6875rem] tracking-[0.08em] uppercase whitespace-nowrap transition-colors duration-150 ${
+            className={`px-4 py-2.5 font-display text-[0.6875rem] tracking-[0.08em] uppercase transition-colors duration-150 ${
               activeTab === tab.key
                 ? "text-terracotta border-b-[3px] border-b-terracotta -mb-[2px]"
                 : "text-offwhite-dim hover:text-offwhite -mb-[2px] border-b-[3px] border-b-transparent"

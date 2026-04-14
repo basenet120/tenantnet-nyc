@@ -15,6 +15,8 @@ type PostWithRelations = {
   id: string;
   title: string;
   body: string;
+  titleEn: string | null;
+  bodyEn: string | null;
   isPinned: boolean;
   status: string | null;
   visibility: string;
@@ -104,7 +106,7 @@ export default async function DashboardPage() {
               Tenantnet.nyc
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <LanguagePicker currentLang={lang} />
             <Link
               href="/settings"
@@ -153,6 +155,8 @@ export default async function DashboardPage() {
                   id={post.id}
                   title={post.title}
                   body={post.body}
+                  titleEn={post.titleEn}
+                  bodyEn={post.bodyEn}
                   authorLabel={authorLabel(post)}
                   sectionName={post.section.name}
                   status={post.status}
@@ -162,6 +166,7 @@ export default async function DashboardPage() {
                   commentCount={post._count.comments}
                   imageCount={post._count.images}
                   isAdmin={isAdmin}
+                  lang={lang}
                 />
               ))}
             </div>
@@ -187,6 +192,8 @@ export default async function DashboardPage() {
                   id={post.id}
                   title={post.title}
                   body={post.body}
+                  titleEn={post.titleEn}
+                  bodyEn={post.bodyEn}
                   authorLabel={authorLabel(post)}
                   sectionName={post.section.name}
                   status={post.status}
@@ -196,6 +203,7 @@ export default async function DashboardPage() {
                   commentCount={post._count.comments}
                   imageCount={post._count.images}
                   isAdmin={isAdmin}
+                  lang={lang}
                 />
               ))}
             </div>
@@ -218,6 +226,8 @@ export default async function DashboardPage() {
                 id={post.id}
                 title={post.title}
                 body={post.body}
+                titleEn={post.titleEn}
+                bodyEn={post.bodyEn}
                 authorLabel={authorLabel(post)}
                 sectionName={post.section.name}
                 status={post.status}
