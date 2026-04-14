@@ -28,19 +28,19 @@ export function generateBuildingRecordUrls(building: BuildingInfo): RecordUrl[] 
   if (building.bin) {
     records.push({
       recordType: "dob_profile",
-      url: `https://a810-bisweb.nyc.gov/bisweb/PropertyProfileOverviewServlet?bin=${building.bin}`,
+      url: `https://a810-dobnow.nyc.gov/Publish/#!/BISProfile/${building.bin}/1`,
       label: "DOB Building Profile",
       description: "NYC Department of Buildings property overview, permits, and certificates of occupancy",
     });
     records.push({
       recordType: "dob_violations",
-      url: `https://a810-bisweb.nyc.gov/bisweb/ECBQueryByLocationServlet?bin=${building.bin}`,
+      url: `https://a810-dobnow.nyc.gov/Publish/#!/BISProfile/${building.bin}/2`,
       label: "DOB Violations",
       description: "Environmental Control Board violations and penalties",
     });
     records.push({
       recordType: "dob_complaints",
-      url: `https://a810-bisweb.nyc.gov/bisweb/ComplaintsByLocationServlet?bin=${building.bin}`,
+      url: `https://a810-dobnow.nyc.gov/Publish/#!/BISProfile/${building.bin}/3`,
       label: "DOB Complaints",
       description: "Building complaints filed with the Department of Buildings",
     });
