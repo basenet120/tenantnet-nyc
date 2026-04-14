@@ -7,12 +7,14 @@ import Link from "next/link";
 import { useI18n } from "@/components/i18n-provider";
 
 type Settings = {
+  type?: "unit" | "admin";
   firstName: string | null;
   lastName: string | null;
   email: string | null;
   username: string | null;
   phone: string | null;
   label: string;
+  role?: string;
   notifyNewPosts: boolean;
   notifyComments: boolean;
   notifyStatusChange: boolean;
@@ -170,7 +172,7 @@ export default function SettingsPage() {
       >
         <div className="max-w-2xl mx-auto flex items-center gap-3">
           <Link
-            href="/dashboard"
+            href={settings?.type === "admin" ? (settings.role === "system_admin" ? "/admin/system" : "/admin") : "/dashboard"}
             className="hover:opacity-70 transition-opacity"
             style={{ color: "var(--color-text-secondary)" }}
             aria-label="Back to dashboard"
@@ -183,14 +185,48 @@ export default function SettingsPage() {
             <h1 className="font-display text-xl uppercase tracking-tight" style={{ color: "var(--color-offwhite)" }}>
               {t("settings_title")}
             </h1>
-            <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Unit {settings?.label}</p>
+            <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+              {settings?.type === "admin" ? (settings.role?.replace("_", " ") ?? "Admin") : `${t("common_unit")} ${settings?.label}`}
+            </p>
           </div>
         </div>
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-8 space-y-10">
 
-        {/* ── PROFILE ── */}
+        {settings?.type === "admin" && (
+          <section>
+            <h2
+              className="font-display text-sm uppercase tracking-widest pb-2 mb-6 border-b-2"
+              style={{ color: "var(--color-terracotta)", borderColor: "var(--color-border)" }}
+            >
+              {t("settings_profile")}
+            </h2>
+            <dl className="space-y-3 text-sm">
+              {settings.firstName && (
+                <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
+                  <dt style={{ color: "var(--color-text-secondary)" }}>{t("settings_first_name")}</dt>
+                  <dd className="text-offwhite">{settings.firstName}</dd>
+                </div>
+              )}
+              {settings.email && (
+                <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
+                  <dt style={{ color: "var(--color-text-secondary)" }}>{t("settings_email")}</dt>
+                  <dd className="text-offwhite">{settings.email}</dd>
+                </div>
+              )}
+              {settings.role && (
+                <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
+                  <dt style={{ color: "var(--color-text-secondary)" }}>Role</dt>
+                  <dd className="text-offwhite capitalize">{settings.role.replace("_", " ")}</dd>
+                </div>
+              )}
+            </dl>
+          </section>
+        )}
+
+        {/* ── PROFILE (unit only) ── */}
+        {settings?.type !== "admin" && (
         <section>
           <h2
             className="font-display text-sm uppercase tracking-widest pb-2 mb-6 border-b-2"
@@ -248,8 +284,10 @@ export default function SettingsPage() {
             </button>
           </form>
         </section>
+        )}
 
-        {/* ── PASSWORD ── */}
+        {/* ── PASSWORD (unit only) ── */}
+        {settings?.type !== "admin" && (
         <section>
           <h2
             className="font-display text-sm uppercase tracking-widest pb-2 mb-6 border-b-2"
@@ -283,8 +321,10 @@ export default function SettingsPage() {
             </button>
           </form>
         </section>
+        )}
 
-        {/* ── NOTIFICATIONS ── */}
+        {/* ── NOTIFICATIONS (unit only) ── */}
+        {settings?.type !== "admin" && (
         <section>
           <h2
             className="font-display text-sm uppercase tracking-widest pb-2 mb-6 border-b-2"
@@ -327,8 +367,9 @@ export default function SettingsPage() {
             </button>
           </div>
         </section>
+        )}
 
-        {/* ── LOGOUT ── */}
+        {/* ── LOGOUT (everyone) ── */}
         <section>
           <h2
             className="font-display text-sm uppercase tracking-widest pb-2 mb-6 border-b-2"

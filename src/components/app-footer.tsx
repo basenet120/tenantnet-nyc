@@ -22,7 +22,8 @@ export function AppFooter() {
   const isAdmin = pathname.startsWith("/admin");
   const isSystem = pathname.startsWith("/admin/system");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const navItems = isAdmin ? getAdminNav(isSystem) : getTenantNav(t as (key: any) => string);
+  const tt = t as (key: any) => string;
+  const navItems = isAdmin ? getAdminNav(isSystem, tt) : getTenantNav(tt);
 
   return (
     <nav className="fixed bottom-0 inset-x-0 z-40 border-t-2 border-[var(--color-border)] bg-[var(--color-charcoal)]">
@@ -73,18 +74,20 @@ function getTenantNav(t: (key: string) => string): NavItem[] {
   ];
 }
 
-function getAdminNav(isSystem: boolean): NavItem[] {
+function getAdminNav(isSystem: boolean, t: (key: string) => string): NavItem[] {
   if (isSystem) {
     return [
-      { href: "/admin/system", label: "Dashboard", icon: <HomeIcon /> },
-      { href: "/admin/system/buildings", label: "Buildings", icon: <BuildingIcon /> },
-      { href: "/admin/system/signups", label: "Signups", icon: <InboxIcon /> },
+      { href: "/admin/system", label: t("nav_dashboard"), icon: <HomeIcon /> },
+      { href: "/admin/system/buildings", label: t("breadcrumb_buildings"), icon: <BuildingIcon /> },
+      { href: "/admin/system/signups", label: t("breadcrumb_signups"), icon: <InboxIcon /> },
+      { href: "/settings", label: t("footer_settings"), icon: <SettingsIcon /> },
     ];
   }
   return [
-    { href: "/admin", label: "Dashboard", icon: <HomeIcon /> },
-    { href: "/admin/moderation", label: "Moderation", icon: <ShieldIcon /> },
-    { href: "/admin/units", label: "Units", icon: <GridIcon /> },
+    { href: "/admin", label: t("nav_dashboard"), icon: <HomeIcon /> },
+    { href: "/admin/moderation", label: t("breadcrumb_moderation"), icon: <ShieldIcon /> },
+    { href: "/admin/units", label: t("breadcrumb_units"), icon: <GridIcon /> },
+    { href: "/settings", label: t("footer_settings"), icon: <SettingsIcon /> },
   ];
 }
 

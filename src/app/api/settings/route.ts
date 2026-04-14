@@ -6,8 +6,33 @@ import { prisma } from "@/lib/db";
 // GET current user settings
 export async function GET() {
   const session = await getSession();
-  if (!session || session.type !== "unit") {
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (session.type === "admin") {
+    const admin = await prisma.admin.findUnique({
+      where: { id: session.adminId },
+      select: {
+        email: true,
+        name: true,
+        role: true,
+      },
+    });
+    return NextResponse.json({
+      type: "admin",
+      firstName: admin?.name || null,
+      lastName: null,
+      email: admin?.email || null,
+      username: null,
+      phone: null,
+      label: admin?.role || "admin",
+      role: admin?.role,
+      notifyNewPosts: false,
+      notifyComments: false,
+      notifyStatusChange: false,
+      notifyBulletins: false,
+    });
   }
 
   const unit = await prisma.unit.findUnique({
@@ -26,7 +51,7 @@ export async function GET() {
     },
   });
 
-  return NextResponse.json(unit);
+  return NextResponse.json({ type: "unit", ...unit });
 }
 
 // PATCH update settings
