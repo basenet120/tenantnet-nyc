@@ -217,25 +217,10 @@ export default function OnboardWizardPage() {
         )}
 
         {step === 2 && (
-          <>
-            <p className="text-sm text-[var(--color-text-secondary)]">
-              Optional NYC identifiers enable automatic links to DOB, HPD, ACRIS, and other public databases.
-            </p>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label>Block</label>
-                <input type="text" value={form.block} onChange={(e) => update("block", e.target.value)} placeholder="1964" />
-              </div>
-              <div>
-                <label>Lot</label>
-                <input type="text" value={form.lot} onChange={(e) => update("lot", e.target.value)} placeholder="55" />
-              </div>
-              <div>
-                <label>BIN</label>
-                <input type="text" value={form.bin} onChange={(e) => update("bin", e.target.value)} placeholder="1056573" />
-              </div>
-            </div>
-          </>
+          <NycIdentifiersStep
+            form={form}
+            update={update}
+          />
         )}
 
         {step === 3 && (
@@ -363,5 +348,93 @@ export default function OnboardWizardPage() {
         )}
       </div>
     </div>
+  );
+}
+
+function NycIdentifiersStep({
+  form,
+  update,
+}: {
+  form: FormData;
+  update: (field: keyof FormData, value: string | string[]) => void;
+}) {
+  const [looking, setLooking] = useState(false);
+  const [lookupDone, setLookupDone] = useState(false);
+
+  async function lookupFromAddress() {
+    if (!form.address.trim() || !form.borough) {
+      toast.error("Enter the building address and borough first (Step 1)");
+      return;
+    }
+    setLooking(true);
+    try {
+      const res = await fetch("/api/admin/system/lookup-bbl", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: form.address.trim(), borough: form.borough }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || "Lookup failed");
+        return;
+      }
+      if (data.block) update("block", data.block);
+      if (data.lot) update("lot", data.lot);
+      if (data.bin) update("bin", data.bin);
+      if (data.yearBuilt && !form.yearBuilt) update("yearBuilt", String(data.yearBuilt));
+      if (data.totalUnits && !form.totalUnits) update("totalUnits", String(data.totalUnits));
+      if (data.numFloors && !form.floors) update("floors", String(data.numFloors));
+      setLookupDone(true);
+      toast.success(`Found: Block ${data.block}, Lot ${data.lot}${data.bin ? `, BIN ${data.bin}` : ""}`);
+    } catch {
+      toast.error("Failed to look up address");
+    } finally {
+      setLooking(false);
+    }
+  }
+
+  return (
+    <>
+      <p className="text-sm text-[var(--color-text-secondary)]">
+        NYC identifiers enable automatic links to DOB, HPD, ACRIS, and other public databases,
+        plus inline violation and complaint browsing.
+      </p>
+
+      <button
+        type="button"
+        onClick={lookupFromAddress}
+        disabled={looking}
+        className="btn btn-outline w-full disabled:opacity-50"
+      >
+        {looking ? "Looking up address..." : lookupDone ? "Look Up Again" : "Auto-fill from NYC Records"}
+      </button>
+
+      {lookupDone && (
+        <div className="border-2 border-[var(--color-sage)]/30 bg-[var(--color-sage)]/5 px-4 py-3">
+          <p className="text-xs text-[var(--color-sage)]">
+            Identifiers auto-filled from NYC PLUTO database. Verify below and adjust if needed.
+          </p>
+        </div>
+      )}
+
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <label>Block</label>
+          <input type="text" value={form.block} onChange={(e) => update("block", e.target.value)} placeholder="e.g. 1966" />
+        </div>
+        <div>
+          <label>Lot</label>
+          <input type="text" value={form.lot} onChange={(e) => update("lot", e.target.value)} placeholder="e.g. 46" />
+        </div>
+        <div>
+          <label>BIN</label>
+          <input type="text" value={form.bin} onChange={(e) => update("bin", e.target.value)} placeholder="e.g. 1059535" />
+        </div>
+      </div>
+
+      <p className="text-xs text-[var(--color-text-secondary)]">
+        Don&apos;t know these? Click &ldquo;Auto-fill from NYC Records&rdquo; above to look them up from the building address.
+      </p>
+    </>
   );
 }
