@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { randomBytes } from "crypto";
 import bcrypt from "bcryptjs";
-import { generateBuildingRecordUrls } from "@/lib/nyc-records";
+import { generateBuildingRecordUrls, lookupHpdBuildingId } from "@/lib/nyc-records";
 import { generateBuildingEmail } from "@/lib/building-email";
 import { sendTenantRepInvite } from "@/lib/email";
 
@@ -116,19 +116,26 @@ export async function POST(request: Request) {
       },
     });
 
-    // 5. Generate building records from NYC identifiers
+    return { building, admin, unitCount: units.length };
+  });
+
+  // 5. Generate building records from NYC identifiers (outside transaction — makes external API call)
+  let recordCount = 0;
+  try {
+    const hpdBuildingId = (block && lot) ? await lookupHpdBuildingId(borough, block, lot) : null;
     const recordUrls = generateBuildingRecordUrls({
       borough,
       block,
       lot,
       bin,
       address,
+      hpdBuildingId: hpdBuildingId,
     });
 
     for (const record of recordUrls) {
-      await tx.buildingRecord.create({
+      await prisma.buildingRecord.create({
         data: {
-          buildingId: building.id,
+          buildingId: result.building.id,
           recordType: record.recordType as never,
           url: record.url,
           label: record.label,
@@ -137,9 +144,10 @@ export async function POST(request: Request) {
         },
       });
     }
-
-    return { building, admin, unitCount: units.length, recordCount: recordUrls.length };
-  });
+    recordCount = recordUrls.length;
+  } catch {
+    // Record generation is best-effort — building is already created
+  }
 
   // Send tenant rep invite email (fire-and-forget)
   sendTenantRepInvite(tenantRepEmail, result.building.name, tenantRepPassword);
@@ -148,6 +156,6 @@ export async function POST(request: Request) {
     buildingId: result.building.id,
     buildingName: result.building.name,
     unitCount: result.unitCount,
-    recordCount: result.recordCount,
+    recordCount,
   });
 }

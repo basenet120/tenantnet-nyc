@@ -237,6 +237,7 @@ export default async function DashboardPage() {
                 commentCount={post._count.comments}
                 imageCount={post._count.images}
                 isAdmin={isAdmin}
+                lang={lang}
               />
             ))}
             {recentPosts.length === 0 && (

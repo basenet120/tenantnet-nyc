@@ -383,31 +383,32 @@ function ViolationsList({ type, externalUrl }: { type: string; externalUrl?: str
 
       <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
         {data.map((item: any, i: number) => (
-          <RecordRow key={i} type={type} item={item} />
+          <RecordRow key={i} type={type} item={item} externalUrl={externalUrl} />
         ))}
       </div>
     </div>
   );
 }
 
-function getRecordUrl(type: string, item: any): string | null {
-  // HPD complaints have per-complaint deep links
-  if (type === "hpd_complaints" && item.complaint_id) {
-    return `https://hpdonline.nyc.gov/hpdonline/complaint/${item.complaint_id}`;
+function getRecordUrl(type: string, item: any, externalUrl?: string): string | null {
+  // HPD uses internal buildingid for URLs
+  if (type === "hpd_violations" && (item.buildingid || item.building_id)) {
+    const bid = item.buildingid || item.building_id;
+    return `https://hpdonline.nyc.gov/hpdonline/building/${bid}/violations`;
   }
-  // HPD violations link to building violations page
-  if (type === "hpd_violations" && item.boroid && item.block && item.lot) {
-    return `https://hpdonline.nyc.gov/hpdonline/building/${item.boroid}/${item.block}/${item.lot}/violations`;
+  if (type === "hpd_complaints" && (item.buildingid || item.building_id)) {
+    const bid = item.buildingid || item.building_id;
+    return `https://hpdonline.nyc.gov/hpdonline/building/${bid}/complaints`;
   }
-  // DOB records link to DOB NOW building profile
-  if ((type === "dob_violations" || type === "dob_complaints") && item.boro && item.block && item.lot) {
-    return `https://a810-dobnow.nyc.gov/Publish/#!/BISProfile?boro=${item.boro}&block=${item.block}&lot=${item.lot}`;
+  // DOB NOW hash URLs don't work as direct links — fall back to the stored external URL
+  if (type === "dob_violations" || type === "dob_complaints") {
+    return externalUrl || null;
   }
   return null;
 }
 
-function RecordRow({ type, item }: { type: string; item: any }) {
-  const url = getRecordUrl(type, item);
+function RecordRow({ type, item, externalUrl }: { type: string; item: any; externalUrl?: string }) {
+  const url = getRecordUrl(type, item, externalUrl);
   const content = <RecordRowContent type={type} item={item} />;
 
   if (url) {
