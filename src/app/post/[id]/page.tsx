@@ -98,17 +98,23 @@ export default async function PostPage({
 
       <main className="container-narrow py-8">
         {/* Post */}
-        <article className="card">
+        <article
+          className="card"
+          style={{
+            backgroundColor: "var(--color-surface)",
+            color: "var(--color-text-on-surface)",
+          }}
+        >
           <div className="mb-4">
             <TranslatedText
               as="h2"
-              className="font-display text-xl sm:text-2xl uppercase leading-tight text-[var(--color-text-on-surface)]"
+              className="font-display text-xl sm:text-2xl uppercase leading-tight"
               text={post.titleEn || post.title}
               lang={lang}
               sourceType="post_title"
               sourceId={post.id}
             />
-            <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-[var(--color-charcoal-lighter)]">
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-xs" style={{ color: "var(--color-charcoal-lighter)" }}>
               <span className="font-semibold">{authorLabelText}</span>
               <span aria-hidden="true">|</span>
               <time dateTime={post.createdAt.toISOString()}>
@@ -135,7 +141,7 @@ export default async function PostPage({
 
           <TranslatedText
             as="div"
-            className="text-sm text-[var(--color-text-on-surface)] whitespace-pre-wrap leading-relaxed"
+            className="text-sm whitespace-pre-wrap leading-relaxed"
             text={post.bodyEn || post.body}
             lang={lang}
             sourceType="post_body"
