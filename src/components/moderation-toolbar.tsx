@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useI18n } from "./i18n-provider";
 
 type ModerationToolbarProps = {
   postId: string;
@@ -20,6 +21,7 @@ export function ModerationToolbar({
   hasIssueTracking,
 }: ModerationToolbarProps) {
   const router = useRouter();
+  const { t } = useI18n();
   const [isPinned, setIsPinned] = useState(initialPinned);
   const [status, setStatus] = useState(initialStatus);
   const [loading, setLoading] = useState(false);
@@ -35,10 +37,10 @@ export function ModerationToolbar({
       });
       if (!res.ok) throw new Error("Failed to update pin status");
       setIsPinned(!isPinned);
-      toast.success(isPinned ? "Post unpinned" : "Post pinned");
+      toast.success(isPinned ? t("mod_unpinned") : t("mod_pinned"));
       router.refresh();
     } catch {
-      toast.error("Failed to update pin status");
+      toast.error(t("mod_pin_failed"));
     } finally {
       setLoading(false);
     }
@@ -54,10 +56,10 @@ export function ModerationToolbar({
       });
       if (!res.ok) throw new Error("Failed to update status");
       setStatus(newStatus);
-      toast.success(`Status set to ${newStatus}`);
+      toast.success(t("mod_status_set"));
       router.refresh();
     } catch {
-      toast.error("Failed to update status");
+      toast.error(t("mod_status_failed"));
     } finally {
       setLoading(false);
     }
@@ -74,10 +76,10 @@ export function ModerationToolbar({
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete post");
-      toast.success("Post deleted");
+      toast.success(t("mod_deleted"));
       router.push("/dashboard");
     } catch {
-      toast.error("Failed to delete post");
+      toast.error(t("mod_delete_failed"));
       setConfirmDelete(false);
       setLoading(false);
     }
@@ -90,7 +92,7 @@ export function ModerationToolbar({
       {/* Label */}
       <div className="flex items-center gap-2 mb-4">
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-terracotta" />
-        <span className="uppercase-label text-terracotta">Tenant Manager</span>
+        <span className="uppercase-label text-terracotta">{t("mod_tenant_manager")}</span>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -100,7 +102,7 @@ export function ModerationToolbar({
           disabled={loading}
           className={`btn btn-sm ${isPinned ? "btn-warning" : "btn-outline"}`}
         >
-          {isPinned ? "Unpin" : "Pin"}
+          {isPinned ? t("mod_unpin") : t("mod_pin")}
         </button>
 
         {/* Status dropdown */}
@@ -113,7 +115,7 @@ export function ModerationToolbar({
             style={{ fontFamily: "var(--font-display)", width: "auto" }}
           >
             <option value="" disabled>
-              Set status
+              {t("mod_set_status")}
             </option>
             {STATUS_OPTIONS.map((opt) => (
               <option key={opt} value={opt}>
@@ -131,7 +133,7 @@ export function ModerationToolbar({
               disabled={loading}
               className="btn btn-sm btn-outline"
             >
-              Cancel
+              {t("mod_cancel")}
             </button>
           )}
           <button
@@ -139,7 +141,7 @@ export function ModerationToolbar({
             disabled={loading}
             className="btn btn-sm btn-danger"
           >
-            {confirmDelete ? "Confirm Delete" : "Delete"}
+            {confirmDelete ? t("mod_delete_confirm") : t("mod_delete")}
           </button>
         </div>
       </div>

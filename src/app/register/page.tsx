@@ -3,11 +3,13 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { LanguagePicker } from "@/components/language-picker";
+import { useI18n } from "@/components/i18n-provider";
 
 type Step = 1 | 2 | 3;
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [step, setStep] = useState<Step>(1);
   const [direction, setDirection] = useState<"forward" | "back">("forward");
 
@@ -34,18 +36,18 @@ export default function RegisterPage() {
   function validateStep2(): boolean {
     const errors: Record<string, string> = {};
 
-    if (!firstName.trim()) errors.firstName = "First name is required";
-    if (!email.trim()) errors.email = "Email is required";
+    if (!firstName.trim()) errors.firstName = t("register_error_first_name");
+    if (!email.trim()) errors.email = t("register_error_email");
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
-      errors.email = "Invalid email address";
-    if (!username.trim()) errors.username = "Username is required";
+      errors.email = t("register_error_email_invalid");
+    if (!username.trim()) errors.username = t("register_error_username");
     else if (!/^[a-z0-9_]{3,20}$/.test(username))
-      errors.username = "3-20 characters, lowercase letters, numbers, underscores";
-    if (!password) errors.password = "Password is required";
+      errors.username = t("register_error_username_format");
+    if (!password) errors.password = t("register_error_password");
     else if (password.length < 8)
-      errors.password = "Password must be at least 8 characters";
+      errors.password = t("register_error_password_length");
     if (password !== confirmPassword)
-      errors.confirmPassword = "Passwords do not match";
+      errors.confirmPassword = t("register_error_confirm");
 
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -76,7 +78,7 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Registration failed");
+        setError(data.error || t("register_failed"));
         setLoading(false);
         return;
       }
@@ -84,7 +86,7 @@ export default function RegisterPage() {
       setUnitLabel(data.unitLabel || "");
       goTo(3);
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(t("register_error_unknown"));
     } finally {
       setLoading(false);
     }
@@ -128,7 +130,7 @@ export default function RegisterPage() {
                 className="font-display text-3xl sm:text-5xl uppercase tracking-tight leading-[0.95]"
                 style={{ color: "var(--color-offwhite)" }}
               >
-                Welcome to
+                {t("register_welcome")}
                 <br />
                 TenantNet<span style={{ color: "var(--color-terracotta)" }}>.NYC</span>
               </h1>
@@ -144,7 +146,7 @@ export default function RegisterPage() {
             >
               <p className="font-display text-base sm:text-lg uppercase tracking-widest"
                 style={{ color: "var(--color-offwhite)" }}>
-                449 West 125th Street
+                {t("register_building_name")}
               </p>
               <p
                 className="font-display text-xs uppercase mt-1"
@@ -153,7 +155,7 @@ export default function RegisterPage() {
                   color: "var(--color-text-secondary)",
                 }}
               >
-                Harlem, New York
+                {t("register_building_location")}
               </p>
             </div>
 
@@ -161,20 +163,12 @@ export default function RegisterPage() {
               className="text-sm leading-relaxed mb-8"
               style={{ color: "var(--color-text-secondary)" }}
             >
-              This is your building&apos;s private forum. Report maintenance issues,
-              document landlord disputes, share community news, and keep your
-              neighbors informed. Everything here is timestamped and photographed
-              &mdash; building a record that matters.
+              {t("register_intro")}
             </p>
 
             <ul className="space-y-3 mb-10">
-              {[
-                "Report & track maintenance issues",
-                "Document landlord disputes with evidence",
-                "Get building bulletins and announcements",
-                "Connect with your neighbors",
-              ].map((item) => (
-                <li key={item} className="flex items-start gap-3 text-sm">
+              {[t("register_feature_1"), t("register_feature_2"), t("register_feature_3"), t("register_feature_4")].map((item, i) => (
+                <li key={i} className="flex items-start gap-3 text-sm">
                   <span
                     className="mt-[2px] w-[6px] h-[6px] shrink-0"
                     style={{ backgroundColor: "var(--color-terracotta)" }}
@@ -188,7 +182,7 @@ export default function RegisterPage() {
               onClick={() => goTo(2)}
               className="btn btn-primary w-full"
             >
-              Get Started
+              {t("register_get_started")}
             </button>
           </div>
         )}
@@ -208,7 +202,7 @@ export default function RegisterPage() {
                 className="font-display text-2xl sm:text-3xl uppercase tracking-tight"
                 style={{ color: "var(--color-offwhite)" }}
               >
-                Create Your Account
+                {t("register_create_title")}
               </h2>
               <div
                 className="mt-3 h-[2px] w-16 mx-auto"
@@ -232,7 +226,7 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* First Name */}
               <Field
-                label="First Name"
+                label={t("register_first_name")}
                 required
                 error={fieldErrors.firstName}
               >
@@ -245,7 +239,7 @@ export default function RegisterPage() {
               </Field>
 
               {/* Email */}
-              <Field label="Email" required error={fieldErrors.email}>
+              <Field label={t("register_email")} required error={fieldErrors.email}>
                 <input
                   type="email"
                   value={email}
@@ -255,7 +249,7 @@ export default function RegisterPage() {
               </Field>
 
               {/* Username */}
-              <Field label="Username" required error={fieldErrors.username}>
+              <Field label={t("register_username")} required error={fieldErrors.username}>
                 <input
                   type="text"
                   value={username}
@@ -272,12 +266,12 @@ export default function RegisterPage() {
                   className="mt-1 text-xs"
                   style={{ color: "var(--color-text-secondary)" }}
                 >
-                  3-20 characters, lowercase letters, numbers, underscores
+                  {t("register_username_help")}
                 </p>
               </Field>
 
               {/* Password */}
-              <Field label="Password" required error={fieldErrors.password}>
+              <Field label={t("register_password")} required error={fieldErrors.password}>
                 <input
                   type="password"
                   value={password}
@@ -288,7 +282,7 @@ export default function RegisterPage() {
 
               {/* Confirm Password */}
               <Field
-                label="Confirm Password"
+                label={t("register_confirm_password")}
                 required
                 error={fieldErrors.confirmPassword}
               >
@@ -310,7 +304,7 @@ export default function RegisterPage() {
                   className="text-xs uppercase tracking-widest"
                   style={{ color: "var(--color-text-secondary)" }}
                 >
-                  Optional
+                  {t("register_optional")}
                 </span>
                 <div
                   className="h-[1px] flex-1"
@@ -319,7 +313,7 @@ export default function RegisterPage() {
               </div>
 
               {/* Last Name */}
-              <Field label="Last Name">
+              <Field label={t("register_last_name")}>
                 <input
                   type="text"
                   value={lastName}
@@ -329,7 +323,7 @@ export default function RegisterPage() {
               </Field>
 
               {/* Phone */}
-              <Field label="Phone">
+              <Field label={t("register_phone")}>
                 <input
                   type="tel"
                   value={phone}
@@ -344,14 +338,14 @@ export default function RegisterPage() {
                   onClick={() => goTo(1)}
                   className="btn btn-outline"
                 >
-                  Back
+                  {t("register_back")}
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
                   className="btn btn-primary flex-1"
                 >
-                  {loading ? "Creating Account..." : "Create Account"}
+                  {loading ? t("register_creating") : t("register_create")}
                 </button>
               </div>
             </form>
@@ -391,7 +385,7 @@ export default function RegisterPage() {
               className="font-display text-2xl sm:text-3xl uppercase tracking-tight mb-4"
               style={{ color: "var(--color-offwhite)" }}
             >
-              You&apos;re all set, {firstName}!
+              {t("register_success")} {firstName}!
             </h2>
 
             {unitLabel && (
@@ -399,8 +393,8 @@ export default function RegisterPage() {
                 className="text-sm mb-6"
                 style={{ color: "var(--color-text-secondary)" }}
               >
-                Your unit is <strong style={{ color: "var(--color-offwhite)" }}>Unit {unitLabel}</strong>.
-                This is your home on TENANTNET.NYC.
+                {t("register_unit_info")} <strong style={{ color: "var(--color-offwhite)" }}>Unit {unitLabel}</strong>.
+                {" "}{t("register_home_info")}
               </p>
             )}
 
@@ -415,16 +409,12 @@ export default function RegisterPage() {
                 className="font-display text-xs uppercase tracking-widest mb-4"
                 style={{ color: "var(--color-text-secondary)" }}
               >
-                Quick Tips
+                {t("register_quick_tips")}
               </p>
               <ul className="space-y-3">
-                {[
-                  "Post issues with photos for evidence",
-                  "Check Bulletins for building updates",
-                  "Your posts are timestamped and documented",
-                ].map((tip) => (
+                {[t("register_tip_1"), t("register_tip_2"), t("register_tip_3")].map((tip, i) => (
                   <li
-                    key={tip}
+                    key={i}
                     className="flex items-start gap-3 text-sm"
                     style={{ color: "var(--color-offwhite)" }}
                   >
@@ -442,7 +432,7 @@ export default function RegisterPage() {
               onClick={() => router.push("/dashboard")}
               className="btn btn-primary w-full"
             >
-              Go to Dashboard
+              {t("register_go_dashboard")}
             </button>
           </div>
         )}

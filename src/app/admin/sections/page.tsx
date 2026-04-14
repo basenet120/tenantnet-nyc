@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import AdminNav from "@/components/admin-nav";
 import { useAdminContext } from "@/lib/use-admin-context";
+import { useAdminI18n } from "@/components/admin-i18n-provider";
 
 type Section = {
   id: string;
@@ -21,6 +22,7 @@ function generateSlug(name: string): string {
 
 export default function AdminSectionsPage() {
   const { role, buildingName } = useAdminContext();
+  const { t } = useAdminI18n();
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
   const [newName, setNewName] = useState("");
@@ -95,8 +97,8 @@ export default function AdminSectionsPage() {
     <div className="container-wide py-8">
       {/* Header */}
       <div className="mb-6">
-        <p className="section-label border-b-0 mb-1">Administration</p>
-        <h1 className="text-3xl tracking-tight">SECTIONS</h1>
+        <p className="section-label border-b-0 mb-1">{t("admin_title")}</p>
+        <h1 className="text-3xl tracking-tight">{t("sections_title")}</h1>
       </div>
 
       <AdminNav current="/admin/sections" role={role} buildingName={buildingName} />
@@ -104,9 +106,9 @@ export default function AdminSectionsPage() {
       {/* Section List */}
       <div className="mt-8">
         {loading ? (
-          <p className="text-sm text-[var(--color-text-secondary)]">Loading sections...</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">{t("sections_loading")}</p>
         ) : sections.length === 0 ? (
-          <p className="text-sm text-[var(--color-text-secondary)]">No sections yet.</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">{t("sections_none")}</p>
         ) : (
           <ul className="divide-y divide-[var(--color-border)]">
             {sections.map((section) => (
@@ -128,7 +130,7 @@ export default function AdminSectionsPage() {
                     section.hasIssueTracking ? "btn-primary" : "btn-outline"
                   }`}
                 >
-                  Issue Tracking: {section.hasIssueTracking ? "ON" : "OFF"}
+                  {section.hasIssueTracking ? t("sections_tracking_on") : t("sections_tracking_off")}
                 </button>
               </li>
             ))}
@@ -138,16 +140,16 @@ export default function AdminSectionsPage() {
 
       {/* Add Section */}
       <div className="mt-10">
-        <h2 className="section-label">Add Section</h2>
+        <h2 className="section-label">{t("sections_add")}</h2>
         <form onSubmit={addSection} className="card-dark">
           <div className="flex flex-wrap items-end gap-4">
             <div className="flex-1 min-w-[200px]">
-              <label>Name</label>
+              <label>{t("sections_name")}</label>
               <input
                 type="text"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                placeholder="Section name"
+                placeholder={t("sections_placeholder")}
                 required
               />
               {newName.trim() && (
@@ -163,14 +165,14 @@ export default function AdminSectionsPage() {
                 onChange={(e) => setNewIssueTracking(e.target.checked)}
                 className="accent-[var(--color-terracotta)]"
               />
-              Issue Tracking
+              {t("sections_tracking_label")}
             </label>
             <button
               type="submit"
               disabled={adding}
               className="btn btn-primary disabled:opacity-50"
             >
-              {adding ? "Adding..." : "Add Section"}
+              {adding ? t("sections_adding") : t("sections_add")}
             </button>
           </div>
         </form>

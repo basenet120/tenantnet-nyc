@@ -2,6 +2,7 @@ import { getSession, sessionBuildingId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import AdminNav from "@/components/admin-nav";
+import { getAdminStrings } from "@/lib/get-admin-strings";
 
 type RecentPost = {
   id: string;
@@ -48,11 +49,13 @@ export default async function AdminDashboardPage() {
     }) as Promise<RecentPost[]>,
   ]);
 
+  const { t } = await getAdminStrings();
+
   return (
     <div className="container-wide py-8">
       {/* Header */}
       <div className="mb-6">
-        <p className="section-label border-b-0 mb-1">Administration</p>
+        <p className="section-label border-b-0 mb-1">{t("admin_title")}</p>
         <h1 className="text-3xl tracking-tight">{building?.name ?? "TENANTNET.NYC"}</h1>
       </div>
 
@@ -60,17 +63,17 @@ export default async function AdminDashboardPage() {
 
       {/* Stat Cards */}
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard label="Open Issues" value={openIssues} accent="terracotta" />
-        <StatCard label="Posts Today" value={postsToday} accent="amber" />
-        <StatCard label="Total Posts" value={totalPosts} accent="sage" />
+        <StatCard label={t("admin_open_issues")} value={openIssues} accent="terracotta" />
+        <StatCard label={t("admin_posts_today")} value={postsToday} accent="amber" />
+        <StatCard label={t("admin_total_posts")} value={totalPosts} accent="sage" />
       </div>
 
       {/* Recent Activity */}
       <div className="mt-10">
-        <h2 className="section-label">Recent Activity</h2>
+        <h2 className="section-label">{t("admin_recent_activity")}</h2>
 
         {recentPosts.length === 0 ? (
-          <p className="text-sm text-[var(--color-text-secondary)]">No posts yet.</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">{t("admin_no_posts")}</p>
         ) : (
           <ul className="divide-y divide-[var(--color-border)]">
             {recentPosts.map((post: RecentPost) => (

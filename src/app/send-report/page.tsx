@@ -37,7 +37,7 @@ function SendReportForm() {
     e.preventDefault();
     const to = getRecipientEmail();
     if (!to || !subject.trim() || !message.trim()) {
-      toast.error("Please fill in all fields");
+      toast.error(t("report_error_fields"));
       return;
     }
 
@@ -51,14 +51,14 @@ function SendReportForm() {
 
       if (!res.ok) {
         const data = await res.json();
-        toast.error(data.error || "Failed to send");
+        toast.error(data.error || t("report_error"));
         return;
       }
 
       setSent(true);
-      toast.success("Report sent successfully");
+      toast.success(t("report_success"));
     } catch {
-      toast.error("Something went wrong");
+      toast.error(t("report_error"));
     } finally {
       setSending(false);
     }

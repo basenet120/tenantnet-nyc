@@ -68,7 +68,7 @@ export default function SettingsPage() {
         setLoading(false);
       })
       .catch(() => {
-        toast.error("Failed to load settings");
+        toast.error(t("settings_load_error"));
         setLoading(false);
       });
   }, []);
@@ -84,12 +84,12 @@ export default function SettingsPage() {
       });
       if (!res.ok) {
         const data = await res.json();
-        toast.error(data.error || "Failed to save profile");
+        toast.error(data.error || t("settings_error"));
         return;
       }
-      toast.success("Profile updated");
+      toast.success(t("settings_profile_updated"));
     } catch {
-      toast.error("Something went wrong");
+      toast.error(t("settings_error"));
     } finally {
       setSavingProfile(false);
     }
@@ -98,11 +98,11 @@ export default function SettingsPage() {
   async function savePassword(e: FormEvent) {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error(t("settings_passwords_mismatch"));
       return;
     }
     if (newPassword.length < 8) {
-      toast.error("Password must be at least 8 characters");
+      toast.error(t("settings_password_length"));
       return;
     }
     setSavingPassword(true);
@@ -114,15 +114,15 @@ export default function SettingsPage() {
       });
       if (!res.ok) {
         const data = await res.json();
-        toast.error(data.error || "Failed to change password");
+        toast.error(data.error || t("settings_error"));
         return;
       }
-      toast.success("Password changed");
+      toast.success(t("settings_password_changed"));
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch {
-      toast.error("Something went wrong");
+      toast.error(t("settings_error"));
     } finally {
       setSavingPassword(false);
     }
@@ -143,12 +143,12 @@ export default function SettingsPage() {
       });
       if (!res.ok) {
         const data = await res.json();
-        toast.error(data.error || "Failed to save preferences");
+        toast.error(data.error || t("settings_error"));
         return;
       }
-      toast.success("Notification preferences saved");
+      toast.success(t("settings_prefs_saved"));
     } catch {
-      toast.error("Something went wrong");
+      toast.error(t("settings_error"));
     } finally {
       setSavingNotifications(false);
     }
@@ -353,10 +353,10 @@ export default function SettingsPage() {
                 setLoggingOut(true);
                 try {
                   await fetch("/api/auth/logout", { method: "POST" });
-                  toast.success("Logged out");
+                  toast.success(t("settings_logged_out"));
                   router.push("/");
                 } catch {
-                  toast.error("Failed to log out");
+                  toast.error(t("settings_error"));
                   setLoggingOut(false);
                 }
               }}

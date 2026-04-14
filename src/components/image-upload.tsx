@@ -25,11 +25,11 @@ export function ImageUpload({ maxImages, onImagesChange }: ImageUploadProps) {
 
     for (const file of toUpload) {
       if (!IMAGE_LIMITS.acceptedTypes.includes(file.type)) {
-        alert(`Invalid file type: ${file.name}. Accepted: jpeg, png, webp`);
+        alert(t("upload_invalid_type"));
         return;
       }
       if (file.size > IMAGE_LIMITS.maxSizeBytes) {
-        alert(`File too large: ${file.name}. Max size: 10MB`);
+        alert(t("upload_too_large"));
         return;
       }
     }

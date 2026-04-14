@@ -5,6 +5,7 @@ import SystemAdminNav from "@/components/system-admin-nav";
 import { BuildingRecordsBrowser } from "@/components/building-records-browser";
 import { EnterBuildingButton } from "@/components/enter-building-button";
 import Link from "next/link";
+import { getAdminStrings } from "@/lib/get-admin-strings";
 
 export default async function BuildingDetailPage({
   params,
@@ -36,10 +37,12 @@ export default async function BuildingDetailPage({
     include: { section: true, unit: true, admin: { select: { email: true, name: true } } },
   });
 
+  const { t } = await getAdminStrings();
+
   return (
     <div className="container-wide py-8">
       <div className="mb-6">
-        <p className="section-label border-b-0 mb-1">System Administration</p>
+        <p className="section-label border-b-0 mb-1">{t("system_title")}</p>
         <h1 className="text-3xl tracking-tight">{building.name}</h1>
       </div>
 
@@ -54,31 +57,31 @@ export default async function BuildingDetailPage({
       {/* Building Info */}
       <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div className="card-dark">
-          <h3 className="font-display text-sm uppercase tracking-widest text-terracotta mb-4">Building Info</h3>
+          <h3 className="font-display text-sm uppercase tracking-widest text-terracotta mb-4">{t("building_info")}</h3>
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <dt className="text-[var(--color-text-secondary)]">Address</dt>
+              <dt className="text-[var(--color-text-secondary)]">{t("building_address")}</dt>
               <dd className="text-offwhite">{building.address}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-[var(--color-text-secondary)]">Borough</dt>
+              <dt className="text-[var(--color-text-secondary)]">{t("building_borough")}</dt>
               <dd className="text-offwhite capitalize">{building.borough.replace("_", " ")}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-[var(--color-text-secondary)]">ZIP</dt>
+              <dt className="text-[var(--color-text-secondary)]">{t("building_zip")}</dt>
               <dd className="text-offwhite">{building.zip}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-[var(--color-text-secondary)]">Floors / Units</dt>
+              <dt className="text-[var(--color-text-secondary)]">{t("building_floors_units")}</dt>
               <dd className="text-offwhite">{building.floors} / {building.totalUnits}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-[var(--color-text-secondary)]">Type</dt>
+              <dt className="text-[var(--color-text-secondary)]">{t("building_type")}</dt>
               <dd className="text-offwhite capitalize">{building.buildingType.replace("_", " ")}</dd>
             </div>
             {building.block && (
               <div className="flex justify-between">
-                <dt className="text-[var(--color-text-secondary)]">Block / Lot / BIN</dt>
+                <dt className="text-[var(--color-text-secondary)]">{t("building_ids")}</dt>
                 <dd className="text-offwhite">{building.block} / {building.lot} / {building.bin}</dd>
               </div>
             )}
@@ -86,7 +89,7 @@ export default async function BuildingDetailPage({
         </div>
 
         <div className="card-dark">
-          <h3 className="font-display text-sm uppercase tracking-widest text-terracotta mb-4">Stats</h3>
+          <h3 className="font-display text-sm uppercase tracking-widest text-terracotta mb-4">{t("building_stats")}</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-2xl font-display text-offwhite">{building._count.units}</p>
@@ -110,7 +113,7 @@ export default async function BuildingDetailPage({
 
       {/* Admins */}
       <div className="mt-8">
-        <h2 className="section-label">Admins</h2>
+        <h2 className="section-label">{t("building_admins")}</h2>
         <ul className="divide-y divide-[var(--color-border)]">
           {building.admins.map((admin) => (
             <li key={admin.id} className="flex items-baseline justify-between py-3">
@@ -133,16 +136,16 @@ export default async function BuildingDetailPage({
       {/* NYC Records */}
       {building.records.length > 0 && (
         <div className="mt-8">
-          <h2 className="section-label">NYC Public Records</h2>
+          <h2 className="section-label">{t("building_records")}</h2>
           <BuildingRecordsBrowser records={building.records} />
         </div>
       )}
 
       {/* Recent Posts */}
       <div className="mt-8">
-        <h2 className="section-label">Recent Posts</h2>
+        <h2 className="section-label">{t("building_recent_posts")}</h2>
         {recentPosts.length === 0 ? (
-          <p className="text-sm text-[var(--color-text-secondary)]">No posts yet.</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">{t("admin_no_posts")}</p>
         ) : (
           <ul className="divide-y divide-[var(--color-border)]">
             {recentPosts.map((post) => (

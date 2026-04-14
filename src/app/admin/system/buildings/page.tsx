@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import SystemAdminNav from "@/components/system-admin-nav";
 import Link from "next/link";
+import { getAdminStrings } from "@/lib/get-admin-strings";
 
 export default async function BuildingsListPage() {
   const session = await getSession();
@@ -17,11 +18,13 @@ export default async function BuildingsListPage() {
     },
   });
 
+  const { t } = await getAdminStrings();
+
   return (
     <div className="container-wide py-8">
       <div className="mb-6">
-        <p className="section-label border-b-0 mb-1">System Administration</p>
-        <h1 className="text-3xl tracking-tight">BUILDINGS</h1>
+        <p className="section-label border-b-0 mb-1">{t("system_title")}</p>
+        <h1 className="text-3xl tracking-tight">{t("system_buildings")}</h1>
       </div>
 
       <SystemAdminNav current="/admin/system/buildings" />
@@ -29,8 +32,8 @@ export default async function BuildingsListPage() {
       <div className="mt-8">
         {buildings.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-[var(--color-text-secondary)] text-sm mb-4">No buildings yet.</p>
-            <Link href="/admin/onboard" className="btn btn-primary">Onboard First Building</Link>
+            <p className="text-[var(--color-text-secondary)] text-sm mb-4">{t("system_no_buildings")}</p>
+            <Link href="/admin/onboard" className="btn btn-primary">{t("system_onboard")}</Link>
           </div>
         ) : (
           <div className="space-y-3">

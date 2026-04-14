@@ -4,9 +4,11 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { LanguagePicker } from "@/components/language-picker";
+import { useAdminI18n } from "@/components/admin-i18n-provider";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const { t } = useAdminI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -58,7 +60,7 @@ export default function AdminLoginPage() {
           <p className="section-label border-b-0 mb-2 text-[var(--color-text-secondary)]">
             TENANTNET.NYC
           </p>
-          <h1 className="text-4xl tracking-tight">ADMIN ACCESS</h1>
+          <h1 className="text-4xl tracking-tight">{t("admin_login_title")}</h1>
           <div className="mt-3 mx-auto w-12 h-[2px] bg-[var(--color-terracotta)]" />
         </div>
 
@@ -72,7 +74,7 @@ export default function AdminLoginPage() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">{t("admin_login_email")}</label>
             <input
               id="email"
               type="email"
@@ -84,7 +86,7 @@ export default function AdminLoginPage() {
           </div>
 
           <div>
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">{t("admin_login_password")}</label>
             <input
               id="password"
               type="password"
@@ -100,12 +102,12 @@ export default function AdminLoginPage() {
             disabled={loading}
             className="btn btn-primary w-full disabled:opacity-50"
           >
-            {loading ? "Authenticating..." : "Sign In"}
+            {loading ? t("admin_login_authenticating") : t("admin_login_sign_in")}
           </button>
         </form>
 
         <p className="mt-6 text-center text-xs text-[var(--color-text-secondary)]">
-          Authorized personnel only
+          {t("admin_login_authorized")}
         </p>
       </div>
     </div>

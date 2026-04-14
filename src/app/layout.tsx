@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { DM_Sans, Archivo_Black } from "next/font/google";
 import { ToasterProvider } from "@/components/toaster-provider";
 import { I18nProvider } from "@/components/i18n-provider";
+import { AppFooter } from "@/components/app-footer";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { getAppStrings } from "@/lib/get-app-strings";
 import "./globals.css";
 
@@ -59,7 +61,11 @@ export default async function RootLayout({
       </head>
       <body>
         <I18nProvider strings={strings} lang={lang}>
-          {children}
+          <Breadcrumb />
+          <div className="pb-16">
+            {children}
+          </div>
+          <AppFooter />
         </I18nProvider>
         <ToasterProvider />
       </body>

@@ -35,7 +35,7 @@ export default function LoginPage() {
 
       router.push("/dashboard");
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(t("login_error"));
       setLoading(false);
     }
   }

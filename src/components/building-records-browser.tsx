@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useI18n } from "./i18n-provider";
+import type { AppStrings } from "@/lib/get-app-strings";
 
 type BuildingRecord = {
   id: string;
@@ -37,7 +39,20 @@ const RECORD_ICONS: Record<string, string> = {
 };
 
 export function BuildingRecordsBrowser({ records }: { records: BuildingRecord[] }) {
+  const { t } = useI18n();
   const [activeTab, setActiveTab] = useState("hpd_violations");
+
+  const tabLabel = (key: string) => {
+    switch (key) {
+      case "hpd_violations": return t("records_hpd_violations");
+      case "hpd_complaints": return t("records_hpd_complaints");
+      case "dob_violations": return t("records_dob_violations");
+      case "dob_complaints": return t("records_dob_complaints");
+      case "rent_stabilization": return t("records_rent_stabilization");
+      case "resources": return t("records_resources");
+      default: return key;
+    }
+  };
 
   // Filter which tabs are available based on existing records
   const hasHpd = records.some((r) => r.recordType.startsWith("hpd_"));
@@ -70,7 +85,7 @@ export function BuildingRecordsBrowser({ records }: { records: BuildingRecord[] 
                 : "text-offwhite-dim hover:text-offwhite -mb-[2px] border-b-[3px] border-b-transparent"
             }`}
           >
-            {tab.label}
+            {tabLabel(tab.key)}
           </button>
         ))}
       </div>
@@ -120,6 +135,7 @@ function ResourceLinks({ records }: { records: BuildingRecord[] }) {
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function RentStabilizationTab({ externalUrl }: { externalUrl?: string }) {
+  const { t } = useI18n();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -143,10 +159,10 @@ function RentStabilizationTab({ externalUrl }: { externalUrl?: string }) {
     return (
       <div className="text-center py-10">
         <p className="text-sm text-[var(--color-text-secondary)] mb-4">
-          View rent stabilization unit counts from NYC public records.
+          {t("records_stab_desc")}
         </p>
         <button onClick={loadData} className="btn btn-outline">
-          Load Stabilization Data
+          {t("records_load_stab")}
         </button>
       </div>
     );
@@ -156,7 +172,7 @@ function RentStabilizationTab({ externalUrl }: { externalUrl?: string }) {
     return (
       <div className="text-center py-10">
         <p className="text-sm text-[var(--color-text-secondary)] animate-pulse">
-          Loading stabilization data...
+          {t("records_loading_stab")}
         </p>
       </div>
     );
@@ -169,36 +185,36 @@ function RentStabilizationTab({ externalUrl }: { externalUrl?: string }) {
       {reg ? (
         <div className="card-dark">
           <h3 className="font-display text-xs uppercase tracking-[0.12em] text-terracotta mb-4">
-            HPD Registration
+            {t("records_stab_title")}
           </h3>
           <dl className="space-y-2 text-sm">
             {reg.housenumber && reg.streetname && (
               <div className="flex justify-between">
-                <dt className="text-[var(--color-text-secondary)]">Address</dt>
+                <dt className="text-[var(--color-text-secondary)]">{t("records_stab_address")}</dt>
                 <dd className="text-offwhite">{reg.housenumber} {reg.streetname}</dd>
               </div>
             )}
             {reg.boro && (
               <div className="flex justify-between">
-                <dt className="text-[var(--color-text-secondary)]">Borough</dt>
+                <dt className="text-[var(--color-text-secondary)]">{t("records_stab_borough")}</dt>
                 <dd className="text-offwhite capitalize">{reg.boro.toLowerCase()}</dd>
               </div>
             )}
             {reg.zip && (
               <div className="flex justify-between">
-                <dt className="text-[var(--color-text-secondary)]">ZIP</dt>
+                <dt className="text-[var(--color-text-secondary)]">{t("records_stab_zip")}</dt>
                 <dd className="text-offwhite">{reg.zip}</dd>
               </div>
             )}
             {reg.registrationid && (
               <div className="flex justify-between">
-                <dt className="text-[var(--color-text-secondary)]">Registration ID</dt>
+                <dt className="text-[var(--color-text-secondary)]">{t("records_stab_reg_id")}</dt>
                 <dd className="text-offwhite">{reg.registrationid}</dd>
               </div>
             )}
             {reg.lastregistrationdate && (
               <div className="flex justify-between">
-                <dt className="text-[var(--color-text-secondary)]">Last Registered</dt>
+                <dt className="text-[var(--color-text-secondary)]">{t("records_stab_last_reg")}</dt>
                 <dd className="text-offwhite">
                   {new Date(reg.lastregistrationdate).toLocaleDateString("en-US", {
                     month: "short", day: "numeric", year: "numeric",
@@ -208,7 +224,7 @@ function RentStabilizationTab({ externalUrl }: { externalUrl?: string }) {
             )}
             {reg.registrationenddate && (
               <div className="flex justify-between">
-                <dt className="text-[var(--color-text-secondary)]">Registration Expires</dt>
+                <dt className="text-[var(--color-text-secondary)]">{t("records_stab_expires")}</dt>
                 <dd className="text-offwhite">
                   {new Date(reg.registrationenddate).toLocaleDateString("en-US", {
                     month: "short", day: "numeric", year: "numeric",
@@ -217,7 +233,7 @@ function RentStabilizationTab({ externalUrl }: { externalUrl?: string }) {
               </div>
             )}
             <div className="flex justify-between">
-              <dt className="text-[var(--color-text-secondary)]">Building Type</dt>
+              <dt className="text-[var(--color-text-secondary)]">{t("records_stab_type")}</dt>
               <dd className="text-offwhite capitalize">{data?.buildingType?.replace("_", " ") ?? "—"}</dd>
             </div>
           </dl>
@@ -225,7 +241,7 @@ function RentStabilizationTab({ externalUrl }: { externalUrl?: string }) {
       ) : (
         <div className="text-center py-6">
           <p className="text-sm text-[var(--color-text-secondary)]">
-            {data?.message || "No registration data found for this building."}
+            {data?.message || t("records_stab_none")}
           </p>
         </div>
       )}
@@ -233,11 +249,10 @@ function RentStabilizationTab({ externalUrl }: { externalUrl?: string }) {
       {/* How to check individual apartment */}
       <div className="card-dark border-l-[3px] border-l-amber">
         <h3 className="font-display text-xs uppercase tracking-[0.12em] text-amber mb-2">
-          Checking your individual apartment
+          {t("records_stab_check_title")}
         </h3>
         <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
-          NYC tracks stabilization at the building level. To verify your specific apartment&apos;s
-          status, request your rent history from DHCR at{" "}
+          {t("records_stab_check_desc")}{" "}
           <strong className="text-offwhite">718-739-6400</strong> or{" "}
           <a
             href="mailto:RentAdmin@hcr.ny.gov"
@@ -255,7 +270,7 @@ function RentStabilizationTab({ externalUrl }: { externalUrl?: string }) {
           rel="noopener noreferrer"
           className="block text-center text-xs text-terracotta-light hover:text-terracotta"
         >
-          View full HPD registration on NYC website <ExternalLinkIcon />
+          {t("records_stab_view_hpd")} <ExternalLinkIcon />
         </a>
       )}
     </div>
@@ -263,6 +278,7 @@ function RentStabilizationTab({ externalUrl }: { externalUrl?: string }) {
 }
 
 function ViolationsList({ type, externalUrl }: { type: string; externalUrl?: string }) {
+  const { t } = useI18n();
   const [data, setData] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -292,10 +308,10 @@ function ViolationsList({ type, externalUrl }: { type: string; externalUrl?: str
     return (
       <div className="text-center py-10">
         <p className="text-sm text-[var(--color-text-secondary)] mb-4">
-          {getTypeDescription(type)}
+          {getTypeDescription(type, t)}
         </p>
         <button onClick={loadData} className="btn btn-outline">
-          Load Records from NYC Open Data
+          {t("records_load")}
         </button>
         {externalUrl && (
           <a
@@ -304,7 +320,7 @@ function ViolationsList({ type, externalUrl }: { type: string; externalUrl?: str
             rel="noopener noreferrer"
             className="block mt-3 text-xs text-terracotta-light hover:text-terracotta"
           >
-            Or view on NYC website <ExternalLinkIcon />
+            {t("records_or_view")} <ExternalLinkIcon />
           </a>
         )}
       </div>
@@ -315,7 +331,7 @@ function ViolationsList({ type, externalUrl }: { type: string; externalUrl?: str
     return (
       <div className="text-center py-10">
         <p className="text-sm text-[var(--color-text-secondary)] animate-pulse">
-          Loading from NYC Open Data...
+          {t("records_loading")}
         </p>
       </div>
     );
@@ -326,7 +342,7 @@ function ViolationsList({ type, externalUrl }: { type: string; externalUrl?: str
       <div className="text-center py-10">
         <p className="text-sm text-[var(--color-danger)] mb-3">{error}</p>
         <button onClick={loadData} className="btn btn-outline btn-sm">
-          Retry
+          {t("records_retry")}
         </button>
         {externalUrl && (
           <a
@@ -335,7 +351,7 @@ function ViolationsList({ type, externalUrl }: { type: string; externalUrl?: str
             rel="noopener noreferrer"
             className="block mt-3 text-xs text-terracotta-light hover:text-terracotta"
           >
-            View on NYC website instead <ExternalLinkIcon />
+            {t("records_view_instead")} <ExternalLinkIcon />
           </a>
         )}
       </div>
@@ -346,7 +362,7 @@ function ViolationsList({ type, externalUrl }: { type: string; externalUrl?: str
     return (
       <div className="text-center py-10">
         <p className="text-sm text-[var(--color-sage)]">
-          No records found — that&apos;s a good sign.
+          {t("records_none")}
         </p>
         {externalUrl && (
           <a
@@ -355,7 +371,7 @@ function ViolationsList({ type, externalUrl }: { type: string; externalUrl?: str
             rel="noopener noreferrer"
             className="block mt-3 text-xs text-terracotta-light hover:text-terracotta"
           >
-            Verify on NYC website <ExternalLinkIcon />
+            {t("records_verify")} <ExternalLinkIcon />
           </a>
         )}
       </div>
@@ -366,8 +382,8 @@ function ViolationsList({ type, externalUrl }: { type: string; externalUrl?: str
     <div>
       <div className="flex items-center justify-between mb-3">
         <p className="text-xs text-[var(--color-text-secondary)]">
-          {data.length} record{data.length !== 1 ? "s" : ""} found
-          {data.length === 50 && " (showing most recent 50)"}
+          {data.length} {t("records_found")}
+          {data.length === 50 && ` ${t("records_showing_50")}`}
         </p>
         {externalUrl && (
           <a
@@ -376,7 +392,7 @@ function ViolationsList({ type, externalUrl }: { type: string; externalUrl?: str
             rel="noopener noreferrer"
             className="text-xs text-terracotta-light hover:text-terracotta flex items-center gap-1"
           >
-            NYC website <ExternalLinkIcon />
+            {t("records_view_nyc")} <ExternalLinkIcon />
           </a>
         )}
       </div>
@@ -408,6 +424,7 @@ function getRecordUrl(type: string, item: any, externalUrl?: string): string | n
 }
 
 function RecordRow({ type, item, externalUrl }: { type: string; item: any; externalUrl?: string }) {
+  const { t } = useI18n();
   const url = getRecordUrl(type, item, externalUrl);
   const content = <RecordRowContent type={type} item={item} />;
 
@@ -421,7 +438,7 @@ function RecordRow({ type, item, externalUrl }: { type: string; item: any; exter
       >
         {content}
         <p className="text-[0.5625rem] text-[var(--color-text-secondary)] mt-2 flex items-center gap-1 group-hover:text-terracotta-light transition-colors">
-          View on city website <ExternalLinkIcon />
+          {t("records_view_city")} <ExternalLinkIcon />
         </p>
       </a>
     );
@@ -619,17 +636,17 @@ function parseYYYYMMDD(s: string): string | null {
   return `${months[m - 1]} ${d}, ${y}`;
 }
 
-function getTypeDescription(type: string): string {
+function getTypeDescription(type: string, t: (key: keyof AppStrings) => string): string {
   switch (type) {
     case "hpd_violations":
-      return "Housing code violations from the NYC Department of Housing Preservation & Development.";
+      return t("records_desc_hpd_violations");
     case "hpd_complaints":
-      return "Housing complaints filed with HPD for issues like heat, hot water, pests, and more.";
+      return t("records_desc_hpd_complaints");
     case "dob_violations":
-      return "Building code violations from the NYC Department of Buildings.";
+      return t("records_desc_dob_violations");
     case "dob_complaints":
-      return "Complaints filed with the Department of Buildings about construction, safety, and permits.";
+      return t("records_desc_dob_complaints");
     default:
-      return "NYC public records for this building.";
+      return t("records_desc_default");
   }
 }

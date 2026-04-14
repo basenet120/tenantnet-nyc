@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useI18n } from "./i18n-provider";
 
 const STORAGE_KEY = "tn_rs_notice_dismissed";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export function RentStabilizedNotice({ buildingType }: { buildingType: string }) {
+  const { t } = useI18n();
   const [visible, setVisible] = useState(false);
   const [stabData, setStabData] = useState<any>(null);
 
@@ -46,16 +48,16 @@ export function RentStabilizedNotice({ buildingType }: { buildingType: string })
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
             <p className="font-display text-xs uppercase tracking-[0.15em] text-terracotta mb-1">
-              Did you know?
+              {t("rs_did_you_know")}
             </p>
             <h2 className="font-display text-xl sm:text-2xl uppercase tracking-tight text-offwhite leading-tight">
-              Your building is on record as rent stabilized
+              {t("rs_title")}
             </h2>
           </div>
           <button
             onClick={dismiss}
             className="shrink-0 text-[var(--color-text-secondary)] hover:text-offwhite transition-colors p-1"
-            aria-label="Dismiss"
+            aria-label={t("rs_dismiss")}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -73,7 +75,7 @@ export function RentStabilizedNotice({ buildingType }: { buildingType: string })
               {reg.lastregistrationdate && ` · Last registered ${new Date(reg.lastregistrationdate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`}
             </p>
             <p className="text-[0.625rem] text-[var(--color-text-secondary)]">
-              Source: NYC HPD Building Registrations (Open Data)
+              {t("rs_source")}
             </p>
           </div>
         )}
@@ -81,29 +83,23 @@ export function RentStabilizedNotice({ buildingType }: { buildingType: string })
         {/* Content */}
         <div className="space-y-4 text-sm text-[var(--color-text-secondary)] leading-relaxed">
           <p>
-            According to NYC records, this building is <strong className="text-offwhite">rent stabilized</strong>.
-            This means your rent increases are regulated by law, and you have important protections
-            including lease renewal rights and limits on how much your landlord can raise your rent.
+            {t("rs_intro")}
           </p>
 
           <p>
-            Stabilization status is tracked at the <strong className="text-offwhite">building level</strong> in
-            NYC databases. To confirm your <strong className="text-offwhite">individual apartment&apos;s</strong> status,
-            you need to request your rent history from DHCR (see step 1 below).
+            {t("rs_unit_level")}
           </p>
 
           <div className="border-2 border-[var(--color-border)] bg-[var(--color-charcoal-light)] p-4">
             <p className="font-display text-xs uppercase tracking-[0.12em] text-amber mb-3">
-              How to check if your apartment has been illegally deregulated
+              {t("rs_check_title")}
             </p>
             <ul className="space-y-2.5 text-[0.8125rem]">
               <li className="flex items-start gap-2">
                 <span className="text-terracotta mt-0.5 shrink-0">1.</span>
                 <span>
-                  <strong className="text-offwhite">Request your apartment&apos;s rent history</strong> from the
-                  NYS Division of Housing and Community Renewal (DHCR). This is the only way to verify
-                  unit-level stabilization. Call{" "}
-                  <strong className="text-offwhite">718-739-6400</strong> or visit{" "}
+                  {t("rs_step_1")} {t("rs_step_1_call")}{" "}
+                  <strong className="text-offwhite">718-739-6400</strong> {t("rs_step_1_or_visit")}{" "}
                   <a
                     href="https://hcr.ny.gov/rent-stabilization-information"
                     target="_blank"
@@ -112,45 +108,40 @@ export function RentStabilizedNotice({ buildingType }: { buildingType: string })
                   >
                     hcr.ny.gov
                   </a>.
-                  You can also email{" "}
+                  {" "}{t("rs_step_1_email")}{" "}
                   <a
                     href="mailto:RentAdmin@hcr.ny.gov"
                     className="text-terracotta-light hover:text-terracotta"
                   >
                     RentAdmin@hcr.ny.gov
                   </a>{" "}
-                  with your name, address, and apartment number.
+                  {t("rs_step_1_email_details")}
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-terracotta mt-0.5 shrink-0">2.</span>
                 <span>
-                  <strong className="text-offwhite">Look for large rent jumps</strong> in your apartment&apos;s history.
-                  If rent suddenly jumped above the deregulation threshold without a documented reason
-                  (e.g., major capital improvement), it may have been illegally deregulated.
+                  {t("rs_step_2")}
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-terracotta mt-0.5 shrink-0">3.</span>
                 <span>
-                  <strong className="text-offwhite">Check if preferential rent was used</strong> to inflate
-                  the legal registered rent above the threshold while charging you less.
+                  {t("rs_step_3")}
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-terracotta mt-0.5 shrink-0">4.</span>
                 <span>
-                  <strong className="text-offwhite">File a complaint</strong> with DHCR if you suspect
-                  illegal deregulation. Under the Housing Stability and Tenant Protection Act (2019),
-                  you may be entitled to rent overcharge refunds going back{" "}
-                  <strong className="text-offwhite">6 years</strong>.
+                  {t("rs_step_4_intro")}{" "}
+                  <strong className="text-offwhite">{t("rs_step_4_years")}</strong>.
                 </span>
               </li>
             </ul>
           </div>
 
           <p className="text-xs">
-            <strong className="text-offwhite">Free legal help:</strong>{" "}
+            <strong className="text-offwhite">{t("rs_free_legal")}</strong>{" "}
             <a
               href="https://www.lawhelpny.org"
               target="_blank"
@@ -159,8 +150,8 @@ export function RentStabilizedNotice({ buildingType }: { buildingType: string })
             >
               LawHelpNY.org
             </a>{" "}
-            can connect you with free housing attorneys, or call the{" "}
-            <strong className="text-offwhite">Tenant Protection Unit</strong> at{" "}
+            {t("rs_legal_connect")}{" "}
+            <strong className="text-offwhite">{t("rs_legal_unit")}</strong> {t("rs_legal_at")}{" "}
             <strong className="text-offwhite">718-739-6400</strong>.
           </p>
         </div>
@@ -168,7 +159,7 @@ export function RentStabilizedNotice({ buildingType }: { buildingType: string })
         {/* Actions */}
         <div className="mt-6 flex gap-3">
           <button onClick={dismiss} className="btn btn-primary flex-1">
-            Got It
+            {t("rs_got_it")}
           </button>
           <a
             href="https://hcr.ny.gov/rent-stabilization-information"
@@ -176,7 +167,7 @@ export function RentStabilizedNotice({ buildingType }: { buildingType: string })
             rel="noopener noreferrer"
             className="btn btn-outline no-underline"
           >
-            Learn More
+            {t("rs_learn_more")}
           </a>
         </div>
       </div>

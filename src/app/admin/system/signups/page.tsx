@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import SystemAdminNav from "@/components/system-admin-nav";
+import { useAdminI18n } from "@/components/admin-i18n-provider";
 
 type Signup = {
   id: string;
@@ -19,6 +20,7 @@ type Signup = {
 };
 
 export default function SignupsPage() {
+  const { t } = useAdminI18n();
   const [signups, setSignups] = useState<Signup[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -52,8 +54,8 @@ export default function SignupsPage() {
   return (
     <div className="container-wide py-8">
       <div className="mb-6">
-        <p className="section-label border-b-0 mb-1">System Administration</p>
-        <h1 className="text-3xl tracking-tight">BUILDING SIGNUPS</h1>
+        <p className="section-label border-b-0 mb-1">{t("system_title")}</p>
+        <h1 className="text-3xl tracking-tight">{t("signups_title")}</h1>
       </div>
 
       <SystemAdminNav current="/admin/system/signups" />
@@ -62,7 +64,7 @@ export default function SignupsPage() {
         {loading ? (
           <p className="text-sm text-[var(--color-text-secondary)]">Loading...</p>
         ) : signups.length === 0 ? (
-          <p className="text-sm text-[var(--color-text-secondary)]">No signup requests yet.</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">{t("signups_none")}</p>
         ) : (
           <div className="space-y-3">
             {signups.map((signup) => (
@@ -106,13 +108,13 @@ export default function SignupsPage() {
                           onClick={() => updateStatus(signup.id, "approved")}
                           className="btn btn-primary btn-sm"
                         >
-                          Approve
+                          {t("signups_approve")}
                         </button>
                         <button
                           onClick={() => updateStatus(signup.id, "rejected")}
                           className="btn btn-outline btn-sm"
                         >
-                          Reject
+                          {t("signups_reject")}
                         </button>
                       </div>
                     )}

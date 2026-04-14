@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import AdminNav from "@/components/admin-nav";
 import { POST_STATUS } from "@/lib/constants";
 import { useAdminContext } from "@/lib/use-admin-context";
+import { useAdminI18n } from "@/components/admin-i18n-provider";
 
 type Section = {
   id: string;
@@ -27,6 +28,7 @@ type Post = {
 
 export default function ModerationPage() {
   const { role, buildingName } = useAdminContext();
+  const { t } = useAdminI18n();
   const [posts, setPosts] = useState<Post[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
@@ -120,7 +122,7 @@ export default function ModerationPage() {
   }
 
   async function deletePost(postId: string) {
-    if (!confirm("Delete this post? This cannot be undone.")) return;
+    if (!confirm(t("mod_delete_confirm"))) return;
 
     const res = await fetch(`/api/admin/posts/${postId}`, { method: "DELETE" });
     if (res.ok) {
@@ -146,8 +148,8 @@ export default function ModerationPage() {
     return (
       <div className="container-wide py-8">
         <div className="mb-6">
-          <p className="section-label border-b-0 mb-1">Administration</p>
-          <h1 className="text-3xl tracking-tight">MODERATION</h1>
+          <p className="section-label border-b-0 mb-1">{t("admin_title")}</p>
+          <h1 className="text-3xl tracking-tight">{t("mod_title")}</h1>
         </div>
         <AdminNav current="/admin/moderation" role={role} buildingName={buildingName} />
         <p className="mt-8 text-sm text-[var(--color-text-secondary)]">Loading...</p>
@@ -159,8 +161,8 @@ export default function ModerationPage() {
     <div className="container-wide py-8">
       {/* Header */}
       <div className="mb-6">
-        <p className="section-label border-b-0 mb-1">Administration</p>
-        <h1 className="text-3xl tracking-tight">MODERATION</h1>
+        <p className="section-label border-b-0 mb-1">{t("admin_title")}</p>
+        <h1 className="text-3xl tracking-tight">{t("mod_title")}</h1>
       </div>
 
       <AdminNav current="/admin/moderation" role={role} buildingName={buildingName} />
@@ -168,37 +170,37 @@ export default function ModerationPage() {
       {/* Create Bulletin */}
       <div className="mt-8 card-dark border-l-[3px] border-l-terracotta">
         <h2 className="font-display text-lg uppercase tracking-wide text-offwhite mb-4">
-          Create Bulletin
+          {t("mod_create_bulletin")}
         </h2>
         <form onSubmit={handleCreateBulletin} className="space-y-4">
           <div>
-            <label>Title</label>
+            <label>{t("mod_bulletin_title")}</label>
             <input
               type="text"
               value={bulletinTitle}
               onChange={(e) => setBulletinTitle(e.target.value)}
-              placeholder="Bulletin title"
+              placeholder={t("mod_bulletin_placeholder")}
               required
             />
           </div>
           <div>
-            <label>Body</label>
+            <label>{t("mod_bulletin_body")}</label>
             <textarea
               value={bulletinBody}
               onChange={(e) => setBulletinBody(e.target.value)}
               rows={3}
-              placeholder="Write your bulletin..."
+              placeholder={t("mod_bulletin_body_placeholder")}
               required
             />
           </div>
           <div>
-            <label>Section</label>
+            <label>{t("mod_bulletin_section")}</label>
             <select
               value={bulletinSectionId}
               onChange={(e) => setBulletinSectionId(e.target.value)}
               required
             >
-              <option value="">Select section</option>
+              <option value="">{t("mod_bulletin_select")}</option>
               {sections.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
@@ -211,17 +213,17 @@ export default function ModerationPage() {
             disabled={submitting}
             className="btn btn-primary disabled:opacity-50"
           >
-            {submitting ? "Creating..." : "Create Bulletin"}
+            {submitting ? t("mod_creating") : t("mod_create_bulletin")}
           </button>
         </form>
       </div>
 
       {/* Posts List */}
       <div className="mt-10">
-        <h2 className="section-label">All Posts</h2>
+        <h2 className="section-label">{t("mod_all_posts")}</h2>
 
         {posts.length === 0 ? (
-          <p className="text-sm text-[var(--color-text-secondary)]">No posts yet.</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">{t("admin_no_posts")}</p>
         ) : (
           <ul className="space-y-3">
             {posts.map((post) => (
@@ -255,13 +257,13 @@ export default function ModerationPage() {
                         post.isPinned ? "btn-warning" : "btn-outline"
                       }`}
                     >
-                      {post.isPinned ? "Unpin" : "Pin"}
+                      {post.isPinned ? t("mod_unpin") : t("mod_pin")}
                     </button>
                     <button
                       onClick={() => deletePost(post.id)}
                       className="btn btn-danger btn-sm"
                     >
-                      Delete
+                      {t("mod_delete")}
                     </button>
                   </div>
                 </div>

@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import QRCode from "qrcode";
 import AdminNav from "@/components/admin-nav";
 import { useAdminContext } from "@/lib/use-admin-context";
+import { useAdminI18n } from "@/components/admin-i18n-provider";
+import type { AdminStrings } from "@/lib/get-admin-strings";
 
 type UnitData = {
   id: string;
@@ -19,36 +21,38 @@ function ConfirmModal({
   unit,
   onConfirm,
   onCancel,
+  t,
 }: {
   unit: UnitData;
   onConfirm: () => void;
   onCancel: () => void;
+  t: (key: keyof AdminStrings) => string;
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: "rgba(0,0,0,0.7)" }}>
       <div className="w-full max-w-sm border-2 border-[var(--color-danger)] bg-[var(--color-charcoal)] p-6">
         <h3 className="font-display text-xl uppercase text-[var(--color-danger)]">
-          Rotate QR Code
+          {t("units_rotate_title")}
         </h3>
         <div className="mt-1 h-[2px] w-10 bg-[var(--color-danger)]" />
         <p className="mt-4 text-sm text-[var(--color-offwhite)]">
           You are about to reset the QR code for <strong className="text-[var(--color-offwhite)]">Unit {unit.label}</strong>.
         </p>
         <div className="mt-4 border-2 border-[var(--color-border)] bg-[var(--color-charcoal-light)] p-3">
-          <p className="text-xs uppercase tracking-wider text-[var(--color-amber)] font-bold mb-2">This will:</p>
+          <p className="text-xs uppercase tracking-wider text-[var(--color-amber)] font-bold mb-2">{t("units_rotate_warning")}</p>
           <ul className="space-y-1 text-sm text-[var(--color-muted)]">
-            <li>Invalidate the current QR code sticker</li>
-            <li>Log out the tenant immediately</li>
-            <li>Require printing a new QR code</li>
-            <li>Reset their registration</li>
+            <li>{t("units_rotate_w1")}</li>
+            <li>{t("units_rotate_w2")}</li>
+            <li>{t("units_rotate_w3")}</li>
+            <li>{t("units_rotate_w4")}</li>
           </ul>
         </div>
         <div className="mt-6 flex gap-3">
           <button onClick={onCancel} className="btn btn-outline flex-1">
-            Cancel
+            {t("units_cancel")}
           </button>
           <button onClick={onConfirm} className="btn btn-danger flex-1">
-            Rotate QR Code
+            {t("units_rotate_qr")}
           </button>
         </div>
       </div>
@@ -58,6 +62,7 @@ function ConfirmModal({
 
 export default function AdminUnitsPage() {
   const { role, buildingName } = useAdminContext();
+  const { t } = useAdminI18n();
   const [units, setUnits] = useState<UnitData[]>([]);
   const [loading, setLoading] = useState(true);
   const [qrImages, setQrImages] = useState<Record<string, string>>({});
@@ -114,14 +119,14 @@ export default function AdminUnitsPage() {
     <div className="container-wide py-8">
       {/* Header */}
       <div className="mb-6">
-        <p className="section-label border-b-0 mb-1">Administration</p>
-        <h1 className="text-3xl tracking-tight">UNIT MANAGEMENT</h1>
+        <p className="section-label border-b-0 mb-1">{t("admin_title")}</p>
+        <h1 className="text-3xl tracking-tight">{t("units_title")}</h1>
       </div>
 
       <AdminNav current="/admin/units" role={role} buildingName={buildingName} />
 
       {loading ? (
-        <p className="mt-8 text-sm text-[var(--color-text-secondary)]">Loading units...</p>
+        <p className="mt-8 text-sm text-[var(--color-text-secondary)]">{t("units_loading")}</p>
       ) : (
         <div className="mt-8 space-y-10">
           {floors.map((floor) => {
@@ -155,13 +160,13 @@ export default function AdminUnitsPage() {
                           onClick={() => showQr(unit)}
                           className="btn btn-outline btn-sm"
                         >
-                          {qrImages[unit.id] ? "Hide QR" : "Show QR"}
+                          {qrImages[unit.id] ? t("units_hide_qr") : t("units_show_qr")}
                         </button>
                         <button
                           onClick={() => setConfirmUnit(unit)}
                           className="btn btn-danger btn-sm"
                         >
-                          Rotate QR
+                          {t("units_rotate_qr")}
                         </button>
                       </div>
 
@@ -180,7 +185,7 @@ export default function AdminUnitsPage() {
                             download={`qr-${unit.label}.png`}
                             className="mt-2 block text-xs text-terracotta-light hover:text-terracotta"
                           >
-                            Download QR Code
+                            {t("units_download_qr")}
                           </a>
                         </div>
                       )}
@@ -198,6 +203,7 @@ export default function AdminUnitsPage() {
           unit={confirmUnit}
           onConfirm={() => rotateQr(confirmUnit)}
           onCancel={() => setConfirmUnit(null)}
+          t={t}
         />
       )}
     </div>
