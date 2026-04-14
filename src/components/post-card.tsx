@@ -48,18 +48,23 @@ export function PostCard({
   return (
     <Link href={`/post/${id}`} className="block group no-underline">
       <div
-        className={`relative bg-surface text-charcoal border-2 border-border rounded-none p-5 transition-all duration-150 hover:border-l-terracotta hover:border-l-4 ${
+        className={`relative border-2 rounded-none p-5 transition-all duration-150 hover:border-l-terracotta hover:border-l-4 ${
           isPinned ? "border-l-4 border-l-amber" : ""
         }`}
+        style={{
+          backgroundColor: "var(--color-surface)",
+          color: "var(--color-text-on-surface)",
+          borderColor: "var(--color-border)",
+        }}
       >
         {/* Top row: section label + status badge */}
         <div className="flex items-start justify-between gap-3 mb-2">
-          <span className="font-display text-[0.6875rem] tracking-[0.12em] uppercase text-charcoal-lighter">
+          <span className="font-display text-[0.6875rem] tracking-[0.12em] uppercase" style={{ color: "var(--color-charcoal-lighter)" }}>
             {sectionName}
           </span>
           <div className="flex items-center gap-2">
             {visibility === "private" && (
-              <span className="inline-flex items-center gap-1 text-[0.625rem] font-display uppercase tracking-wider text-charcoal-lighter">
+              <span className="inline-flex items-center gap-1 text-[0.625rem] font-display uppercase tracking-wider" style={{ color: "var(--color-charcoal-lighter)" }}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                 </svg>
@@ -74,14 +79,17 @@ export function PostCard({
         {shouldTranslate ? (
           <TranslatedText
             as="h3"
-            className="font-display text-lg uppercase leading-tight text-charcoal mb-1 truncate group-hover:text-terracotta transition-colors"
+            className="font-display text-lg uppercase leading-tight mb-1 truncate group-hover:text-terracotta transition-colors"
             text={translationTitle}
             lang={lang}
             sourceType="post_title"
             sourceId={id}
           />
         ) : (
-          <h3 className="font-display text-lg uppercase leading-tight text-charcoal mb-1 truncate group-hover:text-terracotta transition-colors">
+          <h3
+            className="font-display text-lg uppercase leading-tight mb-1 truncate group-hover:text-terracotta transition-colors"
+            style={{ color: "var(--color-charcoal)" }}
+          >
             {title}
           </h3>
         )}
@@ -90,20 +98,20 @@ export function PostCard({
         {shouldTranslate ? (
           <TranslatedText
             as="p"
-            className="text-sm text-charcoal-lighter leading-relaxed line-clamp-2 mb-3"
+            className="text-sm leading-relaxed line-clamp-2 mb-3"
             text={translationBody}
             lang={lang}
             sourceType="post_body"
             sourceId={id}
           />
         ) : (
-          <p className="text-sm text-charcoal-lighter leading-relaxed line-clamp-2 mb-3">
+          <p className="text-sm leading-relaxed line-clamp-2 mb-3" style={{ color: "var(--color-charcoal-lighter)" }}>
             {body}
           </p>
         )}
 
         {/* Meta row */}
-        <div className="flex flex-wrap items-center gap-3 text-[0.6875rem] tracking-wide text-charcoal-lighter font-mono">
+        <div className="flex flex-wrap items-center gap-3 text-[0.6875rem] tracking-wide font-mono" style={{ color: "var(--color-charcoal-lighter)" }}>
           {isAdmin && (
             <>
               <span className="inline-flex items-center gap-1 text-terracotta font-bold uppercase">
