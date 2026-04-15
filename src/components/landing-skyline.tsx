@@ -972,11 +972,11 @@ function StaticSkyline() {
     [buildings],
   );
 
-  // 3x bigger than before (was max 0.85, viewport.width / 100).
-  // Mobile (viewport.width < 15) doubles the previous 1.7x boost -> 3.4x.
+  // Mobile doubles the previous 3.4x boost -> 6.8x.
+  // Desktop reduces baseline by 30% -> 0.7x.
   const baseScale = Math.min(2.55, viewport.width / 33);
   const isMobile = viewport.width < 15;
-  const scale = isMobile ? baseScale * 3.4 : baseScale;
+  const scale = isMobile ? baseScale * 6.8 : baseScale * 0.7;
 
   // Toggle one random window every 10-20 seconds
   useFrame(() => {
@@ -996,10 +996,11 @@ function StaticSkyline() {
     }
   });
 
-  // Nudged ~15px lower (zoom 35 -> ~0.43 world units)
+  // Nudged 15px lower on mobile, 25px on desktop (zoom 35 -> n/35 world units)
+  const tenementY = -viewport.height / 2 + 0.5 - (isMobile ? 15 : 25) / 35;
   return (
     <group
-      position={[-(totalWidth * scale) / 2, -viewport.height / 2 + 0.5 - 15 / 35, 0]}
+      position={[-(totalWidth * scale) / 2, tenementY, 0]}
       scale={[scale, scale, scale]}
     >
       {buildings.map((b, i) => (
