@@ -51,13 +51,11 @@ export const metadata: Metadata = {
   },
   description:
     "Private tenant forums for NYC apartment buildings — report issues, document disputes, connect with neighbors.",
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/icon.svg", type: "image/svg+xml" },
-    ],
-    apple: { url: "/apple-icon.svg", type: "image/svg+xml" },
-  },
+  // Do NOT declare `icons` here. Next.js's file-based convention picks up
+  // src/app/favicon.ico, src/app/icon.svg, and src/app/apple-icon.svg and
+  // wires them with the hashed URLs it actually serves them at. An
+  // explicit `icons: { ... }` block with plain paths will silently replace
+  // those links with broken 404s.
   openGraph: {
     title: "TENANTNET.NYC",
     description:
