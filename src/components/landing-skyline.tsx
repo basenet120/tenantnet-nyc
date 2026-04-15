@@ -972,11 +972,13 @@ function StaticSkyline() {
     [buildings],
   );
 
-  // Mobile doubles the previous 3.4x boost -> 6.8x.
-  // Desktop reduces baseline by 30% -> 0.7x.
-  const baseScale = Math.min(2.55, viewport.width / 33);
+  // Mobile and desktop scales are INDEPENDENT — each has its own viewport
+  // curve + clamp, so tuning one can't bleed into the other via a shared
+  // base. Current targets: ~2.3 on typical phone, ~0.87 on typical desktop.
   const isMobile = viewport.width < 15;
-  const scale = isMobile ? baseScale * 6.8 : baseScale * 0.7;
+  const scale = isMobile
+    ? Math.min(3.0, viewport.width * 0.22)        // phones / small tablets
+    : Math.min(1.8, (viewport.width / 33) * 0.7); // desktop / wide screens
 
   // Toggle one random window every 10-20 seconds
   useFrame(() => {
