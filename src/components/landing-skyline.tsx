@@ -157,22 +157,30 @@ function ScrollingSkyline() {
   // Scale the buildings to fill vertical space in the viewport
   const scale = Math.min(1.2, viewport.height / 14);
 
+  // Sit buildings lower and center the strips around origin so the skyline
+  // fills the screen from the first frame (no blank right half on load).
   return (
-    <group ref={groupRef} position={[0, -4, 0]} scale={[scale, scale, scale]}>
-      {/* First strip */}
-      {buildings.map((b, i) => (
-        <BuildingMesh key={`a-${i}`} building={b} index={i} time={time} />
-      ))}
-      {/* Second strip, offset by totalWidth so it sits flush to the right */}
-      <group position={[totalWidth, 0, 0]}>
+    <group ref={groupRef} position={[0, -5.5, 0]} scale={[scale, scale, scale]}>
+      {/* Strip A — positioned to the left of origin */}
+      <group position={[-totalWidth, 0, 0]}>
         {buildings.map((b, i) => (
-          <BuildingMesh key={`b-${i}`} building={b} index={i} time={time} />
+          <BuildingMesh key={`a-${i}`} building={b} index={i} time={time} />
         ))}
       </group>
-      {/* Third strip for extra coverage on wide screens */}
-      <group position={[totalWidth * 2, 0, 0]}>
+      {/* Strip B — centered at origin */}
+      {buildings.map((b, i) => (
+        <BuildingMesh key={`b-${i}`} building={b} index={i} time={time} />
+      ))}
+      {/* Strip C — to the right of origin */}
+      <group position={[totalWidth, 0, 0]}>
         {buildings.map((b, i) => (
           <BuildingMesh key={`c-${i}`} building={b} index={i} time={time} />
+        ))}
+      </group>
+      {/* Strip D — extra buffer for very wide screens */}
+      <group position={[totalWidth * 2, 0, 0]}>
+        {buildings.map((b, i) => (
+          <BuildingMesh key={`d-${i}`} building={b} index={i} time={time} />
         ))}
       </group>
     </group>
