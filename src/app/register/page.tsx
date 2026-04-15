@@ -93,7 +93,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center px-5 sm:px-6 py-12">
       <div className="fixed top-4 left-4 z-50">
         <LanguagePicker />
       </div>

@@ -67,7 +67,7 @@ function SendReportForm() {
   if (sent) {
     return (
       <div className="min-h-dvh">
-        <header className="border-b-2 border-[var(--color-border)] px-4 py-5">
+        <header className="border-b-2 border-[var(--color-border)] px-5 sm:px-6 py-5">
           <div className="container-narrow flex items-center gap-4">
             <Link href="/dashboard" className="text-[var(--color-text-secondary)] hover:text-offwhite transition-colors" aria-label="Back">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -103,7 +103,7 @@ function SendReportForm() {
 
   return (
     <div className="min-h-dvh">
-      <header className="border-b-2 border-[var(--color-border)] px-4 py-5">
+      <header className="border-b-2 border-[var(--color-border)] px-5 sm:px-6 py-5">
         <div className="container-narrow flex items-center gap-4">
           <Link href="/dashboard" className="text-[var(--color-text-secondary)] hover:text-offwhite transition-colors" aria-label="Back">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

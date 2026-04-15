@@ -95,7 +95,7 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-dvh" dir={dir}>
       {/* Header */}
-      <header className="border-b-2 border-[var(--color-border)] px-4 py-5">
+      <header className="border-b-2 border-[var(--color-border)] px-5 sm:px-6 py-5">
         <div className="container-narrow flex items-center justify-between">
           <div>
             <h1 className="font-display text-xl uppercase tracking-tight text-offwhite">

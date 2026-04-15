@@ -31,7 +31,7 @@ export function Breadcrumb() {
         boxShadow: "0 1px 0 rgba(255,255,255,0.03), 0 2px 8px rgba(0,0,0,0.25)",
       }}
     >
-      <div className="max-w-5xl mx-auto px-4 py-1.5 flex items-center justify-between">
+      <div className="max-w-5xl mx-auto px-5 sm:px-6 py-1.5 flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-[0.6875rem] font-display uppercase tracking-wider">
           {segments.map((seg, i) => (
             <span key={i} className="flex items-center gap-1.5 shrink-0">

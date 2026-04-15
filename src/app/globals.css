@@ -644,14 +644,14 @@ label {
   width: 100%;
   max-width: 48rem;
   margin-inline: auto;
-  padding-inline: var(--space-md);
+  padding-inline: 1.25rem; /* 20px on mobile, a bit more breathing room */
 }
 
 .container-wide {
   width: 100%;
   max-width: 72rem;
   margin-inline: auto;
-  padding-inline: var(--space-md);
+  padding-inline: 1.25rem;
 }
 
 @media (min-width: 640px) {

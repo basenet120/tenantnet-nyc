@@ -167,7 +167,7 @@ export default function SettingsPage() {
     <div className="min-h-screen">
       {/* Header */}
       <header
-        className="border-b-2 px-4 py-4"
+        className="border-b-2 px-5 sm:px-6 py-4"
         style={{ borderColor: "var(--color-border)", backgroundColor: "var(--color-charcoal-light)" }}
       >
         <div className="max-w-2xl mx-auto flex items-center gap-3">
@@ -192,7 +192,7 @@ export default function SettingsPage() {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-8 space-y-10">
+      <main className="max-w-2xl mx-auto px-5 sm:px-6 py-8 space-y-10">
 
         {settings?.type === "admin" && (
           <section>

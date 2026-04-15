@@ -50,7 +50,7 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <div className="flex min-h-screen items-center justify-center px-5 sm:px-6">
       <div className="fixed top-4 left-4 z-50">
         <LanguagePicker />
       </div>
