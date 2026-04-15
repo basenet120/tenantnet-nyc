@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { BuildingSignupForm } from "@/components/building-signup-form";
 import { LanguagePicker } from "@/components/language-picker";
+import { LandingSkyline } from "@/components/landing-skyline-wrapper";
 import { getLang } from "@/lib/get-lang";
 import { translateUiStrings, RTL_LANGS } from "@/lib/i18n";
 import landingStrings from "@/i18n/landing.en.json";
@@ -61,6 +62,18 @@ export default async function Home() {
           className="absolute -left-32 bottom-1/3 w-[400px] h-[2px] bg-terracotta opacity-25"
           style={{ transform: "rotate(-35deg)" }}
         />
+
+        {/* 3D brutalist skyline, anchored to the bottom of the hero */}
+        <div
+          className="absolute bottom-0 inset-x-0 pointer-events-none"
+          style={{
+            height: "55%",
+            maskImage: "linear-gradient(to top, black 60%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to top, black 60%, transparent 100%)",
+          }}
+        >
+          <LandingSkyline />
+        </div>
 
         <div className="container-wide relative">
           <div className="max-w-5xl py-24 sm:py-32">
