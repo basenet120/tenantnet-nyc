@@ -7,7 +7,6 @@ import { useAdminI18n } from "./admin-i18n-provider";
 const allNavItems = [
   { key: "building_dashboard" as const, href: "/admin", roles: ["system_admin", "tenant_rep", "mgmt_rep"] },
   { key: "building_units" as const, href: "/admin/units", roles: ["system_admin", "tenant_rep"] },
-  { key: "building_sections" as const, href: "/admin/sections", roles: ["system_admin", "tenant_rep"] },
   { key: "building_moderation" as const, href: "/admin/moderation", roles: ["system_admin", "tenant_rep"] },
 ];
 
