@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, Archivo_Black } from "next/font/google";
+import { DM_Sans, Archivo_Black, Geist } from "next/font/google";
 import { ToasterProvider } from "@/components/toaster-provider";
 import { I18nProvider } from "@/components/i18n-provider";
 import { AppFooter } from "@/components/app-footer";
@@ -7,6 +7,9 @@ import { Breadcrumb } from "@/components/breadcrumb";
 import { NavigationCursor } from "@/components/navigation-cursor";
 import { getAppStrings } from "@/lib/get-app-strings";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -55,7 +58,7 @@ export default async function RootLayout({
     <html
       lang={lang}
       dir={dir}
-      className={`${dmSans.variable} ${archivoBlack.variable}`}
+      className={cn(dmSans.variable, archivoBlack.variable, "font-sans", geist.variable)}
     >
       <head>
         <link rel="dns-prefetch" href="//centerbeam.proxy.rlwy.net" />
