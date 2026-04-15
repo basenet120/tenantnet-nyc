@@ -4,6 +4,7 @@ import { ToasterProvider } from "@/components/toaster-provider";
 import { I18nProvider } from "@/components/i18n-provider";
 import { AppFooter } from "@/components/app-footer";
 import { Breadcrumb } from "@/components/breadcrumb";
+import { NavigationCursor } from "@/components/navigation-cursor";
 import { getAppStrings } from "@/lib/get-app-strings";
 import "./globals.css";
 
@@ -62,6 +63,7 @@ export default async function RootLayout({
       </head>
       <body>
         <I18nProvider strings={strings} lang={lang}>
+          <NavigationCursor />
           <Breadcrumb />
           <div className="pb-16">
             {children}
