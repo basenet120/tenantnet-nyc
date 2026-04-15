@@ -70,6 +70,18 @@ export default async function Home() {
           <LandingSkyline />
         </div>
 
+        {/* Soft darkness behind the hero copy so title/subtitle stay
+            readable against the animated skyline. Radial gradient keeps
+            the vignette tightest around the text and fades toward the
+            edges so the skyline silhouette still reads at the frame. */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 55% at 30% 45%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 45%, rgba(0,0,0,0) 85%)",
+          }}
+        />
+
         <div className="container-wide relative">
           <div className="max-w-5xl py-24 sm:py-32">
             {/* Overline */}

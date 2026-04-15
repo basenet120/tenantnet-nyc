@@ -671,10 +671,11 @@ function BackgroundSkyscrapers() {
   const { viewport } = useThree();
 
   const { skyscrapers, totalWidth, scale } = useMemo(() => {
-    // Fixed scale across all viewports — narrow viewports crop horizontally
-    // (fewer visible towers) rather than shrinking the buildings themselves.
-    // 1.6 = 2.0 * 0.8 (20% smaller than the previous fixed value).
-    const targetScale = 1.6;
+    // Static two-tier scale — one value for desktop, one for mobile. Not a
+    // continuous viewport formula: mobile simply renders at 80% of desktop.
+    // Narrow viewports still crop horizontally (fewer visible towers).
+    const isMobile = viewport.width < 15;
+    const targetScale = isMobile ? 1.6 * 0.8 : 1.6;
     // Each tower averages ~2.4 raw units (width + spacing). Aim to overshoot
     // the viewport by ~25% so the row clearly fills the screen.
     const targetVisible = viewport.width * 1.25;
@@ -981,11 +982,11 @@ function StaticSkyline() {
     [buildings],
   );
 
-  // Single fixed scale across all viewports — buildings stay the same physical
-  // size regardless of screen width. Narrow viewports simply crop the row
-  // horizontally (show fewer tenements) instead of shrinking the whole row.
-  // 0.9 = 1.5 * 0.6 (40% smaller than the previous fixed value).
-  const scale = 0.9;
+  // Static two-tier scale — one value for desktop, one for mobile. Not a
+  // continuous viewport formula: mobile simply renders at 80% of desktop.
+  // Narrow viewports still crop horizontally (show fewer tenements).
+  const isMobile = viewport.width < 15;
+  const scale = isMobile ? 0.9 * 0.8 : 0.9;
 
   // Toggle one random window every 10-20 seconds
   useFrame(() => {
