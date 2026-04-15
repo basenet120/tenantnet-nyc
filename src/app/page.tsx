@@ -79,7 +79,7 @@ export default async function Home() {
           className="absolute inset-0 pointer-events-none z-30"
           style={{
             background:
-              "radial-gradient(ellipse 40% 22% at 28% 45%, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.4) 35%, rgba(0,0,0,0) 65%)",
+              "radial-gradient(ellipse 40% 28% at 28% calc(45% + 10px), rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.4) 35%, rgba(0,0,0,0) 65%)",
           }}
         />
 
