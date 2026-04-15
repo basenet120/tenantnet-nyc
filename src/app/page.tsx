@@ -4,6 +4,7 @@ import Link from "next/link";
 import { BuildingSignupForm } from "@/components/building-signup-form";
 import { LanguagePicker } from "@/components/language-picker";
 import { LandingSkyline } from "@/components/landing-skyline-wrapper";
+import { HeroStarfield } from "@/components/hero-starfield";
 import { getLang } from "@/lib/get-lang";
 import { translateUiStrings, RTL_LANGS } from "@/lib/i18n";
 import landingStrings from "@/i18n/landing.en.json";
@@ -37,20 +38,11 @@ export default async function Home() {
           HERO
           ═══════════════════════════════════════════ */}
       <section className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden isolate">
-        {/* Terracotta diagonal accents — pinned to the deepest layer so every
-            other graphic (grid, skyline, vignette, text) paints over them. */}
-        <div
-          className="absolute -right-32 top-1/4 w-[500px] h-[3px] bg-terracotta opacity-40 z-0"
-          style={{ transform: "rotate(-35deg)" }}
-        />
-        <div
-          className="absolute -right-24 top-[28%] w-[300px] h-[1px] bg-terracotta opacity-20 z-0"
-          style={{ transform: "rotate(-35deg)" }}
-        />
-        <div
-          className="absolute -left-32 bottom-1/3 w-[400px] h-[2px] bg-terracotta opacity-25 z-0"
-          style={{ transform: "rotate(-35deg)" }}
-        />
+        {/* Starfield — deepest layer. Static + twinkling dots in the upper
+            sky, with an occasional shooting star streaking diagonally. */}
+        <div className="absolute inset-0 z-0">
+          <HeroStarfield />
+        </div>
 
         {/* Grid background */}
         <div
@@ -70,6 +62,15 @@ export default async function Home() {
         <div className="absolute inset-0 pointer-events-none z-20">
           <LandingSkyline />
         </div>
+
+        {/* Uniform low-opacity gray veil over the entire background scene
+            (stars + grid + skyline). Replaces the previous per-canvas
+            opacity trick — buildings stay fully opaque, but the whole
+            backdrop reads as slightly muted so hero text pops. */}
+        <div
+          className="absolute inset-0 pointer-events-none z-30"
+          style={{ background: "rgba(30, 30, 30, 0.5)" }}
+        />
 
         {/* Text-shape darkness — a layered text-shadow on each hero element
             creates a dark halo that hugs the actual letter silhouettes,
@@ -101,7 +102,11 @@ export default async function Home() {
               <Link href="/login" className="btn btn-primary no-underline text-[0.7em] sm:text-base">
                 {t("hero_btn_login")}
               </Link>
-              <a href="#how-it-works" className="btn btn-outline no-underline text-[0.7em] sm:text-base">
+              <a
+                href="#how-it-works"
+                className="btn btn-outline no-underline text-[0.7em] sm:text-base"
+                style={{ background: "var(--color-charcoal-light)" }}
+              >
                 {t("hero_btn_learn")}
               </a>
             </div>

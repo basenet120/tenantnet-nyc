@@ -195,7 +195,10 @@ function mulberry32(seed: number) {
   };
 }
 
-type WindowSlot = { col: number; row: number; initiallyLit: boolean; color: string };
+// Duration of the on-load "windows lighting up" reveal, in seconds.
+const INTRO_DURATION = 1.25;
+
+type WindowSlot = { col: number; row: number; initiallyLit: boolean; color: string; litAt: number };
 
 function BuildingMesh({
   building,
@@ -218,11 +221,26 @@ function BuildingMesh({
         const initiallyLit = rng() > 0.55;
         const pick = rng();
         const color = pick < 0.7 ? AMBER : pick < 0.85 ? TERRACOTTA : OFFWHITE;
-        arr.push({ col: c, row: r, initiallyLit, color });
+        // Random moment (seconds after mount) at which this window lights up.
+        const litAt = rng() * INTRO_DURATION;
+        arr.push({ col: c, row: r, initiallyLit, color, litAt });
       }
     }
     return arr;
   }, [index, windowCols, windowRows]);
+
+  // Intro progress — advances until INTRO_DURATION then stops re-rendering.
+  // Throttled to ~10 fps so we aren't re-rendering every window every frame.
+  const [introElapsed, setIntroElapsed] = useState(0);
+  const accumRef = useRef(0);
+  useFrame((_, delta) => {
+    if (introElapsed >= INTRO_DURATION) return;
+    accumRef.current += delta;
+    if (accumRef.current >= 0.1) {
+      setIntroElapsed((e) => Math.min(INTRO_DURATION, e + accumRef.current));
+      accumRef.current = 0;
+    }
+  });
 
   const windowW = (width * 0.8) / windowCols;
   const windowH = (height * 0.75) / windowRows;
@@ -251,11 +269,13 @@ function BuildingMesh({
         <meshStandardMaterial color={CHARCOAL_DARKER} roughness={1} />
       </mesh>
 
-      {/* Windows grid — rendered only if currently lit (XOR with toggle map) */}
+      {/* Windows grid — rendered only if currently lit (XOR with toggle map)
+          and past its intro reveal time. */}
       {slots.map((w, i) => {
         const key = `${index}-${w.col}-${w.row}`;
         const isLit = toggledKeys.has(key) ? !w.initiallyLit : w.initiallyLit;
         if (!isLit) return null;
+        if (introElapsed < w.litAt) return null;
         const xPos = -width / 2 + gapX + w.col * (windowW + gapX) + windowW / 2;
         const yPos = -height / 2 + gapY + w.row * (windowH + gapY) + windowH / 2 + 0.4;
         return (
@@ -309,17 +329,30 @@ function SkyscraperSection({
 
   const slots = useMemo(() => {
     const rng = mulberry32(seed);
-    const arr: { col: number; row: number; lit: boolean; color: string }[] = [];
+    const arr: { col: number; row: number; lit: boolean; color: string; litAt: number }[] = [];
     for (let c = 0; c < cols; c++) {
       for (let r = 0; r < rows; r++) {
         const lit = rng() > 1 - density;
         const colors = props.windowColors;
         const color = colors[Math.floor(rng() * colors.length)];
-        arr.push({ col: c, row: r, lit, color });
+        const litAt = rng() * INTRO_DURATION;
+        arr.push({ col: c, row: r, lit, color, litAt });
       }
     }
     return arr;
   }, [seed, cols, rows, density, props.windowColors]);
+
+  // Same throttled intro-progress pattern as BuildingMesh.
+  const [introElapsed, setIntroElapsed] = useState(0);
+  const accumRef = useRef(0);
+  useFrame((_, delta) => {
+    if (introElapsed >= INTRO_DURATION) return;
+    accumRef.current += delta;
+    if (accumRef.current >= 0.1) {
+      setIntroElapsed((e) => Math.min(INTRO_DURATION, e + accumRef.current));
+      accumRef.current = 0;
+    }
+  });
 
   const windowW = (width * 0.78) / cols;
   const windowH = (height * 0.85) / rows;
@@ -338,6 +371,7 @@ function SkyscraperSection({
       </mesh>
       {slots.map((w, i) => {
         if (!w.lit) return null;
+        if (introElapsed < w.litAt) return null;
         const xPos = -width / 2 + gapX + w.col * (windowW + gapX) + windowW / 2;
         const yPos = -height / 2 + gapY + w.row * (windowH + gapY) + windowH / 2;
         return (
@@ -1037,7 +1071,7 @@ export function LandingSkyline() {
         camera={{ position: [0, 2, 10], zoom: 35, near: 0.1, far: 50 }}
         dpr={[1, 2]}
         gl={{ alpha: true, antialias: false, powerPreference: "low-power" }}
-        style={{ background: "transparent", opacity: 0.45 }}
+        style={{ background: "transparent" }}
       >
         {/* Fog range pushed well past the scene so back-row buildings render
             at full material opacity. Kept the tag in case we want to
