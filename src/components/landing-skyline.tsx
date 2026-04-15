@@ -679,9 +679,10 @@ function BackgroundSkyscrapers() {
     };
   }, [viewport.width]);
 
+  // Nudged ~40px lower than the foreground (zoom 35 -> ~1.14 world units)
   return (
     <group
-      position={[-(totalWidth * scale) / 2, -viewport.height / 2 + 0.5, -3]}
+      position={[-(totalWidth * scale) / 2, -viewport.height / 2 + 0.5 - 40 / 35, -3]}
       scale={[scale, scale, scale]}
     >
       {skyscrapers.map((s, i) => (
@@ -986,9 +987,10 @@ function StaticSkyline() {
     }
   });
 
+  // Nudged ~15px lower (zoom 35 -> ~0.43 world units)
   return (
     <group
-      position={[-(totalWidth * scale) / 2, -viewport.height / 2 + 0.5, 0]}
+      position={[-(totalWidth * scale) / 2, -viewport.height / 2 + 0.5 - 15 / 35, 0]}
       scale={[scale, scale, scale]}
     >
       {buildings.map((b, i) => (
