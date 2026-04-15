@@ -682,10 +682,13 @@ function BackgroundSkyscrapers() {
     };
   }, [viewport.width]);
 
-  // Nudged ~120px lower than the foreground (zoom 35 -> ~3.43 world units)
+  // Nudged ~120px lower than the foreground on mobile, ~270px on desktop
+  // (zoom 35 -> 120/35 ≈ 3.43 units; 270/35 ≈ 7.71 units)
+  const isMobile = viewport.width < 15;
+  const yOffset = -viewport.height / 2 + 0.5 - (isMobile ? 120 : 270) / 35;
   return (
     <group
-      position={[-(totalWidth * scale) / 2, -viewport.height / 2 + 0.5 - 120 / 35, -3]}
+      position={[-(totalWidth * scale) / 2, yOffset, -3]}
       scale={[scale, scale, scale]}
     >
       {skyscrapers.map((s, i) => (
