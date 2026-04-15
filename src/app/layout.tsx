@@ -32,17 +32,57 @@ export const viewport: Viewport = {
   themeColor: "#1a1a1a",
 };
 
+// Canonical origin used to resolve the opengraph / twitter image URLs into
+// absolute links. iMessage, Slack, and other link unfurlers require
+// absolute URLs for og:image — without this they fall back to whatever
+// default the hosting platform serves (Vercel's generic icon in our case).
+// Override via NEXT_PUBLIC_SITE_URL when deploying to a different domain.
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "https://tenantnet.nyc");
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "TENANTNET.NYC",
     template: "%s | TENANTNET.NYC",
   },
-  description: "Private tenant forums for NYC apartment buildings — report issues, document disputes, connect with neighbors.",
+  description:
+    "Private tenant forums for NYC apartment buildings — report issues, document disputes, connect with neighbors.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: { url: "/apple-icon.svg", type: "image/svg+xml" },
+  },
   openGraph: {
     title: "TENANTNET.NYC",
-    description: "Your building's private forum — report issues, document disputes, connect with neighbors.",
+    description:
+      "Your building's private forum — report issues, document disputes, connect with neighbors.",
     siteName: "TENANTNET.NYC",
+    url: siteUrl,
     type: "website",
+    // The opengraph-image.tsx route in this directory is auto-wired by
+    // Next.js and added to og:image, but we list it explicitly so the
+    // resolved URL shows up in every share preview.
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "TENANTNET.NYC — Private tenant forums for NYC apartment buildings",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TENANTNET.NYC",
+    description:
+      "Your building's private forum — report issues, document disputes, connect with neighbors.",
+    images: ["/twitter-image"],
   },
 };
 
