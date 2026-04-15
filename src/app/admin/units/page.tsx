@@ -60,6 +60,25 @@ function ConfirmModal({
   );
 }
 
+type Density = "compact" | "comfortable" | "expanded";
+
+const DENSITY_KEY = "tn_units_density";
+
+const DENSITY_CLASSES: Record<Density, { grid: string; qr: number }> = {
+  compact: {
+    grid: "grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6",
+    qr: 160,
+  },
+  comfortable: {
+    grid: "grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4",
+    qr: 200,
+  },
+  expanded: {
+    grid: "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3",
+    qr: 256,
+  },
+};
+
 export default function AdminUnitsPage() {
   const { role, buildingName } = useAdminContext();
   const { t } = useAdminI18n();
@@ -67,6 +86,7 @@ export default function AdminUnitsPage() {
   const [loading, setLoading] = useState(true);
   const [qrImages, setQrImages] = useState<Record<string, string>>({});
   const [confirmUnit, setConfirmUnit] = useState<UnitData | null>(null);
+  const [density, setDensity] = useState<Density>("comfortable");
 
   useEffect(() => {
     fetch("/api/admin/units")
@@ -75,7 +95,16 @@ export default function AdminUnitsPage() {
         setUnits(data);
         setLoading(false);
       });
+    const saved = typeof window !== "undefined" ? localStorage.getItem(DENSITY_KEY) : null;
+    if (saved === "compact" || saved === "comfortable" || saved === "expanded") {
+      setDensity(saved);
+    }
   }, []);
+
+  function changeDensity(d: Density) {
+    setDensity(d);
+    if (typeof window !== "undefined") localStorage.setItem(DENSITY_KEY, d);
+  }
 
   // Get unique floors from the data instead of hardcoding
   const floors = [...new Set(units.map((u) => u.floor))].sort((a, b) => a - b);
@@ -125,16 +154,38 @@ export default function AdminUnitsPage() {
 
       <AdminNav current="/admin/units" role={role} buildingName={buildingName} />
 
+      {/* Density selector */}
+      <div className="mt-6 flex items-center gap-2">
+        <span className="text-[0.625rem] font-display uppercase tracking-[0.12em] text-[var(--color-text-secondary)]">
+          {t("units_density")}
+        </span>
+        <div className="flex border-2 border-[var(--color-border)]">
+          {(["compact", "comfortable", "expanded"] as Density[]).map((d, i) => (
+            <button
+              key={d}
+              onClick={() => changeDensity(d)}
+              className={`px-3 py-1.5 text-[0.625rem] font-display uppercase tracking-wider transition-colors ${
+                density === d
+                  ? "bg-terracotta text-offwhite"
+                  : "text-[var(--color-text-secondary)] hover:text-offwhite"
+              } ${i > 0 ? "border-l-2 border-[var(--color-border)]" : ""}`}
+            >
+              {t(`units_density_${d}` as "units_density_compact" | "units_density_comfortable" | "units_density_expanded")}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {loading ? (
         <p className="mt-8 text-sm text-[var(--color-text-secondary)]">{t("units_loading")}</p>
       ) : (
-        <div className="mt-8 space-y-10">
+        <div className="mt-6 space-y-8">
           {floors.map((floor) => {
             const floorUnits = units.filter((u) => u.floor === floor);
             if (floorUnits.length === 0) return null;
             return (
               <div key={floor}>
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-3">
                   <span className="font-display text-lg text-terracotta">
                     {String(floor).padStart(2, "0")}
                   </span>
@@ -143,47 +194,61 @@ export default function AdminUnitsPage() {
                   </h2>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className={DENSITY_CLASSES[density].grid}>
                   {floorUnits.map((unit) => (
-                    <div key={unit.id} className="card-dark">
-                      <div className="flex items-baseline justify-between">
-                        <p className="font-display text-lg text-offwhite">
+                    <div key={unit.id} className={`card-dark ${density === "compact" ? "p-3" : ""}`}>
+                      <div className="flex items-baseline justify-between gap-2">
+                        <p className={`font-display text-offwhite ${density === "compact" ? "text-sm" : "text-lg"}`}>
                           {unit.label}
                         </p>
-                        <span className="badge badge-muted">
-                          {unit._count.posts}P / {unit._count.comments}C
-                        </span>
+                        {density !== "compact" && (
+                          <span className="badge badge-muted whitespace-nowrap">
+                            {unit._count.posts}P / {unit._count.comments}C
+                          </span>
+                        )}
                       </div>
 
-                      <div className="mt-3 flex gap-2">
+                      <div className={`mt-${density === "compact" ? "2" : "3"} flex ${density === "compact" ? "flex-col" : "flex-wrap"} gap-2`}>
                         <button
                           onClick={() => showQr(unit)}
-                          className="btn btn-outline btn-sm"
+                          className={`btn btn-outline ${density === "compact" ? "btn-xs text-[0.625rem] px-2 py-1" : "btn-sm"}`}
                         >
                           {qrImages[unit.id] ? t("units_hide_qr") : t("units_show_qr")}
                         </button>
+                        {density !== "compact" && (
+                          <button
+                            onClick={() => setConfirmUnit(unit)}
+                            className="btn btn-danger btn-sm"
+                          >
+                            {t("units_rotate_qr")}
+                          </button>
+                        )}
+                      </div>
+
+                      {density === "compact" && (
                         <button
                           onClick={() => setConfirmUnit(unit)}
-                          className="btn btn-danger btn-sm"
+                          className="mt-1 w-full text-[0.5625rem] font-display uppercase tracking-wider text-[var(--color-danger)] hover:text-offwhite transition-colors"
                         >
                           {t("units_rotate_qr")}
                         </button>
-                      </div>
+                      )}
 
                       {qrImages[unit.id] && (
-                        <div className="mt-4 border-t-2 border-[var(--color-border)] pt-4">
-                          <div className="bg-offwhite p-3 inline-block">
+                        <div className={`mt-${density === "compact" ? "2" : "4"} border-t-2 border-[var(--color-border)] pt-${density === "compact" ? "2" : "4"}`}>
+                          <div className="bg-offwhite p-2 inline-block">
                             <img
                               src={qrImages[unit.id]}
                               alt={`QR code for ${unit.label}`}
-                              width={256}
-                              height={256}
+                              width={DENSITY_CLASSES[density].qr}
+                              height={DENSITY_CLASSES[density].qr}
+                              style={{ width: "100%", height: "auto", maxWidth: DENSITY_CLASSES[density].qr }}
                             />
                           </div>
                           <a
                             href={qrImages[unit.id]}
                             download={`qr-${unit.label}.png`}
-                            className="mt-2 block text-xs text-terracotta-light hover:text-terracotta"
+                            className="mt-2 block text-[0.625rem] text-terracotta-light hover:text-terracotta"
                           >
                             {t("units_download_qr")}
                           </a>
