@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { toast } from "sonner";
 import AdminNav from "@/components/admin-nav";
 import { POST_STATUS } from "@/lib/constants";
@@ -232,12 +233,15 @@ export default function ModerationPage() {
                 className={`card-dark ${post.isPinned ? "pinned-accent" : ""}`}
               >
                 <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
+                  <Link
+                    href={`/post/${post.id}`}
+                    className="min-w-0 flex-1 no-underline hover:opacity-80 transition-opacity"
+                  >
                     <div className="flex items-center gap-2">
                       {post.isPinned && (
                         <span className="badge badge-amber">{t("mod_pinned_badge")}</span>
                       )}
-                      <p className="text-sm font-semibold text-offwhite truncate">
+                      <p className="text-sm font-semibold text-offwhite truncate hover:text-terracotta transition-colors">
                         {post.title}
                       </p>
                     </div>
@@ -247,7 +251,7 @@ export default function ModerationPage() {
                       {" "}&middot;{" "}
                       {new Date(post.createdAt).toLocaleDateString()}
                     </p>
-                  </div>
+                  </Link>
 
                   {/* Actions */}
                   <div className="flex shrink-0 gap-2">
