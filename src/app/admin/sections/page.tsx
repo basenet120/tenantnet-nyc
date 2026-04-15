@@ -97,7 +97,7 @@ export default function AdminSectionsPage() {
     <div className="container-wide py-8">
       {/* Header */}
       <div className="mb-6">
-        <p className="section-label border-b-0 mb-1">{t("admin_title")}</p>
+        <p className="section-label border-b-0 mb-1">{t("building_title")}</p>
         <h1 className="text-3xl tracking-tight">{t("sections_title")}</h1>
       </div>
 

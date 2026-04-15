@@ -30,12 +30,15 @@ export default async function BuildingDetailPage({
 
   if (!building) notFound();
 
-  const recentPosts = await prisma.post.findMany({
-    where: { buildingId },
-    take: 10,
-    orderBy: { createdAt: "desc" },
-    include: { section: true, unit: true, admin: { select: { email: true, name: true } } },
-  });
+  const [recentPosts, pendingSignups] = await Promise.all([
+    prisma.post.findMany({
+      where: { buildingId },
+      take: 10,
+      orderBy: { createdAt: "desc" },
+      include: { section: true, unit: true, admin: { select: { email: true, name: true } } },
+    }),
+    prisma.buildingSignup.count({ where: { status: "pending" } }),
+  ]);
 
   const { t } = await getAdminStrings();
 
@@ -46,7 +49,7 @@ export default async function BuildingDetailPage({
         <h1 className="text-3xl tracking-tight">{building.name}</h1>
       </div>
 
-      <SystemAdminNav current="/admin/system/buildings" />
+      <SystemAdminNav current="/admin/system/buildings" pendingSignups={pendingSignups} />
 
       {/* Quick Actions */}
       <div className="mt-6 flex gap-3">
@@ -145,7 +148,7 @@ export default async function BuildingDetailPage({
       <div className="mt-8">
         <h2 className="section-label">{t("building_recent_posts")}</h2>
         {recentPosts.length === 0 ? (
-          <p className="text-sm text-[var(--color-text-secondary)]">{t("admin_no_posts")}</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">{t("building_no_posts")}</p>
         ) : (
           <ul className="divide-y divide-[var(--color-border)]">
             {recentPosts.map((post) => (

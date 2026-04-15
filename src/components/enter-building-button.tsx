@@ -36,10 +36,10 @@ export function EnterBuildingButton({
       className={`btn ${target === "admin" ? "btn-primary" : "btn-outline"} disabled:opacity-50`}
     >
       {loading
-        ? t("admin_switching")
+        ? t("system_switching")
         : target === "admin"
-          ? t("admin_enter_panel")
-          : t("admin_view_forum")}
+          ? t("system_enter_building")
+          : t("system_view_forum")}
     </button>
   );
 }

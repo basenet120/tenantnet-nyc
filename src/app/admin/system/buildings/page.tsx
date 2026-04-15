@@ -11,12 +11,15 @@ export default async function BuildingsListPage() {
     redirect("/admin/login");
   }
 
-  const buildings = await prisma.building.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      _count: { select: { units: true, posts: true, admins: true } },
-    },
-  });
+  const [buildings, pendingSignups] = await Promise.all([
+    prisma.building.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        _count: { select: { units: true, posts: true, admins: true } },
+      },
+    }),
+    prisma.buildingSignup.count({ where: { status: "pending" } }),
+  ]);
 
   const { t } = await getAdminStrings();
 
@@ -27,7 +30,7 @@ export default async function BuildingsListPage() {
         <h1 className="text-3xl tracking-tight">{t("system_buildings")}</h1>
       </div>
 
-      <SystemAdminNav current="/admin/system/buildings" />
+      <SystemAdminNav current="/admin/system/buildings" pendingSignups={pendingSignups} />
 
       <div className="mt-8">
         {buildings.length === 0 ? (

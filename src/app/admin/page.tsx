@@ -55,7 +55,7 @@ export default async function AdminDashboardPage() {
     <div className="container-wide py-8">
       {/* Header */}
       <div className="mb-6">
-        <p className="section-label border-b-0 mb-1">{t("admin_title")}</p>
+        <p className="section-label border-b-0 mb-1">{t("building_title")}</p>
         <h1 className="text-3xl tracking-tight">{building?.name ?? "TENANTNET.NYC"}</h1>
       </div>
 
@@ -63,17 +63,17 @@ export default async function AdminDashboardPage() {
 
       {/* Stat Cards */}
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard label={t("admin_open_issues")} value={openIssues} accent="terracotta" />
-        <StatCard label={t("admin_posts_today")} value={postsToday} accent="amber" />
-        <StatCard label={t("admin_total_posts")} value={totalPosts} accent="sage" />
+        <StatCard label={t("building_open_issues")} value={openIssues} accent="terracotta" />
+        <StatCard label={t("building_posts_today")} value={postsToday} accent="amber" />
+        <StatCard label={t("building_total_posts")} value={totalPosts} accent="sage" />
       </div>
 
       {/* Recent Activity */}
       <div className="mt-10">
-        <h2 className="section-label">{t("admin_recent_activity")}</h2>
+        <h2 className="section-label">{t("building_recent_activity")}</h2>
 
         {recentPosts.length === 0 ? (
-          <p className="text-sm text-[var(--color-text-secondary)]">{t("admin_no_posts")}</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">{t("building_no_posts")}</p>
         ) : (
           <ul className="divide-y divide-[var(--color-border)]">
             {recentPosts.map((post: RecentPost) => (

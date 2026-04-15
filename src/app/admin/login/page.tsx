@@ -60,7 +60,7 @@ export default function AdminLoginPage() {
           <p className="section-label border-b-0 mb-2 text-[var(--color-text-secondary)]">
             TENANTNET.NYC
           </p>
-          <h1 className="text-4xl tracking-tight">{t("admin_login_title")}</h1>
+          <h1 className="text-4xl tracking-tight">{t("manager_login_title")}</h1>
           <div className="mt-3 mx-auto w-12 h-[2px] bg-[var(--color-terracotta)]" />
         </div>
 
@@ -74,7 +74,7 @@ export default function AdminLoginPage() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="email">{t("admin_login_email")}</label>
+            <label htmlFor="email">{t("manager_login_email")}</label>
             <input
               id="email"
               type="email"
@@ -86,7 +86,7 @@ export default function AdminLoginPage() {
           </div>
 
           <div>
-            <label htmlFor="password">{t("admin_login_password")}</label>
+            <label htmlFor="password">{t("manager_login_password")}</label>
             <input
               id="password"
               type="password"
@@ -102,12 +102,12 @@ export default function AdminLoginPage() {
             disabled={loading}
             className="btn btn-primary w-full disabled:opacity-50"
           >
-            {loading ? t("admin_login_authenticating") : t("admin_login_sign_in")}
+            {loading ? t("manager_login_authenticating") : t("manager_login_sign_in")}
           </button>
         </form>
 
         <p className="mt-6 text-center text-xs text-[var(--color-text-secondary)]">
-          {t("admin_login_authorized")}
+          {t("manager_login_authorized")}
         </p>
       </div>
     </div>

@@ -29,7 +29,7 @@ export function ExitBuildingButton() {
       disabled={loading}
       className="text-xs font-display uppercase tracking-wider text-terracotta-light hover:text-offwhite transition-colors disabled:opacity-50"
     >
-      {loading ? t("admin_exiting") : t("admin_back_system")}
+      {loading ? t("system_exiting") : t("system_back")}
     </button>
   );
 }

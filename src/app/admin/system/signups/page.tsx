@@ -58,7 +58,7 @@ export default function SignupsPage() {
         <h1 className="text-3xl tracking-tight">{t("signups_title")}</h1>
       </div>
 
-      <SystemAdminNav current="/admin/system/signups" />
+      <SystemAdminNav current="/admin/system/signups" pendingSignups={signups.filter((s) => s.status === "pending").length} />
 
       <div className="mt-8">
         {loading ? (

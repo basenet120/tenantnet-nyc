@@ -138,7 +138,7 @@ export default function ModerationPage() {
       const tag = post.admin.role === "system_admin" ? t("mod_role_system_admin")
         : post.admin.role === "tenant_rep" ? t("mod_role_tenant_rep")
         : post.admin.role === "mgmt_rep" ? t("mod_role_mgmt_rep")
-        : t("mod_role_admin");
+        : t("mod_role_staff");
       return post.admin.name ? `${post.admin.name} (${tag})` : post.admin.email;
     }
     return post.unit?.label ?? t("mod_unknown_author");
@@ -148,7 +148,7 @@ export default function ModerationPage() {
     return (
       <div className="container-wide py-8">
         <div className="mb-6">
-          <p className="section-label border-b-0 mb-1">{t("admin_title")}</p>
+          <p className="section-label border-b-0 mb-1">{t("building_title")}</p>
           <h1 className="text-3xl tracking-tight">{t("mod_title")}</h1>
         </div>
         <AdminNav current="/admin/moderation" role={role} buildingName={buildingName} />
@@ -161,7 +161,7 @@ export default function ModerationPage() {
     <div className="container-wide py-8">
       {/* Header */}
       <div className="mb-6">
-        <p className="section-label border-b-0 mb-1">{t("admin_title")}</p>
+        <p className="section-label border-b-0 mb-1">{t("building_title")}</p>
         <h1 className="text-3xl tracking-tight">{t("mod_title")}</h1>
       </div>
 
@@ -223,7 +223,7 @@ export default function ModerationPage() {
         <h2 className="section-label">{t("mod_all_posts")}</h2>
 
         {posts.length === 0 ? (
-          <p className="text-sm text-[var(--color-text-secondary)]">{t("admin_no_posts")}</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">{t("building_no_posts")}</p>
         ) : (
           <ul className="space-y-3">
             {posts.map((post) => (

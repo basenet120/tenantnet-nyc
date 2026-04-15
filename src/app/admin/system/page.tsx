@@ -31,7 +31,7 @@ export default async function SystemDashboardPage() {
         <h1 className="text-3xl tracking-tight">TENANTNET.NYC</h1>
       </div>
 
-      <SystemAdminNav current="/admin/system" />
+      <SystemAdminNav current="/admin/system" pendingSignups={pendingSignups} />
 
       {/* Stats */}
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -40,7 +40,7 @@ export default async function SystemDashboardPage() {
           <p className="mt-1 font-display text-3xl text-offwhite">{buildingCount}</p>
         </div>
         <div className="card-dark border-l-[3px] border-l-amber">
-          <p className="uppercase-label text-[var(--color-text-secondary)]">{t("admin_total_posts")}</p>
+          <p className="uppercase-label text-[var(--color-text-secondary)]">{t("building_total_posts")}</p>
           <p className="mt-1 font-display text-3xl text-offwhite">{totalPosts}</p>
         </div>
         <div className="card-dark border-l-[3px] border-l-sage">
