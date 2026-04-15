@@ -156,13 +156,18 @@ function generateSkyscrapers(count: number, seed: number): { skyscrapers: Skyscr
     let s: Skyscraper;
     if (i === empireIdx) {
       const width = 2.6 + rng() * 0.3;
-      s = { x: x + width / 2, width, height: 28, variant: "empire_state", material: "stone" };
+      // Shorter than before (was 28) so the spire tip stays inside the
+      // canvas even at max background scale (~2.2x).
+      s = { x: x + width / 2, width, height: 14, variant: "empire_state", material: "stone" };
     } else if (i === freedomIdx) {
       const width = 2.2 + rng() * 0.3;
-      s = { x: x + width / 2, width, height: 32, variant: "freedom_tower", material: "glass_blue" };
+      // Shorter than before (was 32) — same reason as above.
+      s = { x: x + width / 2, width, height: 16, variant: "freedom_tower", material: "glass_blue" };
     } else {
       const width = 1.6 + rng() * 1.0;
-      const height = 11 + rng() * 10;
+      // Range tightened (was 11-21) so crowned towers' antennae don't
+      // overshoot the viewport on wide-screen desktop.
+      const height = 9 + rng() * 6;
       s = {
         x: x + width / 2,
         width,
@@ -511,7 +516,8 @@ function renderSkyscraperBody({
       const setback2W = width * 0.7;
       const towerH = height * 0.18;
       const towerW = width * 0.42;
-      const spireH = height * 0.32;
+      // Spire proportion reduced (was 0.32) so the tip lands inside the canvas
+      const spireH = height * 0.2;
       const spireW = width * 0.05;
 
       let y = 0;
@@ -583,7 +589,8 @@ function renderSkyscraperBody({
       const w3 = width * 0.68;
       const crownH = 0.9;
       const crownW = w3 * 0.85;
-      const spireH = height * 0.3;
+      // Spire proportion reduced (was 0.30) so the tip lands inside the canvas
+      const spireH = height * 0.22;
       const spireW = width * 0.04;
 
       let y = 0;
@@ -974,10 +981,11 @@ function StaticSkyline() {
 
   // Mobile and desktop scales are INDEPENDENT — each has its own viewport
   // curve + clamp, so tuning one can't bleed into the other via a shared
-  // base. Current targets: ~2.3 on typical phone, ~0.87 on typical desktop.
+  // base. Mobile coefficient is double the previous (0.22 → 0.44) and the
+  // clamp tracks (3.0 → 6.0) so buildings dominate the phone frame.
   const isMobile = viewport.width < 15;
   const scale = isMobile
-    ? Math.min(3.0, viewport.width * 0.22)        // phones / small tablets
+    ? Math.min(6.0, viewport.width * 0.44)        // phones / small tablets
     : Math.min(1.8, (viewport.width / 33) * 0.7); // desktop / wide screens
 
   // Toggle one random window every 10-20 seconds
