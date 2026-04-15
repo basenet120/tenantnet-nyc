@@ -1039,8 +1039,10 @@ export function LandingSkyline() {
         gl={{ alpha: true, antialias: false, powerPreference: "low-power" }}
         style={{ background: "transparent", opacity: 0.45 }}
       >
-        {/* Atmospheric fog blends distant buildings into the charcoal background */}
-        <fog attach="fog" args={[FOG_COLOR, 8, 28]} />
+        {/* Fog range pushed well past the scene so back-row buildings render
+            at full material opacity. Kept the tag in case we want to
+            reintroduce distance haze later — just tighten the near/far. */}
+        <fog attach="fog" args={[FOG_COLOR, 60, 120]} />
 
         {/* Ambient fill */}
         <ambientLight intensity={0.5} />
