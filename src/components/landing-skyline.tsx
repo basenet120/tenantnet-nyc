@@ -53,6 +53,38 @@ function generateBuildings(count: number, seed: number): { buildings: Building[]
   return { buildings, totalWidth: x };
 }
 
+type Skyscraper = {
+  x: number;
+  width: number;
+  height: number;
+  windowCols: number;
+  windowRows: number;
+};
+
+function generateSkyscrapers(count: number, seed: number): { skyscrapers: Skyscraper[]; totalWidth: number } {
+  const skyscrapers: Skyscraper[] = [];
+  let x = 0;
+  const rng = mulberry32(seed);
+
+  for (let i = 0; i < count; i++) {
+    // Skyscrapers: narrower and much taller than tenements
+    const width = 1.6 + rng() * 1.0;
+    const height = 14 + rng() * 12;
+    const windowCols = Math.max(2, Math.floor(width * 1.6));
+    const windowRows = Math.max(8, Math.floor(height * 1.2));
+    skyscrapers.push({
+      x: x + width / 2,
+      width,
+      height,
+      windowCols,
+      windowRows,
+    });
+    // Closer spacing so skyscrapers cluster
+    x += width + 0.5 + rng() * 0.8;
+  }
+  return { skyscrapers, totalWidth: x };
+}
+
 // Deterministic PRNG so the skyline shape is consistent across SSR/hydration
 function mulberry32(seed: number) {
   let a = seed;
@@ -140,6 +172,99 @@ function BuildingMesh({
           </mesh>
         );
       })}
+    </group>
+  );
+}
+
+/**
+ * Slim skyscraper silhouette for the background layer. Simpler than
+ * BuildingMesh — no cornice, no base slab, more uniform window grid,
+ * darker tone for atmospheric perspective.
+ */
+function SkyscraperMesh({ tower, index }: { tower: Skyscraper; index: number }) {
+  const { width, height, windowCols, windowRows } = tower;
+
+  const slots = useMemo(() => {
+    const rng = mulberry32(index * 7919 + 31);
+    const arr: { col: number; row: number; lit: boolean; color: string }[] = [];
+    for (let c = 0; c < windowCols; c++) {
+      for (let r = 0; r < windowRows; r++) {
+        const lit = rng() > 0.6; // slightly fewer lit than tenements
+        const pick = rng();
+        // Skyscraper windows skew cooler/dimmer
+        const color = pick < 0.78 ? AMBER : pick < 0.92 ? OFFWHITE : TERRACOTTA;
+        arr.push({ col: c, row: r, lit, color });
+      }
+    }
+    return arr;
+  }, [index, windowCols, windowRows]);
+
+  const windowW = (width * 0.78) / windowCols;
+  const windowH = (height * 0.85) / windowRows;
+  const gapX = (width - windowW * windowCols) / (windowCols + 1);
+  const gapY = (height - windowH * windowRows) / (windowRows + 1);
+
+  return (
+    <group position={[tower.x, height / 2, 0]}>
+      {/* Slim tower body — darker than foreground tenements */}
+      <mesh>
+        <boxGeometry args={[width, height, 0.6]} />
+        <meshStandardMaterial color={CHARCOAL_DARKER} roughness={0.95} />
+      </mesh>
+
+      {/* Windows */}
+      {slots.map((w, i) => {
+        if (!w.lit) return null;
+        const xPos = -width / 2 + gapX + w.col * (windowW + gapX) + windowW / 2;
+        const yPos = -height / 2 + gapY + w.row * (windowH + gapY) + windowH / 2;
+        return (
+          <mesh key={i} position={[xPos, yPos, 0.31]}>
+            <planeGeometry args={[windowW * 0.7, windowH * 0.55]} />
+            <meshBasicMaterial
+              color={w.color}
+              transparent
+              opacity={0.55}
+              toneMapped={false}
+            />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
+
+/**
+ * Background layer of skyscrapers — taller, slimmer, dimmer, sits behind
+ * the main brutalist tenements to add depth/atmosphere.
+ */
+function BackgroundSkyscrapers() {
+  const { viewport } = useThree();
+
+  const skyscrapers = useMemo(() => {
+    const count = Math.max(8, Math.ceil(viewport.width / 14) + 3);
+    return generateSkyscrapers(count, 9241).skyscrapers;
+  }, [viewport.width]);
+
+  const totalWidth = useMemo(
+    () =>
+      skyscrapers.length > 0
+        ? skyscrapers[skyscrapers.length - 1].x + skyscrapers[skyscrapers.length - 1].width / 2
+        : 0,
+    [skyscrapers],
+  );
+
+  // Slightly smaller scale than foreground (suggests distance) and pushed
+  // back in z so atmospheric fog dims them
+  const scale = Math.min(2.0, viewport.width / 42);
+
+  return (
+    <group
+      position={[-(totalWidth * scale) / 2, -viewport.height / 2 + 0.5, -3]}
+      scale={[scale, scale, scale]}
+    >
+      {skyscrapers.map((s, i) => (
+        <SkyscraperMesh key={i} tower={s} index={i} />
+      ))}
     </group>
   );
 }
@@ -477,7 +602,11 @@ export function LandingSkyline() {
         <directionalLight position={[-10, 20, 15]} intensity={0.6} color={OFFWHITE} />
         {/* Warm terracotta rim light simulating street glow */}
         <directionalLight position={[15, 5, 10]} intensity={0.25} color={TERRACOTTA} />
-        {/* Buildings at the bottom of the scene — static, occasional window toggles */}
+        {/* Background skyscrapers — taller, dimmer, set back via z=-3 so
+            three.js fog softens them; renders first so they sit behind the
+            main tenements. */}
+        <BackgroundSkyscrapers />
+        {/* Foreground brutalist tenements — static, occasional window toggles */}
         <StaticSkyline />
         {/* Upper sky layer (behind aircraft): drifting clouds */}
         <Clouds />
