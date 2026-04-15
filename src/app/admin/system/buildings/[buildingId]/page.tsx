@@ -152,19 +152,24 @@ export default async function BuildingDetailPage({
         ) : (
           <ul className="divide-y divide-[var(--color-border)]">
             {recentPosts.map((post) => (
-              <li key={post.id} className="flex items-baseline justify-between py-3">
-                <div className="min-w-0">
-                  <Link href={`/post/${post.id}`} className="text-sm font-semibold text-offwhite hover:text-terracotta truncate block">
-                    {post.title}
-                  </Link>
-                  <p className="text-xs text-[var(--color-text-secondary)]">
-                    {post.unit?.label ?? post.admin?.name ?? post.admin?.email ?? "Unknown"} in{" "}
-                    <span className="text-terracotta-light">{post.section.name}</span>
-                  </p>
-                </div>
-                <time className="ml-4 shrink-0 text-xs text-[var(--color-text-secondary)]">
-                  {post.createdAt.toLocaleDateString()}
-                </time>
+              <li key={post.id}>
+                <Link
+                  href={`/post/${post.id}`}
+                  className="flex items-baseline justify-between py-3 no-underline hover:bg-[var(--color-charcoal-light)] -mx-2 px-2 transition-colors"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-offwhite truncate">
+                      {post.title}
+                    </p>
+                    <p className="text-xs text-[var(--color-text-secondary)]">
+                      {post.unit?.label ?? post.admin?.name ?? post.admin?.email ?? "Unknown"} in{" "}
+                      <span className="text-terracotta-light">{post.section.name}</span>
+                    </p>
+                  </div>
+                  <time className="ms-4 shrink-0 text-xs text-[var(--color-text-secondary)]">
+                    {post.createdAt.toLocaleDateString()}
+                  </time>
+                </Link>
               </li>
             ))}
           </ul>
