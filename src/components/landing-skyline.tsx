@@ -482,7 +482,7 @@ function renderSkyscraperBody({
     case "crowned": {
       const bodyH = height * 0.85;
       const crownH = 0.8;
-      const antennaH = height * 0.18;
+      const antennaH = height * 0.09;
       return (
         <>
           <SkyscraperSection
@@ -516,8 +516,8 @@ function renderSkyscraperBody({
       const setback2W = width * 0.7;
       const towerH = height * 0.18;
       const towerW = width * 0.42;
-      // Spire proportion reduced (was 0.32) so the tip lands inside the canvas
-      const spireH = height * 0.2;
+      // Spire proportion halved again (0.2 -> 0.1) per request
+      const spireH = height * 0.1;
       const spireW = width * 0.05;
 
       let y = 0;
@@ -589,8 +589,8 @@ function renderSkyscraperBody({
       const w3 = width * 0.68;
       const crownH = 0.9;
       const crownW = w3 * 0.85;
-      // Spire proportion reduced (was 0.30) so the tip lands inside the canvas
-      const spireH = height * 0.22;
+      // Spire proportion halved (0.22 -> 0.11) per request
+      const spireH = height * 0.11;
       const spireW = width * 0.04;
 
       let y = 0;
