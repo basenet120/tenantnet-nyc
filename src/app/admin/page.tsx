@@ -1,6 +1,7 @@
 import { getSession, sessionBuildingId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import AdminNav from "@/components/admin-nav";
 import { getAdminStrings } from "@/lib/get-admin-strings";
 
@@ -77,19 +78,24 @@ export default async function AdminDashboardPage() {
         ) : (
           <ul className="divide-y divide-[var(--color-border)]">
             {recentPosts.map((post: RecentPost) => (
-              <li key={post.id} className="flex items-baseline justify-between py-3">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-offwhite">
-                    {post.title}
-                  </p>
-                  <p className="text-xs text-[var(--color-text-secondary)]">
-                    {post.unit?.label ?? post.admin?.name ?? post.admin?.email ?? "Unknown"} in{" "}
-                    <span className="text-terracotta-light">{post.section.name}</span>
-                  </p>
-                </div>
-                <time className="ms-4 shrink-0 text-xs text-[var(--color-text-secondary)]">
-                  {post.createdAt.toLocaleDateString()}
-                </time>
+              <li key={post.id}>
+                <Link
+                  href={`/post/${post.id}`}
+                  className="flex items-baseline justify-between py-3 no-underline hover:bg-[var(--color-charcoal-light)] -mx-2 px-2 transition-colors"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-offwhite">
+                      {post.title}
+                    </p>
+                    <p className="text-xs text-[var(--color-text-secondary)]">
+                      {post.unit?.label ?? post.admin?.name ?? post.admin?.email ?? "Unknown"} in{" "}
+                      <span className="text-terracotta-light">{post.section.name}</span>
+                    </p>
+                  </div>
+                  <time className="ms-4 shrink-0 text-xs text-[var(--color-text-secondary)]">
+                    {post.createdAt.toLocaleDateString()}
+                  </time>
+                </Link>
               </li>
             ))}
           </ul>
