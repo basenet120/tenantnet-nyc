@@ -671,12 +671,10 @@ function BackgroundSkyscrapers() {
   const { viewport } = useThree();
 
   const { skyscrapers, totalWidth, scale } = useMemo(() => {
-    // Scale grows with viewport but is clamped — keeps towers readable
-    // on phones while letting them get a bit larger on wide screens.
-    const baseScale = Math.min(2.2, Math.max(1.4, viewport.width / 28));
-    // Mobile (viewport.width < 15 ≈ < 525 CSS px) shrinks the back row 50%
-    const isMobile = viewport.width < 15;
-    const targetScale = isMobile ? baseScale * 0.5 : baseScale;
+    // Fixed scale across all viewports — narrow viewports crop horizontally
+    // (fewer visible towers) rather than shrinking the buildings themselves.
+    // 1.6 = 2.0 * 0.8 (20% smaller than the previous fixed value).
+    const targetScale = 1.6;
     // Each tower averages ~2.4 raw units (width + spacing). Aim to overshoot
     // the viewport by ~25% so the row clearly fills the screen.
     const targetVisible = viewport.width * 1.25;
@@ -689,14 +687,18 @@ function BackgroundSkyscrapers() {
     };
   }, [viewport.width]);
 
-  // Nudged ~120px lower than the foreground on mobile, ~420px on desktop
-  // (zoom 35 -> 120/35 ≈ 3.43 units; 420/35 = 12 units)
-  const isMobile = viewport.width < 15;
-  const yOffset = -viewport.height / 2 + 0.5 - (isMobile ? 120 : 420) / 35;
+  // Back row sits ~420px below the foreground anchor so the tall skyscrapers
+  // recede behind the tenement strip. Single value on all viewports now that
+  // the row no longer scales per-device.
+  const yOffset = -viewport.height / 2 + 0.5 - 420 / 35;
+  // Y-axis gets an extra ~0.686 world units beyond the uniform scale
+  // (= 300px at zoom 35, divided by the ~12.5-unit average tower height).
+  // This lifts tower tops by ~300px without widening the row.
+  const BACK_TALLER_Y = 300 / 35 / 12.5;
   return (
     <group
       position={[-(totalWidth * scale) / 2, yOffset, -3]}
-      scale={[scale, scale, scale]}
+      scale={[scale, scale + BACK_TALLER_Y, scale]}
     >
       {skyscrapers.map((s, i) => (
         <SkyscraperMesh key={i} tower={s} index={i} />
@@ -979,14 +981,11 @@ function StaticSkyline() {
     [buildings],
   );
 
-  // Mobile and desktop scales are INDEPENDENT — each has its own viewport
-  // curve + clamp, so tuning one can't bleed into the other via a shared
-  // base. Mobile coefficient is double the previous (0.22 → 0.44) and the
-  // clamp tracks (3.0 → 6.0) so buildings dominate the phone frame.
-  const isMobile = viewport.width < 15;
-  const scale = isMobile
-    ? Math.min(6.0, viewport.width * 0.44)        // phones / small tablets
-    : Math.min(1.8, (viewport.width / 33) * 0.7); // desktop / wide screens
+  // Single fixed scale across all viewports — buildings stay the same physical
+  // size regardless of screen width. Narrow viewports simply crop the row
+  // horizontally (show fewer tenements) instead of shrinking the whole row.
+  // 0.9 = 1.5 * 0.6 (40% smaller than the previous fixed value).
+  const scale = 0.9;
 
   // Toggle one random window every 10-20 seconds
   useFrame(() => {
@@ -1006,8 +1005,10 @@ function StaticSkyline() {
     }
   });
 
-  // Nudged 15px lower on mobile, 25px on desktop (zoom 35 -> n/35 world units)
-  const tenementY = -viewport.height / 2 + 0.5 - (isMobile ? 15 : 25) / 35;
+  // Nudged 25px below the canvas-bottom anchor so the base of the tenement
+  // row clears the bottom edge cleanly. Same value on all viewports — no
+  // mobile/desktop branching since the row itself no longer scales per-device.
+  const tenementY = -viewport.height / 2 + 0.5 - 25 / 35;
   return (
     <group
       position={[-(totalWidth * scale) / 2, tenementY, 0]}
