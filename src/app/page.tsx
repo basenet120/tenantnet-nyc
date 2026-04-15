@@ -63,17 +63,10 @@ export default async function Home() {
           style={{ transform: "rotate(-35deg)" }}
         />
 
-        {/* 3D brutalist skyline, anchored to the bottom of the hero.
-            Fade starts lower so the skyline concentrates at the bottom
-            and keeps hero text area clean. */}
-        <div
-          className="absolute bottom-0 inset-x-0 pointer-events-none"
-          style={{
-            height: "45%",
-            maskImage: "linear-gradient(to top, black 30%, transparent 95%)",
-            WebkitMaskImage: "linear-gradient(to top, black 30%, transparent 95%)",
-          }}
-        >
+        {/* 3D brutalist skyline — covers the full hero so clouds and
+            aircraft can render in the upper sky above the text, while
+            buildings hug the bottom. */}
+        <div className="absolute inset-0 pointer-events-none">
           <LandingSkyline />
         </div>
 

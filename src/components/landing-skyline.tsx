@@ -158,26 +158,26 @@ function Plane() {
     x: 0,
     y: 0,
     speed: 0,
-    nextSpawnAt: 6 + Math.random() * 8, // first plane shows up within 6-14s
+    nextSpawnAt: 0, // first plane spawns immediately at t=0
   });
 
   useFrame((_, delta) => {
     const s = stateRef.current;
-    const margin = Math.max(viewport.width, 20) / 2 + 4;
+    const margin = Math.max(viewport.width, 20) / 2 + 10;
 
     if (!s.active) {
       if (elapsed.current >= s.nextSpawnAt) {
         s.active = true;
         s.x = margin; // start off-screen right
-        s.y = 4.5 + Math.random() * 1.5; // upper sky band
+        s.y = 8 + Math.random() * 2; // high upper sky band, above text
         s.speed = 2.4 + Math.random() * 0.8;
       }
     } else {
       s.x -= delta * s.speed;
       if (s.x < -margin) {
         s.active = false;
-        // Next plane in 25-55s
-        s.nextSpawnAt = elapsed.current + 25 + Math.random() * 30;
+        // 1.5x more frequent: previous 25-55s -> now ~17-37s
+        s.nextSpawnAt = elapsed.current + 17 + Math.random() * 20;
       }
     }
 
@@ -187,29 +187,25 @@ function Plane() {
     }
   });
 
+  // 2.5x scale on the plane group
   return (
-    <group ref={groupRef} visible={false}>
-      {/* Fuselage */}
+    <group ref={groupRef} visible={false} scale={[2.5, 2.5, 2.5]}>
       <mesh>
         <boxGeometry args={[1.4, 0.16, 0.16]} />
         <meshBasicMaterial color={OFFWHITE} toneMapped={false} />
       </mesh>
-      {/* Nose tip (slightly offset forward — plane flies leftward, so -x direction) */}
       <mesh position={[-0.75, 0, 0]}>
         <boxGeometry args={[0.12, 0.12, 0.12]} />
         <meshBasicMaterial color={OFFWHITE} toneMapped={false} />
       </mesh>
-      {/* Wing (thin horizontal slab across fuselage) */}
       <mesh position={[0.05, -0.05, 0]}>
         <boxGeometry args={[0.5, 0.04, 0.8]} />
         <meshBasicMaterial color={OFFWHITE} toneMapped={false} />
       </mesh>
-      {/* Tail fin */}
       <mesh position={[0.6, 0.18, 0]}>
         <boxGeometry args={[0.2, 0.28, 0.06]} />
         <meshBasicMaterial color={TERRACOTTA} toneMapped={false} />
       </mesh>
-      {/* Contrail — thin trailing line behind the plane (to the right since it flies left) */}
       <mesh position={[1.4, 0, 0]}>
         <planeGeometry args={[1.8, 0.06]} />
         <meshBasicMaterial color={OFFWHITE} transparent opacity={0.18} toneMapped={false} />
@@ -232,29 +228,29 @@ function Helicopter() {
     x: 0,
     y: 0,
     speed: 0,
-    nextSpawnAt: 18 + Math.random() * 15, // first helicopter later than first plane
+    nextSpawnAt: 12 + Math.random() * 10, // first heli 12-22s in
   });
 
   useFrame((_, delta) => {
     const s = stateRef.current;
-    const margin = Math.max(viewport.width, 20) / 2 + 4;
+    const margin = Math.max(viewport.width, 20) / 2 + 10;
 
     if (!s.active) {
       if (elapsed.current >= s.nextSpawnAt) {
         s.active = true;
-        s.x = -margin; // start off-screen left
-        s.y = 3.2 + Math.random() * 1.2; // slightly lower than planes
-        s.speed = 1.4 + Math.random() * 0.6; // slower than planes
+        s.x = -margin;
+        s.y = 6.5 + Math.random() * 1.5; // high upper sky, slightly below planes
+        s.speed = 1.4 + Math.random() * 0.6;
       }
     } else {
       s.x += delta * s.speed;
       if (s.x > margin) {
         s.active = false;
-        s.nextSpawnAt = elapsed.current + 35 + Math.random() * 40;
+        // 1.5x more frequent: 35-75s -> 23-50s
+        s.nextSpawnAt = elapsed.current + 23 + Math.random() * 27;
       }
     }
 
-    // Spin the rotor constantly while visible
     if (rotorRef.current) {
       rotorRef.current.rotation.y += delta * 30;
     }
@@ -265,9 +261,9 @@ function Helicopter() {
     }
   });
 
+  // 2.5x scale on the helicopter group
   return (
-    <group ref={groupRef} visible={false}>
-      {/* Body */}
+    <group ref={groupRef} visible={false} scale={[2.5, 2.5, 2.5]}>
       <mesh>
         <boxGeometry args={[0.55, 0.3, 0.3]} />
         <meshBasicMaterial color={CHARCOAL_LIGHT} toneMapped={false} />
@@ -298,6 +294,99 @@ function Helicopter() {
         <meshBasicMaterial color={OFFWHITE} toneMapped={false} opacity={0.75} transparent />
       </mesh>
     </group>
+  );
+}
+
+/**
+ * Clouds — brutalist low-poly clumps of offwhite boxes drifting slowly
+ * across the upper sky. Multiple cloud groups at different speeds for
+ * a subtle parallax feel.
+ */
+type Cloud = {
+  x: number;
+  y: number;
+  scale: number;
+  speed: number;
+  opacity: number;
+  shape: { dx: number; dy: number; w: number; h: number }[];
+};
+
+function generateClouds(count: number, seed: number): Cloud[] {
+  const rng = mulberry32(seed);
+  const clouds: Cloud[] = [];
+  for (let i = 0; i < count; i++) {
+    // Each cloud is 3-5 overlapping slabs to suggest a chunky silhouette
+    const slabs = 3 + Math.floor(rng() * 3);
+    const shape: Cloud["shape"] = [];
+    let cursor = 0;
+    for (let s = 0; s < slabs; s++) {
+      const w = 0.9 + rng() * 0.9;
+      const h = 0.3 + rng() * 0.25;
+      shape.push({
+        dx: cursor + w / 2,
+        dy: (rng() - 0.5) * 0.3,
+        w,
+        h,
+      });
+      cursor += w * (0.5 + rng() * 0.3);
+    }
+    clouds.push({
+      x: -20 + i * 14 + rng() * 4,
+      y: 9 + rng() * 4, // high in the sky
+      scale: 1 + rng() * 1.4,
+      speed: 0.25 + rng() * 0.35, // slow drift
+      opacity: 0.32 + rng() * 0.18,
+      shape,
+    });
+  }
+  return clouds;
+}
+
+function Clouds() {
+  const { viewport } = useThree();
+  const clouds = useMemo(() => generateClouds(8, 7777), []);
+  const positionsRef = useRef(clouds.map((c) => c.x));
+
+  // Refs to each cloud's group so we can mutate position without re-rendering
+  const groupRefs = useRef<(THREE.Group | null)[]>([]);
+
+  useFrame((_, delta) => {
+    const margin = Math.max(viewport.width, 20) / 2 + 8;
+    for (let i = 0; i < clouds.length; i++) {
+      positionsRef.current[i] -= delta * clouds[i].speed;
+      if (positionsRef.current[i] < -margin) {
+        positionsRef.current[i] += margin * 2; // wrap back to the right
+      }
+      const g = groupRefs.current[i];
+      if (g) g.position.x = positionsRef.current[i];
+    }
+  });
+
+  return (
+    <>
+      {clouds.map((c, i) => (
+        <group
+          key={i}
+          ref={(el) => {
+            groupRefs.current[i] = el;
+          }}
+          position={[c.x, c.y, 0.5]}
+          scale={[c.scale, c.scale, c.scale]}
+        >
+          {c.shape.map((slab, j) => (
+            <mesh key={j} position={[slab.dx, slab.dy, 0]}>
+              <planeGeometry args={[slab.w, slab.h]} />
+              <meshBasicMaterial
+                color={OFFWHITE}
+                transparent
+                opacity={c.opacity}
+                toneMapped={false}
+              />
+            </mesh>
+          ))}
+        </group>
+      ))}
+    </>
   );
 }
 
@@ -380,7 +469,10 @@ export function LandingSkyline() {
         <directionalLight position={[-10, 20, 15]} intensity={0.6} color={OFFWHITE} />
         {/* Warm terracotta rim light simulating street glow */}
         <directionalLight position={[15, 5, 10]} intensity={0.25} color={TERRACOTTA} />
+        {/* Buildings at the bottom of the scene */}
         <ScrollingSkyline />
+        {/* Upper sky layer (behind aircraft): drifting clouds */}
+        <Clouds />
         {/* Occasional air traffic: plane flies left, helicopter flies right */}
         <Plane />
         <Helicopter />
