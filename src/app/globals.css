@@ -158,7 +158,9 @@ body::before {
   background-size: 256px 256px;
 }
 
-body > * {
+/* Stack content above the noise overlay, but don't clobber fixed/absolute
+   positioning (e.g., the app footer nav, toasts). */
+body > div {
   position: relative;
   z-index: 1;
 }
