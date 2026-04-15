@@ -36,10 +36,25 @@ export default async function Home() {
       {/* ═══════════════════════════════════════════
           HERO
           ═══════════════════════════════════════════ */}
-      <section className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden">
+      <section className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden isolate">
+        {/* Terracotta diagonal accents — pinned to the deepest layer so every
+            other graphic (grid, skyline, vignette, text) paints over them. */}
+        <div
+          className="absolute -right-32 top-1/4 w-[500px] h-[3px] bg-terracotta opacity-40 z-0"
+          style={{ transform: "rotate(-35deg)" }}
+        />
+        <div
+          className="absolute -right-24 top-[28%] w-[300px] h-[1px] bg-terracotta opacity-20 z-0"
+          style={{ transform: "rotate(-35deg)" }}
+        />
+        <div
+          className="absolute -left-32 bottom-1/3 w-[400px] h-[2px] bg-terracotta opacity-25 z-0"
+          style={{ transform: "rotate(-35deg)" }}
+        />
+
         {/* Grid background */}
         <div
-          className="absolute inset-0 opacity-[0.03]"
+          className="absolute inset-0 opacity-[0.03] z-10"
           style={{
             backgroundImage: `
               linear-gradient(var(--color-border-light) 1px, transparent 1px),
@@ -49,24 +64,10 @@ export default async function Home() {
           }}
         />
 
-        {/* Terracotta diagonal accent */}
-        <div
-          className="absolute -right-32 top-1/4 w-[500px] h-[3px] bg-terracotta opacity-40"
-          style={{ transform: "rotate(-35deg)" }}
-        />
-        <div
-          className="absolute -right-24 top-[28%] w-[300px] h-[1px] bg-terracotta opacity-20"
-          style={{ transform: "rotate(-35deg)" }}
-        />
-        <div
-          className="absolute -left-32 bottom-1/3 w-[400px] h-[2px] bg-terracotta opacity-25"
-          style={{ transform: "rotate(-35deg)" }}
-        />
-
         {/* 3D brutalist skyline — covers the full hero so clouds and
             aircraft can render in the upper sky above the text, while
             buildings hug the bottom. */}
-        <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 pointer-events-none z-20">
           <LandingSkyline />
         </div>
 
@@ -75,14 +76,14 @@ export default async function Home() {
             the vignette tightest around the text and fades toward the
             edges so the skyline silhouette still reads at the frame. */}
         <div
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 pointer-events-none z-30"
           style={{
             background:
               "radial-gradient(ellipse 70% 55% at 30% 45%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 45%, rgba(0,0,0,0) 85%)",
           }}
         />
 
-        <div className="container-wide relative">
+        <div className="container-wide relative z-40">
           <div className="max-w-5xl py-12 sm:py-32">
             {/* Overline — mobile base is 70% of desktop (0.6875 * 0.7 ≈ 0.481rem) */}
             <p className="font-display text-[0.481rem] sm:text-[0.6875rem] tracking-[0.25em] uppercase text-[var(--color-text-secondary)] mb-1.5 sm:mb-3 animate-in">
