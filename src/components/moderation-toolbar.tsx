@@ -4,6 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useI18n } from "./i18n-provider";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type ModerationToolbarProps = {
   postId: string;
@@ -107,22 +114,28 @@ export function ModerationToolbar({
 
         {/* Status dropdown */}
         {hasIssueTracking && (
-          <select
-            value={status ?? ""}
-            onChange={(e) => handleStatusChange(e.target.value)}
+          <Select
+            value={status ?? undefined}
+            onValueChange={(v) => v && handleStatusChange(v)}
             disabled={loading}
-            className="text-xs uppercase tracking-[0.08em] py-1.5 px-3 bg-[var(--color-charcoal)] border-2 border-[var(--color-border)] text-offwhite"
-            style={{ fontFamily: "var(--font-display)", width: "auto" }}
           >
-            <option value="" disabled>
-              {t("mod_set_status")}
-            </option>
-            {STATUS_OPTIONS.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger
+              className="text-xs uppercase tracking-[0.08em] bg-[var(--color-charcoal)] border-2 border-[var(--color-border)] text-offwhite rounded-none font-display w-auto"
+            >
+              <SelectValue placeholder={t("mod_set_status")} />
+            </SelectTrigger>
+            <SelectContent className="bg-[var(--color-charcoal)] border-2 border-[var(--color-border)] rounded-none">
+              {STATUS_OPTIONS.map((opt) => (
+                <SelectItem
+                  key={opt}
+                  value={opt}
+                  className="text-xs uppercase tracking-[0.08em] text-offwhite font-display"
+                >
+                  {opt}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         )}
 
         {/* Delete */}

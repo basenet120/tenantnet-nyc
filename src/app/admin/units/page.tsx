@@ -7,6 +7,16 @@ import AdminNav from "@/components/admin-nav";
 import { useAdminContext } from "@/lib/use-admin-context";
 import { useAdminI18n } from "@/components/admin-i18n-provider";
 import type { AdminStrings } from "@/lib/get-admin-strings";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type UnitData = {
   id: string;
@@ -17,29 +27,36 @@ type UnitData = {
   _count: { posts: number; comments: number };
 };
 
-function ConfirmModal({
+function RotateQrDialog({
   unit,
+  open,
+  onOpenChange,
   onConfirm,
-  onCancel,
   t,
 }: {
-  unit: UnitData;
+  unit: UnitData | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
-  onCancel: () => void;
   t: (key: keyof AdminStrings) => string;
 }) {
+  if (!unit) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: "rgba(0,0,0,0.7)" }}>
-      <div className="w-full max-w-sm border-2 border-[var(--color-danger)] bg-[var(--color-charcoal)] p-6">
-        <h3 className="font-display text-xl uppercase text-[var(--color-danger)]">
-          {t("units_rotate_title")}
-        </h3>
-        <div className="mt-1 h-[2px] w-10 bg-[var(--color-danger)]" />
-        <p className="mt-4 text-sm text-[var(--color-offwhite)]">
-          You are about to reset the QR code for <strong className="text-[var(--color-offwhite)]">Unit {unit.label}</strong>.
-        </p>
-        <div className="mt-4 border-2 border-[var(--color-border)] bg-[var(--color-charcoal-light)] p-3">
-          <p className="text-xs uppercase tracking-wider text-[var(--color-amber)] font-bold mb-2">{t("units_rotate_warning")}</p>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent className="border-2 border-[var(--color-danger)] bg-[var(--color-charcoal)] rounded-none">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="font-display text-xl uppercase text-[var(--color-danger)]">
+            {t("units_rotate_title")}
+          </AlertDialogTitle>
+          <div className="h-[2px] w-10 bg-[var(--color-danger)] mt-1" />
+          <AlertDialogDescription className="mt-4 text-sm text-[var(--color-offwhite)]">
+            You are about to reset the QR code for <strong className="text-[var(--color-offwhite)]">Unit {unit.label}</strong>.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <div className="border-2 border-[var(--color-border)] bg-[var(--color-charcoal-light)] p-3">
+          <p className="text-xs uppercase tracking-wider text-[var(--color-amber)] font-bold mb-2">
+            {t("units_rotate_warning")}
+          </p>
           <ul className="space-y-1 text-sm text-[var(--color-muted)]">
             <li>{t("units_rotate_w1")}</li>
             <li>{t("units_rotate_w2")}</li>
@@ -47,16 +64,16 @@ function ConfirmModal({
             <li>{t("units_rotate_w4")}</li>
           </ul>
         </div>
-        <div className="mt-6 flex gap-3">
-          <button onClick={onCancel} className="btn btn-outline flex-1">
+        <AlertDialogFooter>
+          <AlertDialogCancel className="btn btn-outline flex-1 rounded-none">
             {t("units_cancel")}
-          </button>
-          <button onClick={onConfirm} className="btn btn-danger flex-1">
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm} className="btn btn-danger flex-1 rounded-none">
             {t("units_rotate_qr")}
-          </button>
-        </div>
-      </div>
-    </div>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 
@@ -263,14 +280,13 @@ export default function AdminUnitsPage() {
         </div>
       )}
 
-      {confirmUnit && (
-        <ConfirmModal
-          unit={confirmUnit}
-          onConfirm={() => rotateQr(confirmUnit)}
-          onCancel={() => setConfirmUnit(null)}
-          t={t}
-        />
-      )}
+      <RotateQrDialog
+        unit={confirmUnit}
+        open={confirmUnit !== null}
+        onOpenChange={(o) => { if (!o) setConfirmUnit(null); }}
+        onConfirm={() => confirmUnit && rotateQr(confirmUnit)}
+        t={t}
+      />
     </div>
   );
 }

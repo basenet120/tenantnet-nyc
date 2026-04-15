@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useI18n } from "./i18n-provider";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const STORAGE_KEY = "tn_rs_notice_dismissed";
 
@@ -39,30 +40,16 @@ export function RentStabilizedNotice({ buildingType }: { buildingType: string })
   const reg = stabData?.registration;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" style={{ backgroundColor: "rgba(0,0,0,0.6)" }}>
-      <div
-        className="w-full max-w-lg border-2 border-[var(--color-terracotta)] bg-[var(--color-charcoal)] p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
-        style={{ animation: "fadeSlideUp 0.3s ease" }}
-      >
-        {/* Header */}
-        <div className="flex items-start justify-between gap-4 mb-4">
-          <div>
-            <p className="font-display text-xs uppercase tracking-[0.15em] text-terracotta mb-1">
-              {t("rs_did_you_know")}
-            </p>
-            <h2 className="font-display text-xl sm:text-2xl uppercase tracking-tight text-offwhite leading-tight">
-              {t("rs_title")}
-            </h2>
-          </div>
-          <button
-            onClick={dismiss}
-            className="shrink-0 text-[var(--color-text-secondary)] hover:text-offwhite transition-colors p-1"
-            aria-label={t("rs_dismiss")}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </button>
+    <Dialog open={visible} onOpenChange={(o) => { if (!o) dismiss(); }}>
+      <DialogContent className="w-full max-w-lg border-2 border-[var(--color-terracotta)] bg-[var(--color-charcoal)] p-6 sm:p-8 rounded-none max-h-[90vh] overflow-y-auto">
+        <div className="mb-4">
+          <p className="font-display text-xs uppercase tracking-[0.15em] text-terracotta mb-1">
+            {t("rs_did_you_know")}
+          </p>
+          <DialogTitle className="font-display text-xl sm:text-2xl uppercase tracking-tight text-offwhite leading-tight">
+            {t("rs_title")}
+          </DialogTitle>
+          <DialogDescription className="sr-only">{t("rs_intro")}</DialogDescription>
         </div>
 
         <div className="h-[2px] w-12 bg-[var(--color-terracotta)] mb-5" />
@@ -170,20 +157,7 @@ export function RentStabilizedNotice({ buildingType }: { buildingType: string })
             {t("rs_learn_more")}
           </a>
         </div>
-      </div>
-
-      <style jsx>{`
-        @keyframes fadeSlideUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

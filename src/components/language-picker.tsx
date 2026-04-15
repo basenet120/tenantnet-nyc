@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const LANGUAGES = [
   { code: "en", native: "English" },
@@ -14,12 +20,9 @@ const LANGUAGES = [
 const RTL_LANGS = ["yi", "ar"];
 
 export function LanguagePicker({ currentLang }: { currentLang?: string }) {
-  const [open, setOpen] = useState(false);
   const [lang, setLang] = useState(currentLang ?? "en");
   const [switching, setSwitching] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
 
-  // Auto-detect from cookie if no prop was provided
   useEffect(() => {
     if (!currentLang) {
       const match = document.cookie.match(/tn_lang=([a-z]{2})/);
@@ -27,28 +30,8 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
     }
   }, [currentLang]);
 
-  // Close on outside click
-  useEffect(() => {
-    if (!open) return;
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    const t = setTimeout(() => {
-      document.addEventListener("mousedown", handleClick);
-    }, 0);
-    return () => {
-      clearTimeout(t);
-      document.removeEventListener("mousedown", handleClick);
-    };
-  }, [open]);
-
   async function switchLang(code: string) {
-    if (code === lang) {
-      setOpen(false);
-      return;
-    }
+    if (code === lang) return;
     setSwitching(true);
     try {
       await fetch("/api/set-language", {
@@ -61,21 +44,17 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
       document.documentElement.setAttribute("lang", code);
       window.location.reload();
     } catch {
-      // Silently fail
-    } finally {
       setSwitching(false);
-      setOpen(false);
     }
   }
 
   const current = LANGUAGES.find((l) => l.code === lang) ?? LANGUAGES[0];
 
   return (
-    <div ref={ref} className="relative" style={{ zIndex: 9999 }}>
-      <button
-        onClick={() => setOpen((v) => !v)}
+    <DropdownMenu>
+      <DropdownMenuTrigger
         disabled={switching}
-        className="flex items-center gap-1.5 px-2 py-1.5 text-[var(--color-text-secondary)] hover:text-offwhite transition-colors"
+        className="flex items-center gap-1.5 px-2 py-1.5 text-[var(--color-text-secondary)] hover:text-offwhite transition-colors outline-none"
         aria-label="Change language"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -86,29 +65,21 @@ export function LanguagePicker({ currentLang }: { currentLang?: string }) {
         <span className="text-xs font-display uppercase tracking-wider">
           {switching ? "..." : current.code.toUpperCase()}
         </span>
-      </button>
-
-      {open && (
-        <div
-          className="absolute top-full end-0 mt-1 border-2 border-[var(--color-border)] bg-[var(--color-charcoal)] shadow-lg min-w-[160px]"
-          style={{ zIndex: 9999 }}
-        >
-          {LANGUAGES.map((l) => (
-            <button
-              key={l.code}
-              onClick={() => switchLang(l.code)}
-              className={`w-full text-start px-4 py-2.5 text-sm transition-colors flex items-center justify-between ${
-                l.code === lang
-                  ? "text-terracotta bg-[var(--color-charcoal-light)]"
-                  : "text-offwhite hover:bg-[var(--color-charcoal-light)]"
-              }`}
-            >
-              <span>{l.native}</span>
-              <span className="text-[0.625rem] text-[var(--color-text-secondary)] uppercase">{l.code}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-[160px]">
+        {LANGUAGES.map((l) => (
+          <DropdownMenuItem
+            key={l.code}
+            onClick={() => switchLang(l.code)}
+            className={`flex items-center justify-between gap-4 ${
+              l.code === lang ? "text-terracotta" : "text-offwhite"
+            }`}
+          >
+            <span>{l.native}</span>
+            <span className="text-[0.625rem] text-[var(--color-text-secondary)] uppercase">{l.code}</span>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
