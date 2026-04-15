@@ -65,21 +65,30 @@ function mulberry32(seed: number) {
   };
 }
 
-function BuildingMesh({ building, index, time }: { building: Building; index: number; time: number }) {
+type WindowSlot = { col: number; row: number; initiallyLit: boolean; color: string };
+
+function BuildingMesh({
+  building,
+  index,
+  toggledKeys,
+}: {
+  building: Building;
+  index: number;
+  toggledKeys: Set<string>;
+}) {
   const { width, height, depth, windowCols, windowRows, hasCornice } = building;
 
-  // Stable window lit-states per building
-  const windows = useMemo(() => {
+  // Pre-compute EVERY window slot (lit or not) with stable color so toggles
+  // can flip any slot on or off at runtime.
+  const slots = useMemo<WindowSlot[]>(() => {
     const rng = mulberry32(index * 9973 + 13);
-    const arr: { col: number; row: number; litAt: number; color: string; flickerSeed: number }[] = [];
+    const arr: WindowSlot[] = [];
     for (let c = 0; c < windowCols; c++) {
       for (let r = 0; r < windowRows; r++) {
-        const lit = rng() > 0.55;
-        if (!lit) continue;
-        const litAt = rng() * 2.5;
+        const initiallyLit = rng() > 0.55;
         const pick = rng();
         const color = pick < 0.7 ? AMBER : pick < 0.85 ? TERRACOTTA : OFFWHITE;
-        arr.push({ col: c, row: r, litAt, color, flickerSeed: rng() * 100 });
+        arr.push({ col: c, row: r, initiallyLit, color });
       }
     }
     return arr;
@@ -112,19 +121,20 @@ function BuildingMesh({ building, index, time }: { building: Building; index: nu
         <meshStandardMaterial color={CHARCOAL_DARKER} roughness={1} />
       </mesh>
 
-      {/* Windows grid */}
-      {windows.map((w, i) => {
+      {/* Windows grid — rendered only if currently lit (XOR with toggle map) */}
+      {slots.map((w, i) => {
+        const key = `${index}-${w.col}-${w.row}`;
+        const isLit = toggledKeys.has(key) ? !w.initiallyLit : w.initiallyLit;
+        if (!isLit) return null;
         const xPos = -width / 2 + gapX + w.col * (windowW + gapX) + windowW / 2;
         const yPos = -height / 2 + gapY + w.row * (windowH + gapY) + windowH / 2 + 0.4;
-        const turnedOn = time > w.litAt;
-        const flicker = turnedOn ? 0.85 + Math.sin(time * 1.5 + w.flickerSeed) * 0.1 : 0;
         return (
           <mesh key={i} position={[xPos, yPos, depth / 2 + 0.01]}>
             <planeGeometry args={[windowW * 0.82, windowH * 0.7]} />
             <meshBasicMaterial
               color={w.color}
               transparent
-              opacity={flicker}
+              opacity={0.92}
               toneMapped={false}
             />
           </mesh>
@@ -390,55 +400,54 @@ function Clouds() {
   );
 }
 
-function ScrollingSkyline() {
+function StaticSkyline() {
   const { viewport } = useThree();
-  const [time, setTime] = useState(0);
-  const groupRef = useRef<THREE.Group>(null);
-  const scrollRef = useRef(0);
+  const elapsed = useElapsed();
+  const nextToggleAt = useRef(10 + Math.random() * 10);
+  const [toggledKeys, setToggledKeys] = useState<Set<string>>(new Set());
 
-  // One strip of unique buildings, rendered twice back-to-back for seamless loop
-  const { buildings, totalWidth } = useMemo(() => generateBuildings(32, 2468), []);
+  // Generate enough buildings to span the wide viewport. Each building is
+  // ~3 world units wide on average, so we generate count proportional to width.
+  const buildings = useMemo(() => {
+    const count = Math.max(40, Math.ceil(viewport.width / 2.5) + 8);
+    return generateBuildings(count, 2468).buildings;
+  }, [viewport.width]);
 
-  useFrame((_, delta) => {
-    setTime((t) => t + delta);
-    // Slow continuous scroll (units per second). Negative = leftward drift.
-    scrollRef.current -= delta * 0.8;
-    // Loop when we've scrolled one full strip width
-    if (scrollRef.current <= -totalWidth) scrollRef.current += totalWidth;
-    if (groupRef.current) {
-      groupRef.current.position.x = scrollRef.current;
+  // Center the strip horizontally
+  const totalWidth = useMemo(
+    () => (buildings.length > 0 ? buildings[buildings.length - 1].x + buildings[buildings.length - 1].width / 2 : 0),
+    [buildings],
+  );
+
+  // Modest scale, anchor buildings to the bottom of the canvas
+  const scale = Math.min(0.85, viewport.width / 100);
+
+  // Toggle one random window every 10-20 seconds
+  useFrame(() => {
+    if (elapsed.current >= nextToggleAt.current && buildings.length > 0) {
+      const bIdx = Math.floor(Math.random() * buildings.length);
+      const b = buildings[bIdx];
+      const col = Math.floor(Math.random() * b.windowCols);
+      const row = Math.floor(Math.random() * b.windowRows);
+      const key = `${bIdx}-${col}-${row}`;
+      setToggledKeys((prev) => {
+        const next = new Set(prev);
+        if (next.has(key)) next.delete(key);
+        else next.add(key);
+        return next;
+      });
+      nextToggleAt.current = elapsed.current + 10 + Math.random() * 10;
     }
   });
 
-  // Scale the buildings to fill vertical space in the viewport
-  const scale = Math.min(1.2, viewport.height / 14);
-
-  // Sit buildings lower and center the strips around origin so the skyline
-  // fills the screen from the first frame (no blank right half on load).
   return (
-    <group ref={groupRef} position={[0, -5.5, 0]} scale={[scale, scale, scale]}>
-      {/* Strip A — positioned to the left of origin */}
-      <group position={[-totalWidth, 0, 0]}>
-        {buildings.map((b, i) => (
-          <BuildingMesh key={`a-${i}`} building={b} index={i} time={time} />
-        ))}
-      </group>
-      {/* Strip B — centered at origin */}
+    <group
+      position={[-(totalWidth * scale) / 2, -viewport.height / 2 + 0.5, 0]}
+      scale={[scale, scale, scale]}
+    >
       {buildings.map((b, i) => (
-        <BuildingMesh key={`b-${i}`} building={b} index={i} time={time} />
+        <BuildingMesh key={i} building={b} index={i} toggledKeys={toggledKeys} />
       ))}
-      {/* Strip C — to the right of origin */}
-      <group position={[totalWidth, 0, 0]}>
-        {buildings.map((b, i) => (
-          <BuildingMesh key={`c-${i}`} building={b} index={i} time={time} />
-        ))}
-      </group>
-      {/* Strip D — extra buffer for very wide screens */}
-      <group position={[totalWidth * 2, 0, 0]}>
-        {buildings.map((b, i) => (
-          <BuildingMesh key={`d-${i}`} building={b} index={i} time={time} />
-        ))}
-      </group>
     </group>
   );
 }
@@ -469,8 +478,8 @@ export function LandingSkyline() {
         <directionalLight position={[-10, 20, 15]} intensity={0.6} color={OFFWHITE} />
         {/* Warm terracotta rim light simulating street glow */}
         <directionalLight position={[15, 5, 10]} intensity={0.25} color={TERRACOTTA} />
-        {/* Buildings at the bottom of the scene */}
-        <ScrollingSkyline />
+        {/* Buildings at the bottom of the scene — static, occasional window toggles */}
+        <StaticSkyline />
         {/* Upper sky layer (behind aircraft): drifting clouds */}
         <Clouds />
         {/* Occasional air traffic: plane flies left, helicopter flies right */}
