@@ -26,7 +26,13 @@ export function AppFooter() {
   const navItems = isAdmin ? getAdminNav(isSystem, tt) : getTenantNav(tt);
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-40 border-t-2 border-[var(--color-border)] bg-[var(--color-charcoal)]">
+    <nav
+      className="fixed bottom-0 inset-x-0 z-40 border-t border-[var(--color-border)] backdrop-blur-md"
+      style={{
+        background: "linear-gradient(180deg, rgba(26,26,26,0.85) 0%, rgba(26,26,26,0.95) 100%)",
+        boxShadow: "0 -2px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)",
+      }}
+    >
       <div className="flex items-center justify-around max-w-lg mx-auto">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
@@ -34,12 +40,18 @@ export function AppFooter() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-0.5 py-2.5 px-4 no-underline transition-colors ${
+              className={`relative flex flex-col items-center gap-0.5 py-2.5 px-4 no-underline transition-all ${
                 isActive
                   ? "text-terracotta"
                   : "text-[var(--color-text-secondary)] hover:text-offwhite"
               }`}
             >
+              {isActive && (
+                <span
+                  className="absolute top-0 inset-x-4 h-[2px] bg-terracotta rounded-full"
+                  aria-hidden="true"
+                />
+              )}
               {item.icon}
               <span className="text-[0.5625rem] font-display uppercase tracking-wider">
                 {item.label}

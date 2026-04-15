@@ -23,7 +23,14 @@ export function Breadcrumb() {
   const segments = buildBreadcrumb(pathname, t);
 
   return (
-    <div className="relative border-b border-[var(--color-border)] bg-[var(--color-charcoal-light)]" style={{ zIndex: 50 }}>
+    <div
+      className="relative border-b border-[var(--color-border)]"
+      style={{
+        zIndex: 50,
+        background: "linear-gradient(180deg, var(--color-charcoal-light) 0%, var(--color-charcoal) 100%)",
+        boxShadow: "0 1px 0 rgba(255,255,255,0.03), 0 2px 8px rgba(0,0,0,0.25)",
+      }}
+    >
       <div className="max-w-5xl mx-auto px-4 py-1.5 flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-[0.6875rem] font-display uppercase tracking-wider">
           {segments.map((seg, i) => (

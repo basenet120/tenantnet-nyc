@@ -41,7 +41,7 @@ export function RentStabilizedNotice({ buildingType }: { buildingType: string })
 
   return (
     <Dialog open={visible} onOpenChange={(o) => { if (!o) dismiss(); }}>
-      <DialogContent className="w-full max-w-lg border-2 border-[var(--color-terracotta)] bg-[var(--color-charcoal)] p-6 sm:p-8 rounded-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-full max-w-lg border-2 border-[var(--color-terracotta)] bg-[var(--color-charcoal)] p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
         <div className="mb-4">
           <p className="font-display text-xs uppercase tracking-[0.15em] text-terracotta mb-1">
             {t("rs_did_you_know")}

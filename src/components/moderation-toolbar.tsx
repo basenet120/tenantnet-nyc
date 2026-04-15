@@ -120,7 +120,7 @@ export function ModerationToolbar({
             disabled={loading}
           >
             <SelectTrigger
-              className="text-xs uppercase tracking-[0.08em] bg-[var(--color-charcoal)] border-2 border-[var(--color-border)] text-offwhite rounded-none font-display w-auto"
+              className="text-xs uppercase tracking-[0.08em] bg-[var(--color-charcoal)] border-2 border-[var(--color-border)] text-offwhite font-display w-auto"
             >
               <SelectValue placeholder={t("mod_set_status")} />
             </SelectTrigger>

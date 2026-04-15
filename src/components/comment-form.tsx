@@ -55,13 +55,13 @@ export function CommentForm({ postId }: { postId: string }) {
         onChange={(e) => setContent(e.target.value)}
         placeholder={t("comment_placeholder")}
         rows={3}
-        className="w-full rounded-none border-2 border-border bg-charcoal-light text-offwhite placeholder-[var(--color-text-secondary)] px-3 py-3 text-sm focus:border-terracotta focus:outline-none transition-colors"
+        className="w-full border-2 border-border bg-charcoal-light text-offwhite placeholder-[var(--color-text-secondary)] px-3 py-3 text-sm focus:border-terracotta focus:outline-none transition-colors"
       />
       <ImageUpload maxImages={3} onImagesChange={setImageUrls} />
       <button
         type="submit"
         disabled={!content.trim() || submitting}
-        className="btn btn-primary rounded-none font-display text-[0.8125rem] tracking-[0.08em] uppercase disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+        className="btn btn-primary font-display text-[0.8125rem] tracking-[0.08em] uppercase disabled:opacity-40 disabled:cursor-not-allowed transition-all"
       >
         {submitting ? t("comment_posting") : t("comment_post")}
       </button>

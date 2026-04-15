@@ -48,7 +48,7 @@ export function PostCard({
   return (
     <Link href={`/post/${id}`} className="block group no-underline">
       <div
-        className={`card relative border-2 rounded-none p-5 transition-all duration-150 hover:border-l-terracotta hover:border-l-4 ${
+        className={`card relative p-5 transition-all duration-150 hover:border-l-terracotta hover:border-l-4 ${
           isPinned ? "border-l-4 border-l-amber" : ""
         }`}
       >

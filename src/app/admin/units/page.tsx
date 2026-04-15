@@ -43,7 +43,7 @@ function RotateQrDialog({
   if (!unit) return null;
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="border-2 border-[var(--color-danger)] bg-[var(--color-charcoal)] rounded-none">
+      <AlertDialogContent className="border-2 border-[var(--color-danger)] bg-[var(--color-charcoal)] rounded-lg">
         <AlertDialogHeader>
           <AlertDialogTitle className="font-display text-xl uppercase text-[var(--color-danger)]">
             {t("units_rotate_title")}
@@ -65,10 +65,10 @@ function RotateQrDialog({
           </ul>
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel className="btn btn-outline flex-1 rounded-none">
+          <AlertDialogCancel className="btn btn-outline flex-1 rounded-lg">
             {t("units_cancel")}
           </AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} className="btn btn-danger flex-1 rounded-none">
+          <AlertDialogAction onClick={onConfirm} className="btn btn-danger flex-1 rounded-lg">
             {t("units_rotate_qr")}
           </AlertDialogAction>
         </AlertDialogFooter>

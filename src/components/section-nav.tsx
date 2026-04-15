@@ -17,7 +17,7 @@ export function SectionNav({ sections }: SectionNavProps) {
         <Link
           key={section.slug}
           href={`/section/${section.slug}`}
-          className="flex flex-col items-center gap-2 border-2 border-border rounded-none px-4 py-4 text-center no-underline transition-all duration-150 hover:bg-terracotta hover:border-terracotta hover:text-offwhite group"
+          className="flex flex-col items-center gap-2 border-2 border-border rounded-lg px-4 py-4 text-center no-underline transition-all duration-150 hover:bg-terracotta hover:border-terracotta hover:text-offwhite hover:-translate-y-0.5 hover:shadow-lg group"
         >
           <span className="text-2xl" aria-hidden="true">
             {SECTION_ICONS[section.slug] || "\uD83D\uDCCC"}
