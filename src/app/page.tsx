@@ -71,19 +71,11 @@ export default async function Home() {
           <LandingSkyline />
         </div>
 
-        {/* Soft darkness behind the hero copy so title/subtitle stay
-            readable against the animated skyline. Radial gradient keeps
-            the vignette tightest around the text and fades toward the
-            edges so the skyline silhouette still reads at the frame. */}
-        <div
-          className="absolute inset-0 pointer-events-none z-30"
-          style={{
-            background:
-              "radial-gradient(ellipse 40% 28% at 28% calc(45% + 10px), rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.4) 35%, rgba(0,0,0,0) 65%)",
-          }}
-        />
-
-        <div className="container-wide relative z-40">
+        {/* Text-shape darkness — a layered text-shadow on each hero element
+            creates a dark halo that hugs the actual letter silhouettes,
+            instead of a circular overlay. No inset div; the shadow is
+            applied via `hero-text-shadow` on the content container. */}
+        <div className="container-wide relative z-40 hero-text-shadow">
           <div className="max-w-5xl py-12 sm:py-32">
             {/* Overline — mobile base is 70% of desktop (0.6875 * 0.7 ≈ 0.481rem) */}
             <p className="font-display text-[0.481rem] sm:text-[0.6875rem] tracking-[0.25em] uppercase text-[var(--color-text-secondary)] mb-1.5 sm:mb-3 animate-in">
@@ -377,11 +369,25 @@ export default async function Home() {
         </div>
       </footer>
 
-      {/* Scroll pulse animation */}
+      {/* Scroll pulse animation + hero text shadow (darkness hugs letter shapes) */}
       <style>{`
         @keyframes scrollPulse {
           0%, 100% { top: 0; }
           50% { top: 100%; }
+        }
+        .hero-text-shadow,
+        .hero-text-shadow * {
+          text-shadow:
+            0 0 8px rgba(0, 0, 0, 0.9),
+            0 0 18px rgba(0, 0, 0, 0.75),
+            0 0 36px rgba(0, 0, 0, 0.55);
+        }
+        /* Buttons render their own chrome — strip the shadow off them so
+           the text inside CTAs doesn't pick up a glow that clashes with
+           the button border/background. */
+        .hero-text-shadow .btn,
+        .hero-text-shadow .btn * {
+          text-shadow: none;
         }
       `}</style>
     </div>
