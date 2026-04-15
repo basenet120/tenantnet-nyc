@@ -667,9 +667,9 @@ function BackgroundSkyscrapers() {
     // Scale grows with viewport but is clamped — keeps towers readable
     // on phones while letting them get a bit larger on wide screens.
     const baseScale = Math.min(2.2, Math.max(1.4, viewport.width / 28));
-    // Mobile (viewport.width < 15 ≈ < 525 CSS px) shrinks the back row 40%
+    // Mobile (viewport.width < 15 ≈ < 525 CSS px) shrinks the back row 50%
     const isMobile = viewport.width < 15;
-    const targetScale = isMobile ? baseScale * 0.6 : baseScale;
+    const targetScale = isMobile ? baseScale * 0.5 : baseScale;
     // Each tower averages ~2.4 raw units (width + spacing). Aim to overshoot
     // the viewport by ~25% so the row clearly fills the screen.
     const targetVisible = viewport.width * 1.25;
@@ -682,10 +682,10 @@ function BackgroundSkyscrapers() {
     };
   }, [viewport.width]);
 
-  // Nudged ~120px lower than the foreground on mobile, ~270px on desktop
-  // (zoom 35 -> 120/35 ≈ 3.43 units; 270/35 ≈ 7.71 units)
+  // Nudged ~120px lower than the foreground on mobile, ~420px on desktop
+  // (zoom 35 -> 120/35 ≈ 3.43 units; 420/35 = 12 units)
   const isMobile = viewport.width < 15;
-  const yOffset = -viewport.height / 2 + 0.5 - (isMobile ? 120 : 270) / 35;
+  const yOffset = -viewport.height / 2 + 0.5 - (isMobile ? 120 : 420) / 35;
   return (
     <group
       position={[-(totalWidth * scale) / 2, yOffset, -3]}
@@ -973,10 +973,10 @@ function StaticSkyline() {
   );
 
   // 3x bigger than before (was max 0.85, viewport.width / 100).
-  // Mobile (viewport.width < 15) gets a 70% boost so tenements read bigger.
+  // Mobile (viewport.width < 15) doubles the previous 1.7x boost -> 3.4x.
   const baseScale = Math.min(2.55, viewport.width / 33);
   const isMobile = viewport.width < 15;
-  const scale = isMobile ? baseScale * 1.7 : baseScale;
+  const scale = isMobile ? baseScale * 3.4 : baseScale;
 
   // Toggle one random window every 10-20 seconds
   useFrame(() => {
