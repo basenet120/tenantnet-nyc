@@ -406,10 +406,9 @@ function StaticSkyline() {
   const nextToggleAt = useRef(10 + Math.random() * 10);
   const [toggledKeys, setToggledKeys] = useState<Set<string>>(new Set());
 
-  // Generate enough buildings to span the wide viewport. Each building is
-  // ~3 world units wide on average, so we generate count proportional to width.
+  // Buildings are 3x bigger now, so fewer needed to fill the same screen width
   const buildings = useMemo(() => {
-    const count = Math.max(40, Math.ceil(viewport.width / 2.5) + 8);
+    const count = Math.max(14, Math.ceil(viewport.width / 7.5) + 4);
     return generateBuildings(count, 2468).buildings;
   }, [viewport.width]);
 
@@ -419,8 +418,8 @@ function StaticSkyline() {
     [buildings],
   );
 
-  // Modest scale, anchor buildings to the bottom of the canvas
-  const scale = Math.min(0.85, viewport.width / 100);
+  // 3x bigger than before (was max 0.85, viewport.width / 100)
+  const scale = Math.min(2.55, viewport.width / 33);
 
   // Toggle one random window every 10-20 seconds
   useFrame(() => {
