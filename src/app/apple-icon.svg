@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" shape-rendering="crispEdges">
+  <!-- Building body - charcoal -->
+  <rect width="180" height="180" fill="#1a1a1a"/>
+
+  <!-- Terracotta cornice -->
+  <rect width="180" height="18" fill="#c45d3e"/>
+
+  <!-- 2x3 grid of windows -->
+  <rect x="28"  y="45"  width="52" height="28" fill="#f5f0eb"/>
+  <rect x="100" y="45"  width="52" height="28" fill="#f5f0eb"/>
+  <rect x="28"  y="90"  width="52" height="28" fill="#f5f0eb"/>
+  <rect x="100" y="90"  width="52" height="28" fill="#d4a843"/>
+  <rect x="28"  y="135" width="52" height="28" fill="#d4a843"/>
+  <rect x="100" y="135" width="52" height="28" fill="#f5f0eb"/>
+</svg>

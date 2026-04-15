@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <!-- Building body - charcoal -->
+  <rect width="32" height="32" fill="#1a1a1a"/>
+
+  <!-- Terracotta cornice (brand signature bar) -->
+  <rect width="32" height="3" fill="#c45d3e"/>
+
+  <!-- 2x3 grid of windows: cream = tenant home, amber = lit/organizing -->
+  <rect x="5"  y="8"  width="9" height="5" fill="#f5f0eb"/>
+  <rect x="18" y="8"  width="9" height="5" fill="#f5f0eb"/>
+  <rect x="5"  y="16" width="9" height="5" fill="#f5f0eb"/>
+  <rect x="18" y="16" width="9" height="5" fill="#d4a843"/>
+  <rect x="5"  y="24" width="9" height="5" fill="#d4a843"/>
+  <rect x="18" y="24" width="9" height="5" fill="#f5f0eb"/>
+</svg>
