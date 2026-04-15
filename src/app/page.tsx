@@ -83,49 +83,49 @@ export default async function Home() {
         />
 
         <div className="container-wide relative">
-          <div className="max-w-5xl py-24 sm:py-32">
-            {/* Overline */}
-            <p className="font-display text-[0.6875rem] tracking-[0.25em] uppercase text-[var(--color-text-secondary)] mb-6 animate-in">
+          <div className="max-w-5xl py-12 sm:py-32">
+            {/* Overline — mobile base is 70% of desktop (0.6875 * 0.7 ≈ 0.481rem) */}
+            <p className="font-display text-[0.481rem] sm:text-[0.6875rem] tracking-[0.25em] uppercase text-[var(--color-text-secondary)] mb-1.5 sm:mb-3 animate-in">
               {t("hero_overline")}
             </p>
 
-            {/* Main title */}
-            <h1 className="font-display text-[clamp(3.5rem,10vw,9rem)] uppercase leading-[0.85] tracking-tight text-offwhite mb-0 animate-in stagger-1">
+            {/* Main title — mobile clamp max is 70% of desktop (9rem -> 6.3rem, 10vw -> 7vw, 3.5rem -> 2.45rem) */}
+            <h1 className="font-display text-[clamp(2.45rem,7vw,6.3rem)] sm:text-[clamp(3.5rem,10vw,9rem)] uppercase leading-[0.85] tracking-tight text-offwhite mb-0 animate-in stagger-1">
               TENANT
               <br />
               NET<span className="text-terracotta">.NYC</span>
             </h1>
 
-            {/* Subtitle bar */}
-            <div className="mt-8 border-l-[3px] border-terracotta pl-5 max-w-xl animate-in stagger-2">
-              <p className="text-lg sm:text-xl text-offwhite leading-snug font-medium">
+            {/* Subtitle bar — mobile 70% of the previous text-lg (1.125rem -> 0.7875rem) */}
+            <div className="mt-2 sm:mt-4 border-l-[3px] border-terracotta pl-5 max-w-xl animate-in stagger-2">
+              <p className="text-[0.7875rem] sm:text-xl text-offwhite leading-snug font-medium">
                 {t("hero_subtitle")}
               </p>
             </div>
 
             {/* CTA row */}
-            <div className="mt-10 flex flex-wrap gap-4 animate-in stagger-3">
-              <Link href="/login" className="btn btn-primary no-underline">
+            <div className="mt-3 sm:mt-5 flex flex-wrap gap-3 sm:gap-4 animate-in stagger-3">
+              <Link href="/login" className="btn btn-primary no-underline text-[0.7em] sm:text-base">
                 {t("hero_btn_login")}
               </Link>
-              <a href="#how-it-works" className="btn btn-outline no-underline">
+              <a href="#how-it-works" className="btn btn-outline no-underline text-[0.7em] sm:text-base">
                 {t("hero_btn_learn")}
               </a>
             </div>
 
-            {/* Quick stat strip */}
-            <div className="mt-16 flex flex-wrap gap-10 animate-in stagger-4">
+            {/* Quick stat strip — mobile stat numbers 70% of text-3xl (1.875rem -> 1.3125rem) */}
+            <div className="mt-4 sm:mt-8 flex flex-wrap gap-6 sm:gap-10 animate-in stagger-4">
               <div>
-                <p className="font-display text-3xl sm:text-4xl text-terracotta">100%</p>
-                <p className="text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--color-text-secondary)] mt-1">{t("hero_stat_free")}</p>
+                <p className="font-display text-[1.3125rem] sm:text-4xl text-terracotta">100%</p>
+                <p className="text-[0.481rem] sm:text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--color-text-secondary)] mt-1">{t("hero_stat_free")}</p>
               </div>
               <div>
-                <p className="font-display text-3xl sm:text-4xl text-offwhite">QR</p>
-                <p className="text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--color-text-secondary)] mt-1">{t("hero_stat_qr")}</p>
+                <p className="font-display text-[1.3125rem] sm:text-4xl text-offwhite">QR</p>
+                <p className="text-[0.481rem] sm:text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--color-text-secondary)] mt-1">{t("hero_stat_qr")}</p>
               </div>
               <div>
-                <p className="font-display text-3xl sm:text-4xl text-offwhite">NYC</p>
-                <p className="text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--color-text-secondary)] mt-1">{t("hero_stat_nyc")}</p>
+                <p className="font-display text-[1.3125rem] sm:text-4xl text-offwhite">NYC</p>
+                <p className="text-[0.481rem] sm:text-[0.6875rem] uppercase tracking-[0.1em] text-[var(--color-text-secondary)] mt-1">{t("hero_stat_nyc")}</p>
               </div>
             </div>
           </div>
