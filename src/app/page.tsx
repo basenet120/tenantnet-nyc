@@ -98,7 +98,7 @@ export default async function Home() {
 
             {/* Subtitle bar — mobile 70% of the previous text-lg (1.125rem -> 0.7875rem) */}
             <div className="mt-2 sm:mt-4 border-l-[3px] border-terracotta pl-5 max-w-xl animate-in stagger-2">
-              <p className="text-[0.7875rem] sm:text-xl text-offwhite leading-snug font-medium">
+              <p className="text-[1.18rem] sm:text-xl text-offwhite leading-snug font-medium">
                 {t("hero_subtitle")}
               </p>
             </div>
