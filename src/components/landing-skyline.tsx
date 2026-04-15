@@ -134,6 +134,173 @@ function BuildingMesh({ building, index, time }: { building: Building; index: nu
   );
 }
 
+/**
+ * Shared timer hook: returns elapsed seconds since mount.
+ */
+function useElapsed() {
+  const ref = useRef(0);
+  useFrame((_, delta) => {
+    ref.current += delta;
+  });
+  return ref;
+}
+
+/**
+ * Plane — long fuselage, small tail fin, flies leftward across the sky
+ * occasionally (once every 25-55s on average).
+ */
+function Plane() {
+  const groupRef = useRef<THREE.Group>(null);
+  const { viewport } = useThree();
+  const elapsed = useElapsed();
+  const stateRef = useRef({
+    active: false,
+    x: 0,
+    y: 0,
+    speed: 0,
+    nextSpawnAt: 6 + Math.random() * 8, // first plane shows up within 6-14s
+  });
+
+  useFrame((_, delta) => {
+    const s = stateRef.current;
+    const margin = Math.max(viewport.width, 20) / 2 + 4;
+
+    if (!s.active) {
+      if (elapsed.current >= s.nextSpawnAt) {
+        s.active = true;
+        s.x = margin; // start off-screen right
+        s.y = 4.5 + Math.random() * 1.5; // upper sky band
+        s.speed = 2.4 + Math.random() * 0.8;
+      }
+    } else {
+      s.x -= delta * s.speed;
+      if (s.x < -margin) {
+        s.active = false;
+        // Next plane in 25-55s
+        s.nextSpawnAt = elapsed.current + 25 + Math.random() * 30;
+      }
+    }
+
+    if (groupRef.current) {
+      groupRef.current.visible = s.active;
+      groupRef.current.position.set(s.x, s.y, 1);
+    }
+  });
+
+  return (
+    <group ref={groupRef} visible={false}>
+      {/* Fuselage */}
+      <mesh>
+        <boxGeometry args={[1.4, 0.16, 0.16]} />
+        <meshBasicMaterial color={OFFWHITE} toneMapped={false} />
+      </mesh>
+      {/* Nose tip (slightly offset forward — plane flies leftward, so -x direction) */}
+      <mesh position={[-0.75, 0, 0]}>
+        <boxGeometry args={[0.12, 0.12, 0.12]} />
+        <meshBasicMaterial color={OFFWHITE} toneMapped={false} />
+      </mesh>
+      {/* Wing (thin horizontal slab across fuselage) */}
+      <mesh position={[0.05, -0.05, 0]}>
+        <boxGeometry args={[0.5, 0.04, 0.8]} />
+        <meshBasicMaterial color={OFFWHITE} toneMapped={false} />
+      </mesh>
+      {/* Tail fin */}
+      <mesh position={[0.6, 0.18, 0]}>
+        <boxGeometry args={[0.2, 0.28, 0.06]} />
+        <meshBasicMaterial color={TERRACOTTA} toneMapped={false} />
+      </mesh>
+      {/* Contrail — thin trailing line behind the plane (to the right since it flies left) */}
+      <mesh position={[1.4, 0, 0]}>
+        <planeGeometry args={[1.8, 0.06]} />
+        <meshBasicMaterial color={OFFWHITE} transparent opacity={0.18} toneMapped={false} />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Helicopter — chunky body, tail boom, spinning top rotor, flies rightward
+ * (opposite of the plane) at a lower altitude.
+ */
+function Helicopter() {
+  const groupRef = useRef<THREE.Group>(null);
+  const rotorRef = useRef<THREE.Mesh>(null);
+  const { viewport } = useThree();
+  const elapsed = useElapsed();
+  const stateRef = useRef({
+    active: false,
+    x: 0,
+    y: 0,
+    speed: 0,
+    nextSpawnAt: 18 + Math.random() * 15, // first helicopter later than first plane
+  });
+
+  useFrame((_, delta) => {
+    const s = stateRef.current;
+    const margin = Math.max(viewport.width, 20) / 2 + 4;
+
+    if (!s.active) {
+      if (elapsed.current >= s.nextSpawnAt) {
+        s.active = true;
+        s.x = -margin; // start off-screen left
+        s.y = 3.2 + Math.random() * 1.2; // slightly lower than planes
+        s.speed = 1.4 + Math.random() * 0.6; // slower than planes
+      }
+    } else {
+      s.x += delta * s.speed;
+      if (s.x > margin) {
+        s.active = false;
+        s.nextSpawnAt = elapsed.current + 35 + Math.random() * 40;
+      }
+    }
+
+    // Spin the rotor constantly while visible
+    if (rotorRef.current) {
+      rotorRef.current.rotation.y += delta * 30;
+    }
+
+    if (groupRef.current) {
+      groupRef.current.visible = s.active;
+      groupRef.current.position.set(s.x, s.y, 1);
+    }
+  });
+
+  return (
+    <group ref={groupRef} visible={false}>
+      {/* Body */}
+      <mesh>
+        <boxGeometry args={[0.55, 0.3, 0.3]} />
+        <meshBasicMaterial color={CHARCOAL_LIGHT} toneMapped={false} />
+      </mesh>
+      {/* Cockpit accent */}
+      <mesh position={[-0.2, 0.02, 0.16]}>
+        <boxGeometry args={[0.18, 0.14, 0.02]} />
+        <meshBasicMaterial color={TERRACOTTA} toneMapped={false} />
+      </mesh>
+      {/* Tail boom (sticks out to the LEFT since heli flies right, tail trails behind) */}
+      <mesh position={[-0.5, 0.08, 0]}>
+        <boxGeometry args={[0.55, 0.06, 0.06]} />
+        <meshBasicMaterial color={CHARCOAL_LIGHT} toneMapped={false} />
+      </mesh>
+      {/* Tail rotor */}
+      <mesh position={[-0.8, 0.12, 0]}>
+        <boxGeometry args={[0.04, 0.22, 0.04]} />
+        <meshBasicMaterial color={TERRACOTTA} toneMapped={false} />
+      </mesh>
+      {/* Rotor mast */}
+      <mesh position={[0, 0.2, 0]}>
+        <boxGeometry args={[0.05, 0.08, 0.05]} />
+        <meshBasicMaterial color={CHARCOAL_DARKER} toneMapped={false} />
+      </mesh>
+      {/* Spinning main rotor — thin slab, rotates on Y axis */}
+      <mesh ref={rotorRef} position={[0, 0.27, 0]}>
+        <boxGeometry args={[1.4, 0.02, 0.06]} />
+        <meshBasicMaterial color={OFFWHITE} toneMapped={false} opacity={0.75} transparent />
+      </mesh>
+    </group>
+  );
+}
+
 function ScrollingSkyline() {
   const { viewport } = useThree();
   const [time, setTime] = useState(0);
@@ -214,6 +381,9 @@ export function LandingSkyline() {
         {/* Warm terracotta rim light simulating street glow */}
         <directionalLight position={[15, 5, 10]} intensity={0.25} color={TERRACOTTA} />
         <ScrollingSkyline />
+        {/* Occasional air traffic: plane flies left, helicopter flies right */}
+        <Plane />
+        <Helicopter />
       </Canvas>
     </div>
   );
