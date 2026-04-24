@@ -14,7 +14,7 @@ export default function OpengraphImage() {
           display: "flex",
           flexDirection: "column",
           background: "#1a1a1a",
-          padding: "80px",
+          padding: "64px 72px",
           position: "relative",
           fontFamily: "sans-serif",
           color: "#f5f0eb",
@@ -35,12 +35,12 @@ export default function OpengraphImage() {
         {/* Overline */}
         <div
           style={{
-            fontSize: 22,
-            letterSpacing: 6,
+            fontSize: 20,
+            letterSpacing: 5,
             textTransform: "uppercase",
             color: "#b0a99e",
-            marginTop: 40,
-            marginBottom: 32,
+            marginTop: 16,
+            marginBottom: 20,
           }}
         >
           For 449 W 125th St & every NYC tenant
@@ -49,10 +49,10 @@ export default function OpengraphImage() {
         {/* Title */}
         <div
           style={{
-            fontSize: 160,
+            fontSize: 120,
             fontWeight: 900,
-            lineHeight: 0.9,
-            letterSpacing: -4,
+            lineHeight: 0.95,
+            letterSpacing: -3,
             textTransform: "uppercase",
             display: "flex",
             flexDirection: "column",
@@ -67,12 +67,12 @@ export default function OpengraphImage() {
         {/* Subtitle with terracotta left border */}
         <div
           style={{
-            marginTop: 44,
-            paddingLeft: 22,
+            marginTop: 32,
+            paddingLeft: 20,
             borderLeft: "4px solid #c45d3e",
-            fontSize: 34,
-            lineHeight: 1.2,
-            maxWidth: 820,
+            fontSize: 28,
+            lineHeight: 1.25,
+            maxWidth: 880,
             display: "flex",
           }}
         >
@@ -84,28 +84,28 @@ export default function OpengraphImage() {
         <div
           style={{
             display: "flex",
-            gap: 56,
+            gap: 48,
             marginTop: "auto",
-            fontSize: 18,
+            fontSize: 16,
             letterSpacing: 3,
             textTransform: "uppercase",
             color: "#b0a99e",
           }}
         >
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ fontSize: 56, fontWeight: 900, color: "#c45d3e", letterSpacing: 0 }}>
+            <span style={{ fontSize: 44, fontWeight: 900, color: "#c45d3e", letterSpacing: 0 }}>
               100%
             </span>
             <span>Free forever</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ fontSize: 56, fontWeight: 900, color: "#f5f0eb", letterSpacing: 0 }}>
+            <span style={{ fontSize: 44, fontWeight: 900, color: "#f5f0eb", letterSpacing: 0 }}>
               QR
             </span>
             <span>Door-scan access</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ fontSize: 56, fontWeight: 900, color: "#f5f0eb", letterSpacing: 0 }}>
+            <span style={{ fontSize: 44, fontWeight: 900, color: "#f5f0eb", letterSpacing: 0 }}>
               NYC
             </span>
             <span>Built for the five boroughs</span>
